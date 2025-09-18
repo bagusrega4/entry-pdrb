@@ -34,19 +34,14 @@
             <ul class="nav nav-secondary">
                 <li class="nav-item {{ request()->is('dashboard*') ? 'active' : '' }}">
                     @if(Auth::user()->id_role == 2)
-                    <a href="{{ route('dashboard.ketua') }}">
+                    <a href="{{ route('dashboard.admin') }}">
                         <i class="fas fa-home"></i>
-                        <p>Dashboard Ketua Tim</p>
-                    </a>
-                    @elseif(Auth::user()->id_role == 1)
-                    <a href="{{ route('dashboard.anggota') }}">
-                        <i class="fas fa-home"></i>
-                        <p>Dashboard Anggota Tim</p>
+                        <p>Dashboard</p>
                     </a>
                     @else
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('dashboard.operator') }}">
                         <i class="fas fa-home"></i>
-                        <p>Dashboard Pimpinan</p>
+                        <p>Dashboard</p>
                     </a>
                     @endif
                 </li>
@@ -57,64 +52,9 @@
                     <h4 class="text-section">Menu</h4>
                 </li>
                 <li class="nav-item {{ request()->routeIs('form.*') ? 'active' : '' }}">
-                    <a href="{{ route('form.index') }}">
+                    <a href="">
                         <i class="fas fa-file"></i>
                         <p>Form</p>
-                    </a>
-                </li>
-                @if(Auth::user()->id_role == 1)
-                <li class="nav-item {{ request()->routeIs('monitoring.*') ? 'active' : '' }}">
-                    <a href="{{ route('monitoring.operator.index') }}">
-                        <i class="fas fa-desktop"></i>
-                        <p>Monitoring</p>
-                    </a>
-                </li>
-                @else
-                <li class="nav-item {{ request()->routeIs('monitoring.*') ? 'active submenu' : '' }}">
-                    <a data-bs-toggle="collapse" href="#base">
-                        <i class="fas fa-desktop"></i>
-                        <p>Monitoring</p>
-                        <span class="caret"></span>
-                    </a>
-                    <div class="collapse {{ request()->routeIs('monitoring.*') ? 'show' : '' }}" id="base">
-                        <ul class="nav nav-collapse">
-                            <li class="{{ request()->routeIs('monitoring.operator.*') ? 'active' : '' }}">
-                                <a href="{{ route('monitoring.operator.index') }}">
-                                    <span class="sub-item">
-                                        @if(Auth::user()->id_role == 2)
-                                        Anggota Tim
-                                        @elseif(Auth::user()->id_role == 3)
-                                        Semua Tim
-                                        @else
-                                        Operator
-                                        @endif
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                @endif
-                @if(in_array(Auth::user()->id_role, [2, 3]))
-                <li class="nav-item {{ request()->routeIs('manage.kegiatan.*') ? 'active' : '' }}">
-                    <a href="{{ route('manage.kegiatan.index') }}">
-                        <i class="fas fa-tasks"></i>
-                        <p>Manage Kegiatan</p>
-                    </a>
-                </li>
-                @endif
-                @if(in_array(Auth::user()->id_role, [3]))
-                <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
-                    <a href="{{ route('manage.user.index') }}">
-                        <i class="fas fa-users-cog"></i>
-                        <p>Manage User</p>
-                    </a>
-                </li>
-                @endif
-                <li class="nav-item {{ request()->routeIs('panduan.index') ? 'active' : '' }}">
-                    <a href="{{ route('panduan.index') }}">
-                        <i class="fas fa-book"></i>
-                        <p>Panduan</p>
                     </a>
                 </li>
                 <style>

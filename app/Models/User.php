@@ -38,28 +38,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Relasi ke tabel Pegawai
-    public function nipLama()
-    {
-        return $this->belongsTo(Pegawai::class, 'nip_lama', 'nip_lama');
-    }
-
-    // Relasi ke tabel Role
     public function role()
     {
         return $this->belongsTo(Role::class, 'id_role', 'id');
     }
 
-    // Relasi ke Tim
     public function tim()
     {
         return $this->belongsTo(Tim::class, 'tim_id', 'id');
-    }
-
-    // Relasi ke Form
-    public function forms()
-    {
-        return $this->hasMany(Form::class, 'user_id', 'id');
     }
 
     public function pegawai()

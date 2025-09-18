@@ -4,11 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 
@@ -37,7 +35,7 @@ class AuthenticatedSessionController extends Controller
             case 1:
                 return redirect()->intended(route('dashboard.anggota'));
             case 2:
-                return redirect()->intended(route('dashboard.ketua'));
+                return redirect()->intended(route('dashboard.admin'));
             case 3:
                 return redirect()->intended(route('dashboard'));
             default:

@@ -25,13 +25,11 @@ class RedirectIfAuthenticated
                 // Arahkan sesuai role
                 switch ($user->id_role) {
                     case 1:
-                        return redirect()->route('dashboard.anggota');
+                        return redirect()->route('dashboard.operator');
                     case 2:
-                        return redirect()->route('dashboard.ketua');
-                    case 3:
-                        return redirect()->route('dashboard'); // pimpinan
+                        return redirect()->route('dashboard.admin');
                     default:
-                        return redirect()->route('home');
+                        return redirect()->route('login');
                 }
             }
         }
