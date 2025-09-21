@@ -66,6 +66,14 @@
                         <p>Input Produksi</p>
                     </a>
                 </li>
+                @if(in_array(Auth::user()->id_role, [2]))
+                <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
+                    <a href="{{ route('manage.user.index') }}">
+                        <i class="fas fa-users-cog"></i>
+                        <p>Manage User</p>
+                    </a>
+                </li>
+                @endif
             </ul>
         </div>
     </div>

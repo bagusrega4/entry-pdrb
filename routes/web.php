@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardOperatorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ManageUserController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -72,6 +73,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/indicators', [ProductionController::class, 'getIndicators'])->name('productions.indicators');
             Route::get('/units', [ProductionController::class, 'getUnits'])->name('productions.units');
             Route::post('/', [ProductionController::class, 'store'])->name('productions.store');
+        });
+
+        // Manage User
+        Route::name('manage.user.')->prefix('manage/user')->group(function () {
+            Route::get('/', [ManageUserController::class, 'index'])->name('index');
+            Route::get('/create', [ManageUserController::class, 'create'])->name('create');
+            Route::post('/store', [ManageUserController::class, 'store'])->name('store');
+            Route::put('/{id}/update-role', [ManageUserController::class, 'updateRoleUser'])->name('updateRole');
+            Route::put('/{id}/update-tim', [ManageUserController::class, 'updateTimUser'])->name('updateTim'); // 👉 tambahan
+            Route::get('/edit/{id}', [ManageUserController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [ManageUserController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ManageUserController::class, 'destroy'])->name('destroy');
         });
     });
 });

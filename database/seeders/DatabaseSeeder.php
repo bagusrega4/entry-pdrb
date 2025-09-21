@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(UnitHargaSeeder::class);
         $this->call(IndicatorProduksiSeeder::class);
         $this->call(UnitProduksiSeeder::class);
+        $this->call(TimSeeder::class);
     }
 }
