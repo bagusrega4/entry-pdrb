@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\DashboardOperatorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PriceController;
+use App\Http\Controllers\ProductionController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -53,5 +55,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::post('/edit-profile', [ProfileController::class, 'setPhotoProfile'])->name('edit.profile');
         Route::put('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
+
+        // Harga
+        Route::prefix('prices')->group(function () {
+            Route::get('/', [PriceController::class, 'index'])->name('prices.index');
+            Route::get('/commodities/{id}/children', [PriceController::class, 'getChildren']);
+            Route::get('/indicators', [PriceController::class, 'getIndicators'])->name('prices.indicators');
+            Route::get('/units', [PriceController::class, 'getUnits'])->name('prices.units');
+            Route::post('/', [PriceController::class, 'store'])->name('prices.store');
+        });
+
+        // Produksi
+        Route::prefix('productions')->group(function () {
+            Route::get('/', [ProductionController::class, 'index'])->name('productions.index');
+            Route::get('/commodities/{id}/children', [ProductionController::class, 'getChildren']);
+            Route::get('/indicators', [ProductionController::class, 'getIndicators'])->name('productions.indicators');
+            Route::get('/units', [ProductionController::class, 'getUnits'])->name('productions.units');
+            Route::post('/', [ProductionController::class, 'store'])->name('productions.store');
+        });
     });
 });

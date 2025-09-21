@@ -4,10 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\FormPengajuan;
-use App\Models\Komponen;
-use App\Models\KRO;
-use App\Models\SubKomponen;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,5 +16,10 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(PegawaiSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(CommoditySeeder::class);
+        $this->call(IndicatorHargaSeeder::class);
+        $this->call(UnitHargaSeeder::class);
+        $this->call(IndicatorProduksiSeeder::class);
+        $this->call(UnitProduksiSeeder::class);
     }
 }

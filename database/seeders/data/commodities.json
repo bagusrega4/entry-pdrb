@@ -1,0 +1,505 @@
+[
+  {
+    "kode": "1",
+    "nama": "PERTANIAN, KEHUTANAN, & PERIKANAN",
+    "children": [
+      {
+        "kode": "1.1",
+        "nama": "Pertanian, Peternakan, Perburuan, & Jasa Pertanian",
+        "children": [
+          {
+            "kode": "1.1.a",
+            "nama": "Tanaman Pangan",
+            "children": [
+              { "nama": "Padi" },
+              { "nama": "Jagung" },
+              { "nama": "Ubi Kayu" },
+              { "nama": "Ubi Jalar" },
+              { "nama": "Kacang Tanah" },
+              { "nama": "Kedelai" },
+              { "nama": "Kacang Hijau" },
+              { "nama": "Cantel/Sorghum" },
+              { "nama": "Talas" }
+            ]
+          },
+          {
+            "kode": "1.1.b",
+            "nama": "Tanaman Hortikultura Semusim",
+            "children": [
+              {
+                "nama": "Sayur-sayuran Semusim",
+                "children": [
+                  { "nama": "Kentang" },
+                  { "nama": "Bawang Merah" },
+                  { "nama": "Bawang Putih" },
+                  { "nama": "Bawang Daun" },
+                  { "nama": "Kubis" },
+                  { "nama": "Petsai/Sawi" },
+                  { "nama": "Wortel" },
+                  { "nama": "Kacang Panjang" },
+                  { "nama": "Tomat" },
+                  { "nama": "Terong" },
+                  { "nama": "Buncis" },
+                  { "nama": "Mentimun" },
+                  { "nama": "Kangkung" },
+                  { "nama": "Bayam" },
+                  { "nama": "Lobak" },
+                  { "nama": "Kacang Merah" },
+                  { "nama": "Labu Siam" },
+                  { "nama": "Kembang Kol" },
+                  { "nama": "Jamur" }
+                ]
+              },
+              {
+                "nama": "Buah-buahan Semusim",
+                "children": [
+                  { "nama": "Semangka" },
+                  { "nama": "Melon" },
+                  { "nama": "Blewah" },
+                  { "nama": "Timun Suri" }
+                ]
+              },
+              {
+                "nama": "Tanaman Bunga Potong",
+                "children": [
+                  { "nama": "Anggrek (Tangkai)" },
+                  { "nama": "Anthurium (Tangkai)" },
+                  { "nama": "Anyelir (Tangkai)" },
+                  { "nama": "Gerbega (Tangkai)" },
+                  { "nama": "Gladiol (Tangkai)" },
+                  { "nama": "Pisang-Pisangan (Tangkai)" },
+                  { "nama": "Krisan (Tangkai)" },
+                  { "nama": "Mawar (Tangkai)" },
+                  { "nama": "Sedap Malam (Tangkai)" },
+                  { "nama": "Dracaena (Batang)" },
+                  { "nama": "Melati (Kg)" },
+                  { "nama": "Palem (Pohon)" },
+                  { "nama": "Aglaonema (Pohon)" },
+                  { "nama": "Adenium (Pohon)" },
+                  { "nama": "Euphorbia (Tangkai)" },
+                  { "nama": "Philodendron (Tangkai)" },
+                  { "nama": "Pakis (Tangkai)" },
+                  { "nama": "Monstera (Tangkai)" },
+                  { "nama": "Soka (Tangkai)" },
+                  { "nama": "Cordyline (Tangkai)" },
+                  { "nama": "Dieffenbachia (Tangkai)" },
+                  { "nama": "Pedang - Pedangan (Tangkai)" },
+                  { "nama": "Anthurium Daun (Tangkai)" },
+                  { "nama": "Caladium (Tangkai)" },
+                  { "nama": "Heliconia (Tangkai)" }
+                ]
+              },
+              {
+                "nama": "Bibit Bunga",
+                "children": [
+                  { "nama": "Anggrek (Bibit)" },
+                  { "nama": "Anthurium (Bibit)" },
+                  { "nama": "Anyelir (Bibit)" },
+                  { "nama": "Gerbega (Bibit)" },
+                  { "nama": "Gladiol (Bibit)" },
+                  { "nama": "Krisan (Bibit)" },
+                  { "nama": "Mawar (Bibit)" },
+                  { "nama": "Melati (Bibit)" },
+                  { "nama": "Palem (Bibit)" },
+                  { "nama": "Aglaonema (Bibit)" },
+                  { "nama": "Adenium (Bibit)" },
+                  { "nama": "Euphorbia (Bibit)" },
+                  { "nama": "Philodendron (Bibit)" },
+                  { "nama": "Pakis (Bibit)" },
+                  { "nama": "Soka (Bibit)" },
+                  { "nama": "Sabsivera (Bibit)" },
+                  { "nama": "Caladium (Bibit)" }
+                ]
+              }
+            ]
+          },
+          {
+            "kode": "1.1.c",
+            "nama": "Perkebunan Semusim",
+            "children": [
+              { "nama": "Tebu" },
+              { "nama": "Kapas" },
+              { "nama": "Tembakau" },
+              { "nama": "Kapuk" },
+              { "nama": "Serat Karung" },
+              { "nama": "Jarak" },
+              { "nama": "Kenaf" },
+              { "nama": "Serat Nanas" },
+              { "nama": "Mendong" },
+              { "nama": "Janggelan" },
+              { "nama": "Pandan" },
+              { "nama": "Abaka" },
+              { "nama": "Rami" },
+              { "nama": "Wijen" }
+            ]
+          },
+          {
+            "kode": "1.1.d",
+            "nama": "Tanaman Hortikultura Tahunan & Lainnya",
+            "children": [
+              {
+                "nama": "Sayur-sayuran Tahunan",
+                "children": [
+                  { "nama": "Cabai Besar" },
+                  { "nama": "Cabai Merah/Cabai Keriting" },
+                  { "nama": "Cabai Hijau" },
+                  { "nama": "Cabai Rawit" },
+                  { "nama": "Paprika" },
+                  { "nama": "Jengkol" },
+                  { "nama": "Melinjo" },
+                  { "nama": "Petai" }
+                ]
+              },
+              {
+                "nama": "Buah-buahan",
+                "children": [
+                  { "nama": "Alpukat" },
+                  { "nama": "Belimbing" },
+                  { "nama": "Duku/Langsat" },
+                  { "nama": "Durian" },
+                  { "nama": "Jambu Biji" },
+                  { "nama": "Jambu Air" },
+                  { "nama": "Jeruk" },
+                  { "nama": "Mangga" },
+                  { "nama": "Manggis" },
+                  { "nama": "Nangka/Cempedak" },
+                  { "nama": "Nenas" },
+                  { "nama": "Pepaya" },
+                  { "nama": "Pisang" },
+                  { "nama": "Rambutan" },
+                  { "nama": "Salak" },
+                  { "nama": "Sawo" },
+                  { "nama": "Sirsak" },
+                  { "nama": "Sukun" },
+                  { "nama": "Markisa" },
+                  { "nama": "Anggur" },
+                  { "nama": "Apel" },
+                  { "nama": "Strawberry" },
+                  { "nama": "Buah Naga" }
+                ]
+              },
+              {
+                "nama": "Biofarmaka",
+                "children": [
+                  { "nama": "Jahe" },
+                  { "nama": "Kapulaga" },
+                  { "nama": "Cabai Jamu" },
+                  { "nama": "Laos/Lengkuas" },
+                  { "nama": "Kencur" },
+                  { "nama": "Kunyit" },
+                  { "nama": "Lempuyang" },
+                  { "nama": "Temulawak" },
+                  { "nama": "Temuireng" },
+                  { "nama": "Temukunci" },
+                  { "nama": "Dringo" },
+                  { "nama": "Mengkudu/Pace" },
+                  { "nama": "Mahkota Dewa" },
+                  { "nama": "Kejibeling" },
+                  { "nama": "Sambiloto" },
+                  { "nama": "Lidah Buaya" },
+                  { "nama": "Serai" },
+                  { "nama": "Jeruk Nipis" }
+                ]
+              }
+            ]
+          },
+          {
+            "kode": "1.1.e",
+            "nama": "Perkebunan Tahunan",
+            "children": [
+              { "nama": "Karet" },
+              { "nama": "Kelapa Sawit" },
+              { "nama": "Kelapa Dalam" },
+              { "nama": "Kelapa Hibrida" },
+              { "nama": "Kopi" },
+              { "nama": "Teh" },
+              { "nama": "Cengkeh" },
+              { "nama": "Kakao" },
+              { "nama": "Jambu Mete" },
+              { "nama": "Lada" },
+              { "nama": "Kayu Manis" },
+              { "nama": "Kemiri" },
+              { "nama": "Pala" },
+              { "nama": "Panili" },
+              { "nama": "Asam Jawa" },
+              { "nama": "Siwalan" },
+              { "nama": "Aren" },
+              { "nama": "Sereh Wangi" },
+              { "nama": "Nilam" },
+              { "nama": "Gambir" },
+              { "nama": "Pinang" },
+              { "nama": "Kina" },
+              { "nama": "Kenanga" },
+              { "nama": "Akar Wangi" },
+              { "nama": "Melinjo" },
+              { "nama": "Jarak" },
+              { "nama": "Kenaf" },
+              { "nama": "Kapuk Randu" }
+            ]
+          },
+          {
+            "kode": "1.1.f",
+            "nama": "Peternakan",
+            "children": [
+              { "nama": "Sapi Potong" },
+              { "nama": "Sapi Perah" },
+              { "nama": "Kerbau" },
+              { "nama": "Kambing" },
+              { "nama": "Domba" },
+              { "nama": "Babi" },
+              { "nama": "Kuda" },
+              { "nama": "Ayam Buras" },
+              { "nama": "Ayam Ras Pedaging" },
+              { "nama": "Itik" },
+              { "nama": "Kelinci" },
+              { "nama": "Burung Puyuh" },
+              { "nama": "Merpati" },
+              { "nama": "Ayam Ras Petelur" },
+              { "nama": "Telur Ayam Buras" },
+              { "nama": "Telur Ayam Ras" },
+              { "nama": "Telur Itik" },
+              { "nama": "Susu Sapi" }
+            ]
+          },
+          {
+            "kode": "1.1.g",
+            "nama": "Jasa Pertanian & Perburuan",
+            "children": [
+              { "nama": "Tanaman Pangan" },
+              { "nama": "Tanaman Hortikultura Semusim" },
+              { "nama": "Perkebunan Semusim" },
+              { "nama": "Tanaman Hortikultura Tahunan & Lainnya" },
+              { "nama": "Perkebunan Tahunan" },
+              { "nama": "Peternakan" }
+            ]
+          }
+        ]
+      },
+      {
+        "kode": "1.2",
+        "nama": "Kehutanan & Penebangan Kayu",
+        "children": [
+          {
+            "kode": "1.2.a",
+            "nama": "Pengusaha Kayu",
+            "children": [
+              { "kode": "1.2.a.1", "nama": "Pengusahaan Hutan Jati" },
+              { "kode": "1.2.a.2", "nama": "Pengusahaan Hutan Pinus" },
+              { "kode": "1.2.a.3", "nama": "Pengusahaan Hutan Mahoni" },
+              { "kode": "1.2.a.4", "nama": "Pengusahaan Hutan Sonokeling" },
+              { "kode": "1.2.a.5", "nama": "Pengusahaan Hutan Jeunjing" },
+              { "kode": "1.2.a.6", "nama": "Pengusahaan Hutan Cendana" },
+              { "kode": "1.2.a.7", "nama": "Pengusahaan Hutan Akasia" },
+              { "kode": "1.2.a.8", "nama": "Pengusahaan Hutan Ekaliptus" },
+              { "kode": "1.2.a.9", "nama": "Pengusahaan Hutan Lainnya" },
+              { "kode": "1.2.a.10", "nama": "Pengusahaan Hutan Alam (Selain HTI/Hutan Rakyat)" }
+            ]
+          },
+          {
+            "kode": "1.2.b",
+            "nama": "Pengusaha Hutan Bukan Kayu",
+            "children": [
+              { "kode": "1.2.b.1", "nama": "Damar" },
+              { "kode": "1.2.b.2", "nama": "Getah" },
+              { "kode": "1.2.b.3", "nama": "Jelutung" },
+              { "kode": "1.2.b.4", "nama": "Kulit Kayu" },
+              { "kode": "1.2.b.5", "nama": "Lumut" },
+              { "kode": "1.2.b.6", "nama": "Daun-daunan" },
+              { "kode": "1.2.b.7", "nama": "Sarang Burung Walet" },
+              { "kode": "1.2.b.8", "nama": "Akar-Akaran" },
+              { "kode": "1.2.b.9", "nama": "Arang" },
+              { "kode": "1.2.b.10", "nama": "Bambu" }
+            ]
+          },
+          {
+            "kode": "1.2.c",
+            "nama": "Jasa Kehutanan",
+            "children": [
+              { "kode": "1.2.c.1", "nama": "Jasa Kehutanan Bidang Inventarisasi Dan Tataguna Hutan" },
+              { "kode": "1.2.c.2", "nama": "Jasa Kehutanan Bidang Perlindungan Hutan Dan Pelestarian Alam" },
+              { "kode": "1.2.c.3", "nama": "Jasa Kehutanan Bidang Reboisasi Dan Rehabilitasi" },
+              { "kode": "1.2.c.4", "nama": "Jasa Kehutanan Lainnya" }
+            ]
+          }
+        ]
+      },
+      {
+        "kode": "1.3",
+        "nama": "Perikanan",
+        "children": [
+          {
+            "kode": "1.3.a",
+            "nama": "Ikan Laut",
+            "children": [
+              { "kode": "1.3.a.1", "nama": "Manyung" },
+              { "kode": "1.3.a.2", "nama": "Ikan Sebelah" },
+              { "kode": "1.3.a.3", "nama": "Selar" },
+              { "kode": "1.3.a.4", "nama": "Kuwe" },
+              { "kode": "1.3.a.5", "nama": "Layang" },
+              { "kode": "1.3.a.6", "nama": "Tetengek" },
+              { "kode": "1.3.a.7", "nama": "Bawal Hitam" },
+              { "kode": "1.3.a.8", "nama": "Golok-Golok" },
+              { "kode": "1.3.a.9", "nama": "Tembang" },
+              { "kode": "1.3.a.10", "nama": "Lemuru" },
+              { "kode": "1.3.a.11", "nama": "Lemadang" },
+              { "kode": "1.3.a.12", "nama": "Beloso" },
+              { "kode": "1.3.a.13", "nama": "Ikan Lidah" },
+              { "kode": "1.3.a.14", "nama": "Teri" },
+              { "kode": "1.3.a.15", "nama": "Kapasan" },
+              { "kode": "1.3.a.16", "nama": "Peperek" },
+              { "kode": "1.3.a.17", "nama": "Lencam" },
+              { "kode": "1.3.a.18", "nama": "Kakap Merah/Bambangan" },
+              { "kode": "1.3.a.19", "nama": "Biji Nangka Karang" },
+              { "kode": "1.3.a.20", "nama": "Biji Nangka" },
+              { "kode": "1.3.a.21", "nama": "Kuniran/Kuningan" },
+              { "kode": "1.3.a.22", "nama": "Kurisi" },
+              { "kode": "1.3.a.23", "nama": "Kuro/senangin" },
+              { "kode": "1.3.a.24", "nama": "Swanggi/Mata Besar" },
+              { "kode": "1.3.a.25", "nama": "Gumalah/Tiga Wajah" },
+              { "kode": "1.3.a.26", "nama": "Tongkol Krai/Lisong" },
+              { "kode": "1.3.a.27", "nama": "Tongkol Komo" },
+              { "kode": "1.3.a.28", "nama": "Kembung" },
+              { "kode": "1.3.a.29", "nama": "Banyar" },
+              { "kode": "1.3.a.30", "nama": "Tenggiri" },
+              { "kode": "1.3.a.31", "nama": "Tongkol Abu-abu" },
+              { "kode": "1.3.a.32", "nama": "Kerapu Lumpur/Karang Air Laut" },
+              { "kode": "1.3.a.33", "nama": "Beronang" },
+              { "kode": "1.3.a.34", "nama": "Alu-alu/Manggilala/Pucul" },
+              { "kode": "1.3.a.35", "nama": "Kerong-Kerong" },
+              { "kode": "1.3.a.36", "nama": "Layur" },
+              { "kode": "1.3.a.37", "nama": "Cucut" },
+              { "kode": "1.3.a.38", "nama": "Pari Kembang" },
+              { "kode": "1.3.a.39", "nama": "Kambing/Kambing (Ayam-Ayam)" },
+              { "kode": "1.3.a.40", "nama": "Bukur/Jaket" },
+              { "kode": "1.3.a.41", "nama": "Tonang/Remang" },
+              { "kode": "1.3.a.42", "nama": "Teri Nasi" },
+              { "kode": "1.3.a.43", "nama": "Ikan Campuran/Lainnya" },
+              { "kode": "1.3.a.44", "nama": "Ikan Laut Lainnya" }
+            ]
+          },
+          {
+            "kode": "1.3.b",
+            "nama": "Udang Laut / Binatang",
+            "children": [
+              {
+                "kode": "1.3.b.1",
+                "nama": "Berkulit Keras",
+                "children": [
+                  { "kode": "1.3.b.1.1", "nama": "Rajungan" },
+                  { "kode": "1.3.b.1.2", "nama": "Udang Putih" },
+                  { "kode": "1.3.b.1.3", "nama": "Udang Laut Lainnya" },
+                  { "kode": "1.3.b.1.4", "nama": "Kerang Dara" },
+                  { "kode": "1.3.b.1.5", "nama": "Cumi-cumi" },
+                  { "kode": "1.3.b.1.6", "nama": "Binatang Berkulit Keras Lainnya" }
+                ]
+              },
+              {
+                "kode": "1.3.b.2",
+                "nama": "Binatang Air",
+                "children": [
+                  { "kode": "1.3.b.2.1", "nama": "Telur Penyu" }
+                ]
+              }
+            ]
+          },
+          {
+            "kode": "1.3.c",
+            "nama": "Ikan Darat",
+            "children": [
+              { "kode": "1.3.c.1", "nama": "Bandeng" },
+              { "kode": "1.3.c.2", "nama": "Nila" },
+              { "kode": "1.3.c.3", "nama": "Tombro/Mas" },
+              { "kode": "1.3.c.4", "nama": "Tawes" },
+              { "kode": "1.3.c.5", "nama": "Lele" },
+              { "kode": "1.3.c.6", "nama": "Patin" },
+              { "kode": "1.3.c.7", "nama": "Gabus" },
+              { "kode": "1.3.c.8", "nama": "Gurami" },
+              { "kode": "1.3.c.9", "nama": "Mujair" },
+              { "kode": "1.3.c.10", "nama": "Kerapu" },
+              { "kode": "1.3.c.11", "nama": "Ikan Lain" },
+              { "kode": "1.3.c.12", "nama": "Udang Vaname" },
+              { "kode": "1.3.c.13", "nama": "Udang Windu" },
+              { "kode": "1.3.c.14", "nama": "Udang Lain" }
+            ]
+          },
+          {
+            "kode": "1.3.d",
+            "nama": "Ikan Kolam",
+            "children": [
+              { "kode": "1.3.d.1", "nama": "Mas Kolam" },
+              { "kode": "1.3.d.2", "nama": "Tawes/Gabus" },
+              { "kode": "1.3.d.3", "nama": "Tilapia Mujair" },
+              { "kode": "1.3.d.4", "nama": "Sepat Siam/Nila" },
+              { "kode": "1.3.d.5", "nama": "Tambakan/Biawan" },
+              { "kode": "1.3.d.6", "nama": "Ikan Hias" }
+            ]
+          },
+          {
+            "kode": "1.3.e",
+            "nama": "Ikan Keramba",
+            "children": [
+              { "kode": "1.3.e.1", "nama": "Mas Keramba" },
+              { "kode": "1.3.e.2", "nama": "Lele Keramba" },
+              { "kode": "1.3.e.3", "nama": "Ikan Keramba Lainnya" }
+            ]
+          },
+          {
+            "kode": "1.3.f",
+            "nama": "Air Payau",
+            "children": [
+              { "kode": "1.3.f.1", "nama": "Bandeng Payau" },
+              { "kode": "1.3.f.2", "nama": "Belanak" },
+              { "kode": "1.3.f.3", "nama": "Ikan Air Payau Lainnya" }
+            ]
+          },
+          {
+            "kode": "1.3.g",
+            "nama": "Udang Darat",
+            "children": [
+              { "kode": "1.3.g.1", "nama": "Udang Windu" },
+              { "kode": "1.3.g.2", "nama": "Udang Putih" },
+              { "kode": "1.3.g.3", "nama": "Kepiting" },
+              { "kode": "1.3.g.4", "nama": "Lainnya Udang Darat" }
+            ]
+          },
+          {
+            "kode": "1.3.h",
+            "nama": "Pembibitan",
+            "children": [
+              {
+                "kode": "1.3.h.1",
+                "nama": "Air Payau/Tambak",
+                "children": [
+                  { "kode": "1.3.h.1.1", "nama": "Bandeng (1-5 cm)" },
+                  { "kode": "1.3.h.1.2", "nama": "Bandeng (5 cm)" },
+                  { "kode": "1.3.h.1.3", "nama": "Ikan Tambak Lainnya" },
+                  { "kode": "1.3.h.1.4", "nama": "Udang Windu" },
+                  { "kode": "1.3.h.1.5", "nama": "Udang Putih" }
+                ]
+              },
+              {
+                "kode": "1.3.h.2",
+                "nama": "Air Kolam/Tawar",
+                "children": [
+                  { "kode": "1.3.h.2.1", "nama": "Ikan Mas (1-5 cm)" },
+                  { "kode": "1.3.h.2.2", "nama": "Ikan Mas (5 cm)" },
+                  { "kode": "1.3.h.2.3", "nama": "Nila" },
+                  { "kode": "1.3.h.2.4", "nama": "Ikan Tawar Lainnya" }
+                ]
+              },
+              {
+                "kode": "1.3.h.3",
+                "nama": "Keramba",
+                "children": [
+                  { "kode": "1.3.h.3.1", "nama": "Ikan Mas" },
+                  { "kode": "1.3.h.3.2", "nama": "Ikan Gabus" },
+                  { "kode": "1.3.h.3.3", "nama": "Ikan Keramba Lainnya" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

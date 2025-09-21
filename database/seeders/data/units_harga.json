@@ -1,0 +1,12 @@
+[
+  { "satuan_harga": "Rp/Ton" },
+  { "satuan_harga": "Rp/Tangkai" },
+  { "satuan_harga": "Rp/Pohon" },
+  { "satuan_harga": "Rp/Rumpun" },
+  { "satuan_harga": "Rp/Kg" },
+  { "satuan_harga": "Rp/Ekor" },
+  { "satuan_harga": "Rp/Liter" },
+  { "satuan_harga": "Rp/M3" },
+  { "satuan_harga": "Rp/Ekor" },
+  { "satuan_harga": "Rp/000 Ekor" }
+]
