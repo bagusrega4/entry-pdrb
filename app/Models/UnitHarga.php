@@ -15,8 +15,8 @@ class UnitHarga extends Model
         'satuan_harga',
     ];
 
-    public function commodityPrice()
+    public function commodityPriceProduction()
     {
-        return $this->hasMany(CommodityPrice::class);
+        return $this->hasMany(CommodityPriceProduction::class);
     }
 }

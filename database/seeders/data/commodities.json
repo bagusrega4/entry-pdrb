@@ -1,6 +1,6 @@
 [
   {
-    "kode": "1",
+    "kode": 1,
     "nama": "PERTANIAN, KEHUTANAN, & PERIKANAN",
     "children": [
       {
@@ -11,15 +11,60 @@
             "kode": "1.1.a",
             "nama": "Tanaman Pangan",
             "children": [
-              { "nama": "Padi" },
-              { "nama": "Jagung" },
-              { "nama": "Ubi Kayu" },
-              { "nama": "Ubi Jalar" },
-              { "nama": "Kacang Tanah" },
-              { "nama": "Kedelai" },
-              { "nama": "Kacang Hijau" },
-              { "nama": "Cantel/Sorghum" },
-              { "nama": "Talas" }
+              {
+                "nama": "Padi",
+                "indikator_id": 1,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Jagung",
+                "indikator_id": 2,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ubi Kayu",
+                "indikator_id": 3,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ubi Jalar",
+                "indikator_id": 4,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kacang Tanah",
+                "indikator_id": 5,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kedelai",
+                "indikator_id": 5,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kacang Hijau",
+                "indikator_id": 5,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Cantel/Sorghum",
+                "indikator_id": 5,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Talas",
+                "indikator_id": 4,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              }
             ]
           },
           {
@@ -29,86 +74,321 @@
               {
                 "nama": "Sayur-sayuran Semusim",
                 "children": [
-                  { "nama": "Kentang" },
-                  { "nama": "Bawang Merah" },
-                  { "nama": "Bawang Putih" },
-                  { "nama": "Bawang Daun" },
-                  { "nama": "Kubis" },
-                  { "nama": "Petsai/Sawi" },
-                  { "nama": "Wortel" },
-                  { "nama": "Kacang Panjang" },
-                  { "nama": "Tomat" },
-                  { "nama": "Terong" },
-                  { "nama": "Buncis" },
-                  { "nama": "Mentimun" },
-                  { "nama": "Kangkung" },
-                  { "nama": "Bayam" },
-                  { "nama": "Lobak" },
-                  { "nama": "Kacang Merah" },
-                  { "nama": "Labu Siam" },
-                  { "nama": "Kembang Kol" },
-                  { "nama": "Jamur" }
+                  {
+                    "nama": "Kentang",
+                    "indikator_id": 4,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Bawang Merah",
+                    "indikator_id": 4,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Bawang Putih",
+                    "indikator_id": 4,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Bawang Daun",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kubis",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Petsai/Sawi",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Wortel",
+                    "indikator_id": 4,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kacang Panjang",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Tomat",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Terong",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Buncis",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Mentimun",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kangkung",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Bayam",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Lobak",
+                    "indikator_id": 4,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kacang Merah",
+                    "indikator_id": 5,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Labu Siam",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kembang Kol",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Jamur",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  }
                 ]
               },
               {
                 "nama": "Buah-buahan Semusim",
                 "children": [
-                  { "nama": "Semangka" },
-                  { "nama": "Melon" },
-                  { "nama": "Blewah" },
-                  { "nama": "Timun Suri" }
+                  {
+                    "nama": "Semangka",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Melon",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Blewah",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Timun Suri",
+                    "indikator_id": 7,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  }
                 ]
               },
               {
                 "nama": "Tanaman Bunga Potong",
                 "children": [
-                  { "nama": "Anggrek (Tangkai)" },
-                  { "nama": "Anthurium (Tangkai)" },
-                  { "nama": "Anyelir (Tangkai)" },
-                  { "nama": "Gerbega (Tangkai)" },
-                  { "nama": "Gladiol (Tangkai)" },
-                  { "nama": "Pisang-Pisangan (Tangkai)" },
-                  { "nama": "Krisan (Tangkai)" },
-                  { "nama": "Mawar (Tangkai)" },
-                  { "nama": "Sedap Malam (Tangkai)" },
-                  { "nama": "Dracaena (Batang)" },
-                  { "nama": "Melati (Kg)" },
-                  { "nama": "Palem (Pohon)" },
-                  { "nama": "Aglaonema (Pohon)" },
-                  { "nama": "Adenium (Pohon)" },
-                  { "nama": "Euphorbia (Tangkai)" },
-                  { "nama": "Philodendron (Tangkai)" },
-                  { "nama": "Pakis (Tangkai)" },
-                  { "nama": "Monstera (Tangkai)" },
-                  { "nama": "Soka (Tangkai)" },
-                  { "nama": "Cordyline (Tangkai)" },
-                  { "nama": "Dieffenbachia (Tangkai)" },
-                  { "nama": "Pedang - Pedangan (Tangkai)" },
-                  { "nama": "Anthurium Daun (Tangkai)" },
-                  { "nama": "Caladium (Tangkai)" },
-                  { "nama": "Heliconia (Tangkai)" }
+                  {
+                    "nama": "Anggrek (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Anyelir (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Gerbega (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Gladiol (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Pisang-Pisangan (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Krisan (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Mawar (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Sedap Malam (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Dracaena (Batang)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Melati (Kg)",
+                    "indikator_id": 9,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Palem (Pohon)",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 3,
+                    "satuan_produksi_id": 3
+                  },
+                  {
+                    "nama": "Aglaonema (Pohon)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 3,
+                    "satuan_produksi_id": 3
+                  },
+                  {
+                    "nama": "Adenium (Pohon)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 3,
+                    "satuan_produksi_id": 3
+                  },
+                  {
+                    "nama": "Euphorbia (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Philodendron (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Pakis (Tangkai)",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Monstera (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Soka (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Cordyline (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Dieffenbachia (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Pedang - Pedangan (Tangkai)",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Anthurium Daun (Tangkai)",
+                    "indikator_id": 6,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Caladium (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  },
+                  {
+                    "nama": "Heliconia (Tangkai)",
+                    "indikator_id": 8,
+                    "satuan_harga_id": 2,
+                    "satuan_produksi_id": 2
+                  }
+                  
                 ]
               },
               {
                 "nama": "Bibit Bunga",
                 "children": [
-                  { "nama": "Anggrek (Bibit)" },
-                  { "nama": "Anthurium (Bibit)" },
-                  { "nama": "Anyelir (Bibit)" },
-                  { "nama": "Gerbega (Bibit)" },
-                  { "nama": "Gladiol (Bibit)" },
-                  { "nama": "Krisan (Bibit)" },
-                  { "nama": "Mawar (Bibit)" },
-                  { "nama": "Melati (Bibit)" },
-                  { "nama": "Palem (Bibit)" },
-                  { "nama": "Aglaonema (Bibit)" },
-                  { "nama": "Adenium (Bibit)" },
-                  { "nama": "Euphorbia (Bibit)" },
-                  { "nama": "Philodendron (Bibit)" },
-                  { "nama": "Pakis (Bibit)" },
-                  { "nama": "Soka (Bibit)" },
-                  { "nama": "Sabsivera (Bibit)" },
-                  { "nama": "Caladium (Bibit)" }
+                  { "nama": "Anggrek (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Anthurium (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Anyelir (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Gerbega (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Gladiol (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Krisan (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Mawar (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Melati (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Palem (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Aglaonema (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Adenium (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Euphorbia (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Philodendron (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Pakis (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Soka (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 },
+                  { "nama": "Sabsivera (Bibit)", "indikator_id": 10, "satuan_harga_id": "4", "satuan_produksi_id": 3 },
+                  { "nama": "Caladium (Bibit)", "indikator_id": 10, "satuan_harga_id": 3, "satuan_produksi_id": 3 }
                 ]
               }
             ]
@@ -117,20 +397,20 @@
             "kode": "1.1.c",
             "nama": "Perkebunan Semusim",
             "children": [
-              { "nama": "Tebu" },
-              { "nama": "Kapas" },
-              { "nama": "Tembakau" },
-              { "nama": "Kapuk" },
-              { "nama": "Serat Karung" },
-              { "nama": "Jarak" },
-              { "nama": "Kenaf" },
-              { "nama": "Serat Nanas" },
-              { "nama": "Mendong" },
-              { "nama": "Janggelan" },
-              { "nama": "Pandan" },
-              { "nama": "Abaka" },
-              { "nama": "Rami" },
-              { "nama": "Wijen" }
+              { "nama": "Tebu", "indikator_id": 11, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kapas", "indikator_id": 12, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Tembakau", "indikator_id": 13, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kapuk", "indikator_id": 14, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Serat Karung", "indikator_id": 16, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Jarak", "indikator_id": 15, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kenaf", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null },
+              { "nama": "Serat Nanas", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Mendong", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Janggelan", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Pandan", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Abaka", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Rami", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Wijen", "indikator_id": 5, "satuan_harga_id": 1, "satuan_produksi_id": 1  }
             ]
           },
           {
@@ -140,65 +420,65 @@
               {
                 "nama": "Sayur-sayuran Tahunan",
                 "children": [
-                  { "nama": "Cabai Besar" },
-                  { "nama": "Cabai Merah/Cabai Keriting" },
-                  { "nama": "Cabai Hijau" },
-                  { "nama": "Cabai Rawit" },
-                  { "nama": "Paprika" },
-                  { "nama": "Jengkol" },
-                  { "nama": "Melinjo" },
-                  { "nama": "Petai" }
+                  { "nama": "Cabai Besar", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Cabai Merah/Cabai Keriting", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Cabai Hijau", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null },
+                  { "nama": "Cabai Rawit", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Paprika", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Jengkol", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Melinjo", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Petai", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 }
                 ]
               },
               {
                 "nama": "Buah-buahan",
                 "children": [
-                  { "nama": "Alpukat" },
-                  { "nama": "Belimbing" },
-                  { "nama": "Duku/Langsat" },
-                  { "nama": "Durian" },
-                  { "nama": "Jambu Biji" },
-                  { "nama": "Jambu Air" },
-                  { "nama": "Jeruk" },
-                  { "nama": "Mangga" },
-                  { "nama": "Manggis" },
-                  { "nama": "Nangka/Cempedak" },
-                  { "nama": "Nenas" },
-                  { "nama": "Pepaya" },
-                  { "nama": "Pisang" },
-                  { "nama": "Rambutan" },
-                  { "nama": "Salak" },
-                  { "nama": "Sawo" },
-                  { "nama": "Sirsak" },
-                  { "nama": "Sukun" },
-                  { "nama": "Markisa" },
-                  { "nama": "Anggur" },
-                  { "nama": "Apel" },
-                  { "nama": "Strawberry" },
-                  { "nama": "Buah Naga" }
+                  { "nama": "Alpukat", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Belimbing", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Duku/Langsat", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Durian", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Jambu Biji", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Jambu Air", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Jeruk", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Mangga", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Manggis", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Nangka/Cempedak", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Nenas", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Pepaya", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Pisang", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Rambutan", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Salak", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Sawo", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Sirsak", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Sukun", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Markisa", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Anggur", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Apel", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Strawberry", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+                  { "nama": "Buah Naga", "indikator_id": 7, "satuan_harga_id": 1, "satuan_produksi_id": 1 }
                 ]
               },
               {
                 "nama": "Biofarmaka",
                 "children": [
-                  { "nama": "Jahe" },
-                  { "nama": "Kapulaga" },
-                  { "nama": "Cabai Jamu" },
-                  { "nama": "Laos/Lengkuas" },
-                  { "nama": "Kencur" },
-                  { "nama": "Kunyit" },
-                  { "nama": "Lempuyang" },
-                  { "nama": "Temulawak" },
-                  { "nama": "Temuireng" },
-                  { "nama": "Temukunci" },
-                  { "nama": "Dringo" },
-                  { "nama": "Mengkudu/Pace" },
-                  { "nama": "Mahkota Dewa" },
-                  { "nama": "Kejibeling" },
-                  { "nama": "Sambiloto" },
-                  { "nama": "Lidah Buaya" },
-                  { "nama": "Serai" },
-                  { "nama": "Jeruk Nipis" }
+                  { "nama": "Jahe", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Kapulaga", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Cabai Jamu", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Laos/Lengkuas", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Kencur", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Kunyit", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Lempuyang", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Temulawak", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Temuireng", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Temukunci", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Dringo", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Mengkudu/Pace", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Mahkota Dewa", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Kejibeling", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Sambiloto", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Lidah Buaya", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Serai", "indikator_id": 17, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+                  { "nama": "Jeruk Nipis", "indikator_id": null, "satuan_harga_id": 5, "satuan_produksi_id": 5  }
                 ]
               }
             ]
@@ -207,70 +487,58 @@
             "kode": "1.1.e",
             "nama": "Perkebunan Tahunan",
             "children": [
-              { "nama": "Karet" },
-              { "nama": "Kelapa Sawit" },
-              { "nama": "Kelapa Dalam" },
-              { "nama": "Kelapa Hibrida" },
-              { "nama": "Kopi" },
-              { "nama": "Teh" },
-              { "nama": "Cengkeh" },
-              { "nama": "Kakao" },
-              { "nama": "Jambu Mete" },
-              { "nama": "Lada" },
-              { "nama": "Kayu Manis" },
-              { "nama": "Kemiri" },
-              { "nama": "Pala" },
-              { "nama": "Panili" },
-              { "nama": "Asam Jawa" },
-              { "nama": "Siwalan" },
-              { "nama": "Aren" },
-              { "nama": "Sereh Wangi" },
-              { "nama": "Nilam" },
-              { "nama": "Gambir" },
-              { "nama": "Pinang" },
-              { "nama": "Kina" },
-              { "nama": "Kenanga" },
-              { "nama": "Akar Wangi" },
-              { "nama": "Melinjo" },
-              { "nama": "Jarak" },
-              { "nama": "Kenaf" },
-              { "nama": "Kapuk Randu" }
+              { "nama": "Karet", "indikator_id": 18, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kelapa Sawit", "indikator_id": 19, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kelapa Dalam", "indikator_id": 20, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kelapa Hibrida", "indikator_id": 20, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kopi", "indikator_id": 5, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Teh", "indikator_id": 28, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Cengkeh", "indikator_id": 21, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kakao", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Jambu Mete", "indikator_id": 22, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Lada", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kayu Manis", "indikator_id": 23, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kemiri", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Pala", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Panili", "indikator_id": 24, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Asam Jawa", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Siwalan", "indikator_id": 26, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Aren", "indikator_id": 27, "satuan_harga_id": null, "satuan_produksi_id": null },
+              { "nama": "Sereh Wangi", "indikator_id": 28, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Nilam", "indikator_id": 28, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Gambir", "indikator_id": 28, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Pinang", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kina", "indikator_id": 29, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kenanga", "indikator_id": 25, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Akar Wangi", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null },
+              { "nama": "Melinjo", "indikator_id": 20, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Jarak", "indikator_id": 31, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kenaf", "indikator_id": 32, "satuan_harga_id": 1, "satuan_produksi_id": 1 },
+              { "nama": "Kapuk Randu", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null }
             ]
           },
           {
             "kode": "1.1.f",
             "nama": "Peternakan",
             "children": [
-              { "nama": "Sapi Potong" },
-              { "nama": "Sapi Perah" },
-              { "nama": "Kerbau" },
-              { "nama": "Kambing" },
-              { "nama": "Domba" },
-              { "nama": "Babi" },
-              { "nama": "Kuda" },
-              { "nama": "Ayam Buras" },
-              { "nama": "Ayam Ras Pedaging" },
-              { "nama": "Itik" },
-              { "nama": "Kelinci" },
-              { "nama": "Burung Puyuh" },
-              { "nama": "Merpati" },
-              { "nama": "Ayam Ras Petelur" },
-              { "nama": "Telur Ayam Buras" },
-              { "nama": "Telur Ayam Ras" },
-              { "nama": "Telur Itik" },
-              { "nama": "Susu Sapi" }
-            ]
-          },
-          {
-            "kode": "1.1.g",
-            "nama": "Jasa Pertanian & Perburuan",
-            "children": [
-              { "nama": "Tanaman Pangan" },
-              { "nama": "Tanaman Hortikultura Semusim" },
-              { "nama": "Perkebunan Semusim" },
-              { "nama": "Tanaman Hortikultura Tahunan & Lainnya" },
-              { "nama": "Perkebunan Tahunan" },
-              { "nama": "Peternakan" }
+              { "nama": "Sapi Potong", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Sapi Perah", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Kerbau", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Kambing", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Domba", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Babi", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Kuda", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Ayam Buras", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Ayam Ras Pedaging", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Itik", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Kelinci", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Burung Puyuh", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Merpati", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Ayam Ras Petelur", "indikator_id": 33, "satuan_harga_id": 6, "satuan_produksi_id": 6 },
+              { "nama": "Telur Ayam Buras", "indikator_id": 34, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+              { "nama": "Telur Ayam Ras", "indikator_id": 34, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+              { "nama": "Telur Itik", "indikator_id": 34, "satuan_harga_id": 5, "satuan_produksi_id": 5 },
+              { "nama": "Susu Sapi", "indikator_id": 35, "satuan_harga_id": 7, "satuan_produksi_id": 7 }
             ]
           }
         ]
@@ -283,42 +551,92 @@
             "kode": "1.2.a",
             "nama": "Pengusaha Kayu",
             "children": [
-              { "kode": "1.2.a.1", "nama": "Pengusahaan Hutan Jati" },
-              { "kode": "1.2.a.2", "nama": "Pengusahaan Hutan Pinus" },
-              { "kode": "1.2.a.3", "nama": "Pengusahaan Hutan Mahoni" },
-              { "kode": "1.2.a.4", "nama": "Pengusahaan Hutan Sonokeling" },
-              { "kode": "1.2.a.5", "nama": "Pengusahaan Hutan Jeunjing" },
-              { "kode": "1.2.a.6", "nama": "Pengusahaan Hutan Cendana" },
-              { "kode": "1.2.a.7", "nama": "Pengusahaan Hutan Akasia" },
-              { "kode": "1.2.a.8", "nama": "Pengusahaan Hutan Ekaliptus" },
-              { "kode": "1.2.a.9", "nama": "Pengusahaan Hutan Lainnya" },
-              { "kode": "1.2.a.10", "nama": "Pengusahaan Hutan Alam (Selain HTI/Hutan Rakyat)" }
+              {
+                "nama": "Pengusahaan Hutan Jati",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Pinus",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Mahoni",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Sonokeling",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Jeunjing",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Cendana",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Akasia",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Ekaliptus",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Lainnya",
+                "indikator_id": 37,
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              },
+              {
+                "nama": "Pengusahaan Hutan Alam (Selain HTI/Hutan Rakyat)",
+                "indikator_id": "",
+                "satuan_harga_id": 8,
+                "satuan_produksi_id": 8
+              }
             ]
           },
           {
             "kode": "1.2.b",
             "nama": "Pengusaha Hutan Bukan Kayu",
             "children": [
-              { "kode": "1.2.b.1", "nama": "Damar" },
-              { "kode": "1.2.b.2", "nama": "Getah" },
-              { "kode": "1.2.b.3", "nama": "Jelutung" },
-              { "kode": "1.2.b.4", "nama": "Kulit Kayu" },
-              { "kode": "1.2.b.5", "nama": "Lumut" },
-              { "kode": "1.2.b.6", "nama": "Daun-daunan" },
-              { "kode": "1.2.b.7", "nama": "Sarang Burung Walet" },
-              { "kode": "1.2.b.8", "nama": "Akar-Akaran" },
-              { "kode": "1.2.b.9", "nama": "Arang" },
-              { "kode": "1.2.b.10", "nama": "Bambu" }
+              { "nama": "Damar", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Getah", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Jelutung", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Kulit Kayu", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Lumut", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Daun-daunan", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Sarang Burung Walet", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Akar-Akaran", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Arang", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Bambu", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  }
             ]
           },
           {
             "kode": "1.2.c",
             "nama": "Jasa Kehutanan",
             "children": [
-              { "kode": "1.2.c.1", "nama": "Jasa Kehutanan Bidang Inventarisasi Dan Tataguna Hutan" },
-              { "kode": "1.2.c.2", "nama": "Jasa Kehutanan Bidang Perlindungan Hutan Dan Pelestarian Alam" },
-              { "kode": "1.2.c.3", "nama": "Jasa Kehutanan Bidang Reboisasi Dan Rehabilitasi" },
-              { "kode": "1.2.c.4", "nama": "Jasa Kehutanan Lainnya" }
+              { "nama": "Jasa Kehutanan Bidang Inventarisasi Dan Tataguna Hutan", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Jasa Kehutanan Bidang Perlindungan Hutan Dan Pelestarian Alam", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Jasa Kehutanan Bidang Reboisasi Dan Rehabilitasi", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  },
+              { "nama": "Jasa Kehutanan Lainnya", "indikator_id": null, "satuan_harga_id": null, "satuan_produksi_id": null  }
             ]
           }
         ]
@@ -331,50 +649,270 @@
             "kode": "1.3.a",
             "nama": "Ikan Laut",
             "children": [
-              { "kode": "1.3.a.1", "nama": "Manyung" },
-              { "kode": "1.3.a.2", "nama": "Ikan Sebelah" },
-              { "kode": "1.3.a.3", "nama": "Selar" },
-              { "kode": "1.3.a.4", "nama": "Kuwe" },
-              { "kode": "1.3.a.5", "nama": "Layang" },
-              { "kode": "1.3.a.6", "nama": "Tetengek" },
-              { "kode": "1.3.a.7", "nama": "Bawal Hitam" },
-              { "kode": "1.3.a.8", "nama": "Golok-Golok" },
-              { "kode": "1.3.a.9", "nama": "Tembang" },
-              { "kode": "1.3.a.10", "nama": "Lemuru" },
-              { "kode": "1.3.a.11", "nama": "Lemadang" },
-              { "kode": "1.3.a.12", "nama": "Beloso" },
-              { "kode": "1.3.a.13", "nama": "Ikan Lidah" },
-              { "kode": "1.3.a.14", "nama": "Teri" },
-              { "kode": "1.3.a.15", "nama": "Kapasan" },
-              { "kode": "1.3.a.16", "nama": "Peperek" },
-              { "kode": "1.3.a.17", "nama": "Lencam" },
-              { "kode": "1.3.a.18", "nama": "Kakap Merah/Bambangan" },
-              { "kode": "1.3.a.19", "nama": "Biji Nangka Karang" },
-              { "kode": "1.3.a.20", "nama": "Biji Nangka" },
-              { "kode": "1.3.a.21", "nama": "Kuniran/Kuningan" },
-              { "kode": "1.3.a.22", "nama": "Kurisi" },
-              { "kode": "1.3.a.23", "nama": "Kuro/senangin" },
-              { "kode": "1.3.a.24", "nama": "Swanggi/Mata Besar" },
-              { "kode": "1.3.a.25", "nama": "Gumalah/Tiga Wajah" },
-              { "kode": "1.3.a.26", "nama": "Tongkol Krai/Lisong" },
-              { "kode": "1.3.a.27", "nama": "Tongkol Komo" },
-              { "kode": "1.3.a.28", "nama": "Kembung" },
-              { "kode": "1.3.a.29", "nama": "Banyar" },
-              { "kode": "1.3.a.30", "nama": "Tenggiri" },
-              { "kode": "1.3.a.31", "nama": "Tongkol Abu-abu" },
-              { "kode": "1.3.a.32", "nama": "Kerapu Lumpur/Karang Air Laut" },
-              { "kode": "1.3.a.33", "nama": "Beronang" },
-              { "kode": "1.3.a.34", "nama": "Alu-alu/Manggilala/Pucul" },
-              { "kode": "1.3.a.35", "nama": "Kerong-Kerong" },
-              { "kode": "1.3.a.36", "nama": "Layur" },
-              { "kode": "1.3.a.37", "nama": "Cucut" },
-              { "kode": "1.3.a.38", "nama": "Pari Kembang" },
-              { "kode": "1.3.a.39", "nama": "Kambing/Kambing (Ayam-Ayam)" },
-              { "kode": "1.3.a.40", "nama": "Bukur/Jaket" },
-              { "kode": "1.3.a.41", "nama": "Tonang/Remang" },
-              { "kode": "1.3.a.42", "nama": "Teri Nasi" },
-              { "kode": "1.3.a.43", "nama": "Ikan Campuran/Lainnya" },
-              { "kode": "1.3.a.44", "nama": "Ikan Laut Lainnya" }
+              {
+                "nama": "Manyung",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Sebelah",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Selar",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kuwe",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Layang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tetengek",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Bawal Hitam",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Golok-Golok",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tembang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lemuru",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lemadang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Beloso",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Lidah",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Teri",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kapasan",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Peperek",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lencam",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kakap Merah/Bambangan",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Biji Nangka Karang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Biji Nangka",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kuniran/Kuningan",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kurisi",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kuro/senangin",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Swanggi/Mata Besar",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Gumalah/Tiga Wajah",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tongkol Krai/Lisong",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tongkol Komo",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kembung",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Banyar",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tenggiri",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tongkol Abu-abu",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kerapu Lumpur/Karang Air Laut",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Beronang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Alu-alu/Manggilala/ Pucul",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kerong-Kerong",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Layur",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Cucut",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Pari Kembang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kambing/Kambing (ayam-Ayam)",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Bukur/Jaket",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tonang/remang",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Teri Nasi",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Campuran/Lainnya",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Laut Lainnya",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              }
             ]
           },
           {
@@ -385,19 +923,54 @@
                 "kode": "1.3.b.1",
                 "nama": "Berkulit Keras",
                 "children": [
-                  { "kode": "1.3.b.1.1", "nama": "Rajungan" },
-                  { "kode": "1.3.b.1.2", "nama": "Udang Putih" },
-                  { "kode": "1.3.b.1.3", "nama": "Udang Laut Lainnya" },
-                  { "kode": "1.3.b.1.4", "nama": "Kerang Dara" },
-                  { "kode": "1.3.b.1.5", "nama": "Cumi-cumi" },
-                  { "kode": "1.3.b.1.6", "nama": "Binatang Berkulit Keras Lainnya" }
+                  {
+                    "nama": "Rajungan",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Udang Putih",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Udang Laut Lainnya",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Kerang Dara",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Cumi-cumi",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  },
+                  {
+                    "nama": "Binatang Berkulit Keras Lainnya",
+                    "indikator_id": 36,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  }
                 ]
               },
               {
                 "kode": "1.3.b.2",
                 "nama": "Binatang Air",
                 "children": [
-                  { "kode": "1.3.b.2.1", "nama": "Telur Penyu" }
+                  {
+                    "nama": "Telur Penyu",
+                    "indikator_id": null,
+                    "satuan_harga_id": 1,
+                    "satuan_produksi_id": 1
+                  }
                 ]
               }
             ]
@@ -406,60 +979,216 @@
             "kode": "1.3.c",
             "nama": "Ikan Darat",
             "children": [
-              { "kode": "1.3.c.1", "nama": "Bandeng" },
-              { "kode": "1.3.c.2", "nama": "Nila" },
-              { "kode": "1.3.c.3", "nama": "Tombro/Mas" },
-              { "kode": "1.3.c.4", "nama": "Tawes" },
-              { "kode": "1.3.c.5", "nama": "Lele" },
-              { "kode": "1.3.c.6", "nama": "Patin" },
-              { "kode": "1.3.c.7", "nama": "Gabus" },
-              { "kode": "1.3.c.8", "nama": "Gurami" },
-              { "kode": "1.3.c.9", "nama": "Mujair" },
-              { "kode": "1.3.c.10", "nama": "Kerapu" },
-              { "kode": "1.3.c.11", "nama": "Ikan Lain" },
-              { "kode": "1.3.c.12", "nama": "Udang Vaname" },
-              { "kode": "1.3.c.13", "nama": "Udang Windu" },
-              { "kode": "1.3.c.14", "nama": "Udang Lain" }
+              {
+                "nama": "Bandeng",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Nila",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tombro/Mas",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tawes",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lele",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Patin",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Gabus",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Gurami",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Mujair",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kerapu",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Lain",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Udang Vaname",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Udang Windu",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Udang Lain",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Darat Lainnya",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              }
             ]
           },
           {
             "kode": "1.3.d",
             "nama": "Ikan Kolam",
             "children": [
-              { "kode": "1.3.d.1", "nama": "Mas Kolam" },
-              { "kode": "1.3.d.2", "nama": "Tawes/Gabus" },
-              { "kode": "1.3.d.3", "nama": "Tilapia Mujair" },
-              { "kode": "1.3.d.4", "nama": "Sepat Siam/Nila" },
-              { "kode": "1.3.d.5", "nama": "Tambakan/Biawan" },
-              { "kode": "1.3.d.6", "nama": "Ikan Hias" }
+              {
+                "nama": "Mas Kolam",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tawes / Gabus",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tilapia Mujair",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Sepat Siam / Nila",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Tambakan / Biawan",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Hias",
+                "indikator_id": 38,
+                "satuan_harga_id": 9,
+                "satuan_produksi_id": 9
+              }
             ]
           },
           {
             "kode": "1.3.e",
             "nama": "Ikan Keramba",
             "children": [
-              { "kode": "1.3.e.1", "nama": "Mas Keramba" },
-              { "kode": "1.3.e.2", "nama": "Lele Keramba" },
-              { "kode": "1.3.e.3", "nama": "Ikan Keramba Lainnya" }
+              {
+                "nama": "Mas Keramba",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lele Keramba",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Ikan Keramba Lainnya",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              }
             ]
           },
           {
             "kode": "1.3.f",
             "nama": "Air Payau",
             "children": [
-              { "kode": "1.3.f.1", "nama": "Bandeng Payau" },
-              { "kode": "1.3.f.2", "nama": "Belanak" },
-              { "kode": "1.3.f.3", "nama": "Ikan Air Payau Lainnya" }
+              {
+              "nama": "Bandeng payau",
+              "indikator_id": 36,
+              "satuan_harga_id": 1,
+              "satuan_produksi_id": 1
+            },
+            {
+              "nama": "Belanak",
+              "indikator_id": 36,
+              "satuan_harga_id": 1,
+              "satuan_produksi_id": 1
+            },
+            {
+              "nama": "Ikan Air Payau Lainnya",
+              "indikator_id": 36,
+              "satuan_harga_id": 1,
+              "satuan_produksi_id": 1
+            }
             ]
           },
           {
             "kode": "1.3.g",
             "nama": "Udang Darat",
             "children": [
-              { "kode": "1.3.g.1", "nama": "Udang Windu" },
-              { "kode": "1.3.g.2", "nama": "Udang Putih" },
-              { "kode": "1.3.g.3", "nama": "Kepiting" },
-              { "kode": "1.3.g.4", "nama": "Lainnya Udang Darat" }
+              {
+                "nama": "Udang Windu",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Udang Putih",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Kepiting",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              },
+              {
+                "nama": "Lainnya Udang Darat",
+                "indikator_id": 36,
+                "satuan_harga_id": 1,
+                "satuan_produksi_id": 1
+              }
             ]
           },
           {
@@ -470,30 +1199,90 @@
                 "kode": "1.3.h.1",
                 "nama": "Air Payau/Tambak",
                 "children": [
-                  { "kode": "1.3.h.1.1", "nama": "Bandeng (1-5 cm)" },
-                  { "kode": "1.3.h.1.2", "nama": "Bandeng (5 cm)" },
-                  { "kode": "1.3.h.1.3", "nama": "Ikan Tambak Lainnya" },
-                  { "kode": "1.3.h.1.4", "nama": "Udang Windu" },
-                  { "kode": "1.3.h.1.5", "nama": "Udang Putih" }
+                  {
+                    "nama": "Bandeng ( 1 - 5 cm )",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Bandeng ( 5 cm )",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Ikan Tambak Lainnya",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Udang Windu",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Udang Putih",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  }
                 ]
               },
               {
                 "kode": "1.3.h.2",
                 "nama": "Air Kolam/Tawar",
                 "children": [
-                  { "kode": "1.3.h.2.1", "nama": "Ikan Mas (1-5 cm)" },
-                  { "kode": "1.3.h.2.2", "nama": "Ikan Mas (5 cm)" },
-                  { "kode": "1.3.h.2.3", "nama": "Nila" },
-                  { "kode": "1.3.h.2.4", "nama": "Ikan Tawar Lainnya" }
+                  {
+                    "nama": "Ikan Mas ( 1 - 5 cm )",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Ikan Mas ( 5 cm )",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Nila",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Ikan Tawar Lainnya",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  }
                 ]
               },
               {
                 "kode": "1.3.h.3",
                 "nama": "Keramba",
                 "children": [
-                  { "kode": "1.3.h.3.1", "nama": "Ikan Mas" },
-                  { "kode": "1.3.h.3.2", "nama": "Ikan Gabus" },
-                  { "kode": "1.3.h.3.3", "nama": "Ikan Keramba Lainnya" }
+                  {
+                    "nama": "Ikan Mas",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Ikan Gabus",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  },
+                  {
+                    "nama": "Ikan Keramba Lainnya",
+                    "indikator_id": 38,
+                    "satuan_harga_id": 10,
+                    "satuan_produksi_id": 10
+                  }
                 ]
               }
             ]

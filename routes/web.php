@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardAdminController;
 use App\Http\Controllers\DashboardOperatorController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PriceController;
-use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\PriceProductionController;
 use App\Http\Controllers\ManageUserController;
 
 // -------------------------------------------------------------------
@@ -57,22 +56,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/edit-profile', [ProfileController::class, 'setPhotoProfile'])->name('edit.profile');
         Route::put('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
 
-        // Harga
-        Route::prefix('prices')->group(function () {
-            Route::get('/', [PriceController::class, 'index'])->name('prices.index');
-            Route::get('/commodities/{id}/children', [PriceController::class, 'getChildren']);
-            Route::get('/indicators', [PriceController::class, 'getIndicators'])->name('prices.indicators');
-            Route::get('/units', [PriceController::class, 'getUnits'])->name('prices.units');
-            Route::post('/', [PriceController::class, 'store'])->name('prices.store');
-        });
+        Route::prefix('prices-productions')->group(function () {
+            Route::get('/', [PriceProductionController::class, 'index'])
+                ->name('prices_productions.index');
 
-        // Produksi
-        Route::prefix('productions')->group(function () {
-            Route::get('/', [ProductionController::class, 'index'])->name('productions.index');
-            Route::get('/commodities/{id}/children', [ProductionController::class, 'getChildren']);
-            Route::get('/indicators', [ProductionController::class, 'getIndicators'])->name('productions.indicators');
-            Route::get('/units', [ProductionController::class, 'getUnits'])->name('productions.units');
-            Route::post('/', [ProductionController::class, 'store'])->name('productions.store');
+            // ambil subtree (anak-anak komoditas)
+            Route::get('/commodities/{commodity}/subtree', [PriceProductionController::class, 'getSubtree'])
+                ->name('prices_productions.subtree');
+
+            // generate kode otomatis untuk child baru
+            Route::get('/commodities/{parent}/next-code', [PriceProductionController::class, 'generateNextCode'])
+                ->name('prices_productions.next_code');
+
+            // indikator & satuan
+            Route::get('/indicators', [PriceProductionController::class, 'getIndicators'])
+                ->name('prices_productions.indicators');
+            Route::get('/unit-harga', [PriceProductionController::class, 'getUnitHarga'])
+                ->name('prices_productions.unit_harga');
+            Route::get('/unit-produksi', [PriceProductionController::class, 'getUnitProduksi'])
+                ->name('prices_productions.unit_produksi');
+
+            // tambah komoditas baru
+            Route::post('/commodities', [PriceProductionController::class, 'storeCommodity'])
+                ->name('prices_productions.store_commodity');
+
+            // input harga/produksi
+            Route::post('/', [PriceProductionController::class, 'store'])
+                ->name('prices_productions.store');
+            Route::post('/bulk', [PriceProductionController::class, 'bulkStore'])
+                ->name('prices_productions.bulk');
+
+            Route::get('/commodities/all', [PriceProductionController::class, 'getAllCommodities'])
+                ->name('prices_productions.all_commodities');
         });
 
         // Manage User
@@ -81,7 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/create', [ManageUserController::class, 'create'])->name('create');
             Route::post('/store', [ManageUserController::class, 'store'])->name('store');
             Route::put('/{id}/update-role', [ManageUserController::class, 'updateRoleUser'])->name('updateRole');
-            Route::put('/{id}/update-tim', [ManageUserController::class, 'updateTimUser'])->name('updateTim'); // 👉 tambahan
+            Route::put('/{id}/update-tim', [ManageUserController::class, 'updateTimUser'])->name('updateTim');
             Route::get('/edit/{id}', [ManageUserController::class, 'edit'])->name('edit');
             Route::put('/{id}', [ManageUserController::class, 'update'])->name('update');
             Route::delete('/{id}', [ManageUserController::class, 'destroy'])->name('destroy');

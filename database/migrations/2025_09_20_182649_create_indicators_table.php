@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('indicators_harga', function (Blueprint $table) {
+        Schema::create('indicators', function (Blueprint $table) {
             $table->id();
-            $table->string('indikator_harga');
+            $table->string('indikator');
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('indicators_harga');
+        Schema::dropIfExists('indicators');
     }
 };

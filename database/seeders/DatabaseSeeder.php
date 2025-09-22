@@ -17,9 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PegawaiSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(CommoditySeeder::class);
-        $this->call(IndicatorHargaSeeder::class);
+        $this->call(IndicatorSeeder::class);
         $this->call(UnitHargaSeeder::class);
-        $this->call(IndicatorProduksiSeeder::class);
         $this->call(UnitProduksiSeeder::class);
         $this->call(TimSeeder::class);
     }

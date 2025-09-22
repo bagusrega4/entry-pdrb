@@ -15,8 +15,8 @@ class UnitProduksi extends Model
         'satuan_produksi',
     ];
 
-    public function commodityPrice()
+    public function commodityPriceProduction()
     {
-        return $this->hasMany(CommodityProduction::class);
+        return $this->hasMany(CommodityPriceProduction::class);
     }
 }

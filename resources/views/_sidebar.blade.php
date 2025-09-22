@@ -51,19 +51,11 @@
                     <h4 class="text-section">Menu Utama</h4>
                 </li>
 
-                <!-- Input Harga -->
-                <li class="nav-item {{ request()->routeIs('prices.*') ? 'active' : '' }}">
-                    <a href="{{ route('prices.index') }}">
+                <!-- Input Harga dan Produksi -->
+                <li class="nav-item {{ request()->routeIs('prices_productions.*') ? 'active' : '' }}">
+                    <a href="{{ route('prices_productions.index') }}">
                         <i class="fas fa-clipboard-list"></i>
-                        <p>Input Harga</p>
-                    </a>
-                </li>
-
-                <!-- Input Produksi -->
-                <li class="nav-item {{ request()->routeIs('productions.*') ? 'active' : '' }}">
-                    <a href="{{ route('productions.index') }}">
-                        <i class="fas fa-clipboard-list"></i>
-                        <p>Input Produksi</p>
+                        <p>Input Harga & Produksi</p>
                     </a>
                 </li>
                 @if(in_array(Auth::user()->id_role, [2]))

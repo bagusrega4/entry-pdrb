@@ -24,10 +24,13 @@ class CommoditySeeder extends Seeder
             $kode = $item['kode'] ?? ($parentCode ? $parentCode . '.' . ($index + 1) : null);
 
             $commodity = Commodity::create([
-                'parent_id' => $parentId,
-                'kode'      => $kode,
-                'nama'      => $item['nama'],
-                'level'     => $level,
+                'parent_id'         => $parentId,
+                'kode'              => $kode,
+                'nama'              => $item['nama'],
+                'level'             => $level,
+                'indikator_id'      => $item['indikator_id'] ?? null,
+                'satuan_harga_id'   => $item['satuan_harga_id'] ?? null,
+                'satuan_produksi_id' => $item['satuan_produksi_id'] ?? null,
             ]);
 
             // kalau ada children, rekursif

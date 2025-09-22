@@ -3,10 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\IndicatorHarga;
-use App\Models\IndicatorProduksi;
+use App\Models\Indicator;
 
-class IndicatorProduksiSeeder extends Seeder
+class IndicatorSeeder extends Seeder
 {
     public function run(): void
     {
@@ -19,14 +18,19 @@ class IndicatorProduksiSeeder extends Seeder
             'Daun Segar',
             'Buah Segar',
             'Bunga Segar',
+            'Bunga Basah',
             'Pohon',
             'Tebu Giling',
             'Kapas Berbiji',
+            'Daun Kering',
+            'Buah Kering',
+            'Buah',
             'Serat Basah',
             'Rimpang Kering',
             'Lateks',
             'Tandan buah segar',
             'Buah Kelapa',
+            'Bunga Kering',
             'Mentor Basah',
             'Kulit Basah',
             'Polong Basah',
@@ -40,13 +44,14 @@ class IndicatorProduksiSeeder extends Seeder
             'Serat Kering',
             'Hewan Hidup',
             'Telur',
+            'Susu',
             'Ikan Segar',
             'Kayu Gelondongan',
             'Ikan Hidup',
         ];
 
         foreach ($data as $indikator) {
-            IndicatorProduksi::create(['indikator_produksi' => $indikator]);
+            Indicator::create(['indikator' => $indikator]);
         }
     }
 }

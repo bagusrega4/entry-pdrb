@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class IndicatorHarga extends Model
+class Indicator extends Model
 {
     use HasFactory;
 
-    protected $table = 'indicators_harga';
+    protected $table = 'indicators';
 
     protected $fillable = [
-        'indikator_harga',
+        'indikator',
     ];
 
-    public function commodityPrice()
+    public function commodityPriceProduction()
     {
-        return $this->hasMany(CommodityPrice::class);
+        return $this->hasMany(CommodityPriceProduction::class);
     }
 }
