@@ -119,20 +119,65 @@
         const requiredYear = 2010;
         let currentRootId = null;
 
-        function formatNumberID(value, isCurrency = false) {
-            if (value === null || value === undefined || value === '') return '';
-            let number = parseFloat(value.toString().replace(/\./g, '').replace(',', '.'));
-            if (isNaN(number)) return '';
-            let formatted = number.toLocaleString('id-ID', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            });
-            return isCurrency ? 'Rp ' + formatted : formatted;
+        // --- parsing yang robust: menerima format ID/EN ---
+        function parseNumberID(formatted) {
+            if (formatted === null || formatted === undefined || formatted === '') return null;
+            let s = String(formatted).trim();
+
+            // hapus "Rp" dan spasi
+            s = s.replace(/Rp\s*/i, '').replace(/\s+/g, '');
+
+            // jika mengandung kedua separator '.' dan ','
+            const hasDot = s.indexOf('.') !== -1;
+            const hasComma = s.indexOf(',') !== -1;
+
+            if (hasDot && hasComma) {
+                // anggap separator terakhir adalah decimal
+                const lastDot = s.lastIndexOf('.');
+                const lastComma = s.lastIndexOf(',');
+                if (lastComma > lastDot) {
+                    // comma = decimal, dot = thousands
+                    s = s.replace(/\./g, '').replace(',', '.');
+                } else {
+                    // dot = decimal, comma = thousands
+                    s = s.replace(/,/g, '');
+                }
+            } else if (hasComma) {
+                // hanya comma ada
+                // jika lebih dari 1 comma, kemungkinan comma sebagai thousands -> hapus semua
+                if ((s.match(/,/g) || []).length > 1) {
+                    s = s.replace(/,/g, '');
+                } else {
+                    // 1 comma -> anggap decimal
+                    s = s.replace(',', '.');
+                }
+            } else if (hasDot) {
+                // hanya dot ada
+                // jika lebih dari 1 dot, anggap dot sebagai thousands -> hapus semua
+                if ((s.match(/\./g) || []).length > 1) {
+                    s = s.replace(/\./g, '');
+                }
+                // jika 1 dot, bisa jadi decimal (EN style) -> biarkan (`parseFloat` menangani)
+            }
+
+            // hapus semua karakter selain 0-9, minus dan dot (decimal)
+            s = s.replace(/[^0-9.\-]/g, '');
+
+            const num = parseFloat(s);
+            return isNaN(num) ? null : num;
         }
 
-        function parseNumberID(formatted) {
-            if (!formatted) return null;
-            return formatted.toString().replace(/[Rp\s]/g, '').replace(/\./g, '').replace(',', '.');
+        function formatNumberID(value, isCurrency = false) {
+            if (value === null || value === undefined || value === '') return '';
+            // pastikan value numeric
+            let num = (typeof value === 'number') ? value : parseNumberID(value);
+            if (num === null) return '';
+            // format dengan locale id-ID, 0-2 decimal places
+            const formatted = new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(num);
+            return isCurrency ? 'Rp ' + formatted : formatted;
         }
 
         // ambil indikator, unit harga, dan unit produksi
@@ -195,8 +240,8 @@
                 if (it.is_parent) {
                     row.append(
                         `<td colspan="${4 + displayYears.length*2}" class="fw-bold bg-light">
-                            ${escapeHtml(it.kode + ' - ' + it.nama)}
-                        </td>`
+                        ${escapeHtml(it.kode + ' - ' + it.nama)}
+                    </td>`
                     );
                 } else {
                     let displayName = it.is_leaf ? escapeHtml(it.nama) : escapeHtml(it.kode + ' - ' + it.nama);
@@ -204,11 +249,37 @@
                     row.append(`<td>${it.indicator_name ? escapeHtml(it.indicator_name) : ''}</td>`);
                     row.append(`<td>${it.satuan_harga_name ? escapeHtml(it.satuan_harga_name) : ''}</td>`);
                     row.append(`<td>${it.satuan_produksi_name ? escapeHtml(it.satuan_produksi_name) : ''}</td>`);
+
                     displayYears.forEach(y => {
+                        // ambil nilai asli (bisa number atau string)
                         let hargaVal = (it.prices && it.prices[y] !== undefined) ? it.prices[y] : '';
                         let prodVal = (it.productions && it.productions[y] !== undefined) ? it.productions[y] : '';
-                        row.append(`<td><input type="text" class="form-control harga text-end" data-year="${y}" value="${hargaVal}" placeholder="Harga"></td>`);
-                        row.append(`<td><input type="text" class="form-control produksi text-end" data-year="${y}" value="${prodVal}" placeholder="Produksi"></td>`);
+
+                        // simpan raw di data-raw (numeric) dan tampilkan formatted
+                        const hargaRaw = parseNumberID(hargaVal);
+                        const prodRaw = parseNumberID(prodVal);
+
+                        row.append(`
+                        <td>
+                            <input type="text"
+                                class="form-control harga text-end"
+                                data-year="${y}"
+                                data-raw="${hargaRaw !== null ? hargaRaw : ''}"
+                                value="${formatNumberID(hargaRaw, true)}"
+                                placeholder="Harga">
+                        </td>
+                    `);
+
+                        row.append(`
+                        <td>
+                            <input type="text"
+                                class="form-control produksi text-end"
+                                data-year="${y}"
+                                data-raw="${prodRaw !== null ? prodRaw : ''}"
+                                value="${formatNumberID(prodRaw)}"
+                                placeholder="Produksi">
+                        </td>
+                    `);
                     });
                 }
                 $tbody.append(row);
@@ -217,24 +288,45 @@
             attachFormatHandlers();
         }
 
+        // fokus → tampilkan raw untuk editing; blur → format kembali
         function attachFormatHandlers() {
-            // format harga → pakai Rp
-            $('#hargaTable input.harga').each(function() {
-                let val = $(this).val();
-                if (val) $(this).val(formatNumberID(val, true));
-            }).off('input').on('input', function() {
-                let raw = parseNumberID($(this).val());
-                $(this).val(formatNumberID(raw, true));
-            });
+            // HARGA (currency)
+            $('#hargaTable').off('focus', 'input.harga blur', 'input.harga input', 'input.harga');
+            $('#hargaTable')
+                .on('focus', 'input.harga', function() {
+                    // tampilkan angka raw (tanpa Rp/format)
+                    const raw = $(this).data('raw');
+                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
+                    $(this).select();
+                })
+                .on('blur', 'input.harga', function() {
+                    const raw = parseNumberID($(this).val());
+                    $(this).data('raw', raw);
+                    $(this).val(formatNumberID(raw, true));
+                })
+                .on('input', 'input.harga', function() {
+                    // update data-raw live (optional)
+                    const raw = parseNumberID($(this).val());
+                    $(this).data('raw', raw);
+                });
 
-            // format produksi → tanpa Rp
-            $('#hargaTable input.produksi').each(function() {
-                let val = $(this).val();
-                if (val) $(this).val(formatNumberID(val));
-            }).off('input').on('input', function() {
-                let raw = parseNumberID($(this).val());
-                $(this).val(formatNumberID(raw));
-            });
+            // PRODUKSI (non-currency)
+            $('#hargaTable')
+                .off('focus', 'input.produksi blur', 'input.produksi input', 'input.produksi')
+                .on('focus', 'input.produksi', function() {
+                    const raw = $(this).data('raw');
+                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
+                    $(this).select();
+                })
+                .on('blur', 'input.produksi', function() {
+                    const raw = parseNumberID($(this).val());
+                    $(this).data('raw', raw);
+                    $(this).val(formatNumberID(raw));
+                })
+                .on('input', 'input.produksi', function() {
+                    const raw = parseNumberID($(this).val());
+                    $(this).data('raw', raw);
+                });
         }
 
         function escapeHtml(text) {
@@ -292,17 +384,16 @@
             }
         });
 
-        // === Simpan Semua ===
         $('#saveAll').on('click', function() {
             let payload = [];
             $('#hargaTable tbody tr').each(function() {
                 let commodityId = $(this).data('id');
-                if (!commodityId) return; // skip row parent
+                if (!commodityId) return;
 
                 $(this).find('input.harga').each(function() {
                     let year = $(this).data('year');
-                    let harga = parseNumberID($(this).val());
-                    let produksi = parseNumberID($(this).closest('tr').find(`input.produksi[data-year="${year}"]`).val());
+                    let harga = $(this).data('raw');
+                    let produksi = $(this).closest('tr').find(`input.produksi[data-year="${year}"]`).data('raw');
 
                     if (harga || produksi) {
                         payload.push({
@@ -478,8 +569,9 @@
             let satuanHarga = $('#newSatuanHarga').val();
             let satuanProduksi = $('#newSatuanProduksi').val();
 
-            if (!kode || !nama || !indikator || !satuanHarga || !satuanProduksi) {
-                Swal.fire('Error', 'Isi semua field', 'error');
+            // === VALIDASI BARU ===
+            if (!kode || !nama) {
+                Swal.fire('Error', 'Parent, kode, dan nama wajib diisi', 'error');
                 return;
             }
 
@@ -487,9 +579,9 @@
                 parent_id: parentId || null,
                 kode: kode,
                 nama: nama,
-                indikator_id: indikator,
-                satuan_harga_id: satuanHarga,
-                satuan_produksi_id: satuanProduksi,
+                indikator_id: indikator || null,
+                satuan_harga_id: satuanHarga || null,
+                satuan_produksi_id: satuanProduksi || null,
                 _token: '{{ csrf_token() }}'
             }).done(function() {
                 $('#commodityModal').modal('hide');

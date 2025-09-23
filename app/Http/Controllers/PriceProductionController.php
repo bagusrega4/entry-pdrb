@@ -154,12 +154,12 @@ class PriceProductionController extends Controller
     public function storeCommodity(Request $request)
     {
         $validated = $request->validate([
-            'parent_id' => 'nullable|exists:commodities,id',
-            'kode' => 'required|string|max:50|unique:commodities,kode',
-            'nama' => 'required|string|max:255',
-            'indikator_id' => 'required|exists:indicators,id',
-            'satuan_harga_id' => 'required|exists:units_harga,id',
-            'satuan_produksi_id' => 'required|exists:units_produksi,id',
+            'parent_id'           => 'nullable|exists:commodities,id',
+            'kode'                => 'required|string|max:50|unique:commodities,kode',
+            'nama'                => 'required|string|max:255',
+            'indikator_id'        => 'nullable|exists:indicators,id',
+            'satuan_harga_id'     => 'nullable|exists:units_harga,id',
+            'satuan_produksi_id'  => 'nullable|exists:units_produksi,id',
         ]);
 
         $level = 0;
@@ -168,13 +168,13 @@ class PriceProductionController extends Controller
         }
 
         $commodity = Commodity::create([
-            'parent_id' => $validated['parent_id'] ?? null,
-            'kode' => $validated['kode'],
-            'nama' => $validated['nama'],
-            'indikator_id' => $validated['indikator_id'],
-            'satuan_harga_id' => $validated['satuan_harga_id'],
-            'satuan_produksi_id' => $validated['satuan_produksi_id'],
-            'level' => $level,
+            'parent_id'          => $validated['parent_id'] ?? null,
+            'kode'               => $validated['kode'],
+            'nama'               => $validated['nama'],
+            'indikator_id'       => $validated['indikator_id'] ?? null,
+            'satuan_harga_id'    => $validated['satuan_harga_id'] ?? null,
+            'satuan_produksi_id' => $validated['satuan_produksi_id'] ?? null,
+            'level'              => $level,
         ]);
 
         return response()->json($commodity);
@@ -240,7 +240,6 @@ class PriceProductionController extends Controller
             'produksi'           => 'nullable|numeric',
         ]);
 
-        // update kalau tahun sudah ada, kalau belum insert
         CommodityPriceProduction::updateOrCreate(
             [
                 'commodity_id'       => $validated['commodity_id'],

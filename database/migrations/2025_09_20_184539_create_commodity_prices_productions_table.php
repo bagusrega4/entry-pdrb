@@ -14,25 +14,9 @@ return new class extends Migration {
                 ->constrained('commodities')
                 ->onDelete('cascade');
 
-            // indikator, satuan harga, satuan produksi tetap nullable
-            $table->foreignId('indikator_id')
-                ->nullable()
-                ->constrained('indicators')
-                ->onDelete('cascade');
-
-            $table->foreignId('satuan_harga_id')
-                ->nullable()
-                ->constrained('units_harga')
-                ->onDelete('cascade');
-
             $table->year('tahun');
 
             $table->decimal('harga', 15, 2)->nullable();
-
-            $table->foreignId('satuan_produksi_id')
-                ->nullable()
-                ->constrained('units_produksi')
-                ->onDelete('cascade');
 
             $table->decimal('produksi', 15, 2)->nullable();
 
