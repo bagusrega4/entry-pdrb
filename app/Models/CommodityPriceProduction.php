@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class CommodityPriceProduction extends Model
 {
     protected $table = 'commodity_prices_productions';
+
     protected $fillable = [
         'commodity_id',
-        'indicator_id',
-        'unit_price_id',
+        'indikator_id',
+        'satuan_harga_id',
         'harga',
-        'unit_production_id',
+        'satuan_produksi_id',
         'produksi',
         'tahun',
     ];
@@ -24,16 +25,16 @@ class CommodityPriceProduction extends Model
 
     public function indicator()
     {
-        return $this->belongsTo(Indicator::class, 'indicator_id');
+        return $this->belongsTo(Indicator::class, 'indikator_id');
     }
 
     public function unitHarga()
     {
-        return $this->belongsTo(UnitHarga::class, 'unit_harga_id');
+        return $this->belongsTo(UnitHarga::class, 'satuan_harga_id');
     }
 
     public function unitProduksi()
     {
-        return $this->belongsTo(UnitProduksi::class, 'unit_produksi_id');
+        return $this->belongsTo(UnitProduksi::class, 'satuan_produksi_id');
     }
 }

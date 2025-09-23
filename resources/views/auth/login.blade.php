@@ -73,7 +73,7 @@
     <div class="d-flex justify-content-center align-items-center min-vh-100">
         <div class="card-login shadow-lg border-0" style="max-width: 400px; width: 100%;">
             <div class="text-center mb-4">
-                <h2 class="fw-bold">Login</h2>
+                <h2 class="fw-bold">ENTRY PDRB</h2>
                 <p class="text-muted">Masukan username email BPS anda untuk login</p>
             </div>
 

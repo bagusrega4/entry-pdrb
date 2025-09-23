@@ -14,39 +14,33 @@ return new class extends Migration {
                 ->constrained('commodities')
                 ->onDelete('cascade');
 
-            $table->foreignId('indicator_id')
+            // indikator, satuan harga, satuan produksi tetap nullable
+            $table->foreignId('indikator_id')
                 ->nullable()
                 ->constrained('indicators')
                 ->onDelete('cascade');
 
-            $table->foreignId('unit_price_id')
+            $table->foreignId('satuan_harga_id')
                 ->nullable()
                 ->constrained('units_harga')
                 ->onDelete('cascade');
 
+            $table->year('tahun');
+
             $table->decimal('harga', 15, 2)->nullable();
 
-            $table->foreignId('unit_production_id')
+            $table->foreignId('satuan_produksi_id')
                 ->nullable()
                 ->constrained('units_produksi')
                 ->onDelete('cascade');
 
             $table->decimal('produksi', 15, 2)->nullable();
 
-            // Tahun & Timestamp
-            $table->year('tahun');
             $table->timestamps();
 
-            // Unique gabungan
             $table->unique(
-                [
-                    'commodity_id',
-                    'indicator_id',
-                    'unit_price_id',
-                    'unit_production_id',
-                    'tahun'
-                ],
-                'unique_price_production'
+                ['commodity_id', 'tahun'],
+                'unique_price_production_per_year'
             );
         });
     }

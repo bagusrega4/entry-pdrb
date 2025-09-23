@@ -85,6 +85,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('prices_productions.store');
             Route::post('/bulk', [PriceProductionController::class, 'bulkStore'])
                 ->name('prices_productions.bulk');
+            Route::post('/bulk-store', [PriceProductionController::class, 'bulkStore'])
+                ->name('prices_productions.bulk_store');
 
             Route::get('/commodities/all', [PriceProductionController::class, 'getAllCommodities'])
                 ->name('prices_productions.all_commodities');

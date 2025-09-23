@@ -109,29 +109,6 @@ class PriceProductionController extends Controller
         return $rows;
     }
 
-    public function bulkStore(Request $request)
-    {
-        $data = json_decode($request->input('data'), true);
-
-        foreach ($data as $row) {
-            CommodityPriceProduction::updateOrCreate(
-                [
-                    'commodity_id'     => $row['commodity_id'],
-                    'indicator_id'     => $row['indicator_id'],
-                    'unit_harga_id'    => $row['unit_harga_id'],
-                    'unit_produksi_id' => $row['unit_produksi_id'],
-                    'tahun'            => $row['tahun'],
-                ],
-                [
-                    'harga'     => $row['harga'],
-                    'produksi'  => $row['produksi'] ?? null,
-                ]
-            );
-        }
-
-        return response()->json(['success' => true]);
-    }
-
     public function generateNextCode(Request $request, Commodity $parent = null)
     {
         // Kalau parent kosong (mau buat root baru)
@@ -220,25 +197,58 @@ class PriceProductionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'commodity_id'     => 'required|exists:commodities,id',
-            'indicator_id'     => 'nullable|exists:indicators,id',
-            'unit_harga_id'    => 'nullable|exists:unit_harga,id',
-            'unit_produksi_id' => 'nullable|exists:unit_produksi,id',
-            'tahun'            => 'required|integer',
-            'harga'            => 'required|numeric',
-            'produksi'         => 'nullable|numeric',
+        $validated = $request->validate([
+            'commodity_id'       => 'required|exists:commodities,id',
+            'indikator_id'       => 'nullable|exists:indicators,id',
+            'satuan_harga_id'    => 'nullable|exists:units_harga,id',
+            'satuan_produksi_id' => 'nullable|exists:units_produksi,id',
+            'tahun'              => 'required|integer',
+            'harga'              => 'required|numeric',
+            'produksi'           => 'nullable|numeric',
         ]);
 
-        CommodityPriceProduction::create([
-            'commodity_id'     => $request->commodity_id,
-            'indicator_id'     => $request->indicator_id,
-            'unit_harga_id'    => $request->unit_harga_id,
-            'unit_produksi_id' => $request->unit_produksi_id,
-            'tahun'            => $request->tahun,
-            'harga'            => $request->harga,
-            'produksi'         => $request->produksi,
-        ]);
+        // update kalau tahun sudah ada, kalau belum insert
+        CommodityPriceProduction::updateOrCreate(
+            [
+                'commodity_id'       => $validated['commodity_id'],
+                'tahun'              => $validated['tahun'],
+            ],
+            [
+                'indikator_id'       => $validated['indikator_id'],
+                'satuan_harga_id'    => $validated['satuan_harga_id'],
+                'satuan_produksi_id' => $validated['satuan_produksi_id'],
+                'harga'              => $validated['harga'],
+                'produksi'           => $validated['produksi'] ?? null,
+            ]
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $data = json_decode($request->input('data'), true);
+
+        foreach ($data as $row) {
+            $commodity = Commodity::find($row['commodity_id']);
+            if (!$commodity) {
+                continue;
+            }
+
+            CommodityPriceProduction::updateOrCreate(
+                [
+                    'commodity_id' => $row['commodity_id'],
+                    'tahun'        => $row['tahun'],
+                ],
+                [
+                    'indikator_id'       => $commodity->indikator_id,
+                    'satuan_harga_id'    => $commodity->satuan_harga_id,
+                    'satuan_produksi_id' => $commodity->satuan_produksi_id,
+                    'harga'              => $row['harga'] ?? null,
+                    'produksi'           => $row['produksi'] ?? null,
+                ]
+            );
+        }
 
         return response()->json(['success' => true]);
     }
