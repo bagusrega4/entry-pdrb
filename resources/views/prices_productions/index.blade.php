@@ -104,11 +104,8 @@
 @endsection
 
 @section('script')
-<!-- jQuery (sudah ada di project kamu, pastikan tidak dobel) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -347,26 +344,116 @@
                 });
             });
 
+            // isi indikator
             $.get('/prices-productions/indicators', function(res) {
                 res.forEach(i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
+                $('#newIndikator').append('<option value="__new__">+ Tambah Baru...</option>');
             });
+
+            // isi satuan harga
             $.get('/prices-productions/unit-harga', function(res) {
                 res.forEach(u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
+                $('#newSatuanHarga').append('<option value="__new__">+ Tambah Baru...</option>');
             });
+
+            // isi satuan produksi
             $.get('/prices-productions/unit-produksi', function(res) {
                 res.forEach(u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
+                $('#newSatuanProduksi').append('<option value="__new__">+ Tambah Baru...</option>');
             });
 
             $('#commodityModal').modal('show');
         });
 
-        // === Sinkronisasi Satuan Harga → Satuan Produksi ===
+        // Tambah baru Indikator
+        $('#newIndikator').on('change', function() {
+            if ($(this).val() === '__new__') {
+                // modal parent cuma disembunyikan
+                $('#commodityModal').modal('hide');
+
+                Swal.fire({
+                    title: 'Tambah Indikator Baru',
+                    input: 'text',
+                    inputLabel: 'Nama Indikator',
+                    showCancelButton: true,
+                    confirmButtonText: 'Simpan'
+                }).then(res => {
+                    // tampilkan kembali modal parent dengan isi yang sama
+                    $('#commodityModal').modal('show');
+
+                    if (!res.isConfirmed || !res.value) {
+                        $(this).val('');
+                        return;
+                    }
+
+                    $.post('/prices-productions/indicators', {
+                        indikator: res.value,
+                        _token: '{{ csrf_token() }}'
+                    }).done(data => {
+                        let newOpt = new Option(data.indikator, data.id, true, true);
+                        $('#newIndikator').append(newOpt).trigger('change');
+                    }).fail(() => Swal.fire('Error', 'Gagal menambah indikator', 'error'));
+                });
+            }
+        });
+
+        // Tambah baru Satuan Harga
         $('#newSatuanHarga').on('change', function() {
-            let selectedId = $(this).val();
-            if (selectedId) {
-                $('#newSatuanProduksi').val(selectedId).prop('disabled', true);
-            } else {
-                $('#newSatuanProduksi').prop('disabled', false);
+            if ($(this).val() === '__new__') {
+                $('#commodityModal').modal('hide');
+
+                Swal.fire({
+                    title: 'Tambah Satuan Harga Baru',
+                    input: 'text',
+                    inputLabel: 'Nama Satuan Harga',
+                    showCancelButton: true,
+                    confirmButtonText: 'Simpan'
+                }).then(res => {
+                    $('#commodityModal').modal('show');
+
+                    if (!res.isConfirmed || !res.value) {
+                        $(this).val('');
+                        return;
+                    }
+                    $.post('/prices-productions/unit-harga', {
+                        satuan_harga: res.value,
+                        _token: '{{ csrf_token() }}'
+                    }).done(data => {
+                        let newOpt = new Option(data.satuan_harga, data.id, true, true);
+                        $('#newSatuanHarga').append(newOpt).trigger('change');
+                    }).fail(() => Swal.fire('Error', 'Gagal menambah satuan harga', 'error'));
+                });
+            }
+        });
+
+        // Tambah baru Satuan Produksi
+        $('#newSatuanProduksi').on('change', function() {
+            if ($(this).val() === '__new__') {
+                // tutup modal parent dulu
+                $('#commodityModal').modal('hide');
+
+                Swal.fire({
+                    title: 'Tambah Satuan Produksi Baru',
+                    input: 'text',
+                    inputLabel: 'Nama Satuan Produksi',
+                    showCancelButton: true,
+                    confirmButtonText: 'Simpan'
+                }).then(res => {
+                    // buka lagi modal parent
+                    $('#commodityModal').modal('show');
+
+                    if (!res.isConfirmed || !res.value) {
+                        $(this).val('');
+                        return;
+                    }
+                    $.post('/prices-productions/unit-produksi', {
+                        satuan_produksi: res.value,
+                        _token: '{{ csrf_token() }}'
+                    }).done(data => {
+                        let newOpt = new Option(data.satuan_produksi, data.id, true, true);
+                        $('#newSatuanProduksi').append(newOpt).trigger('change');
+                    }).fail(() => Swal.fire('Error', 'Gagal menambah satuan produksi', 'error'));
+                });
             }
         });
 

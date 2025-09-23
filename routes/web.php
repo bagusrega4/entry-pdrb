@@ -71,10 +71,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // indikator & satuan
             Route::get('/indicators', [PriceProductionController::class, 'getIndicators'])
                 ->name('prices_productions.indicators');
+            Route::post('/indicators', [PriceProductionController::class, 'storeIndicator'])
+                ->name('prices_productions.store_indicator');
+
             Route::get('/unit-harga', [PriceProductionController::class, 'getUnitHarga'])
                 ->name('prices_productions.unit_harga');
+            Route::post('/unit-harga', [PriceProductionController::class, 'storeUnitHarga'])
+                ->name('prices_productions.store_unit_harga');
+
             Route::get('/unit-produksi', [PriceProductionController::class, 'getUnitProduksi'])
                 ->name('prices_productions.unit_produksi');
+            Route::post('/unit-produksi', [PriceProductionController::class, 'storeUnitProduksi'])
+                ->name('prices_productions.store_unit_produksi');
 
             // tambah komoditas baru
             Route::post('/commodities', [PriceProductionController::class, 'storeCommodity'])

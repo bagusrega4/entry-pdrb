@@ -195,6 +195,39 @@ class PriceProductionController extends Controller
         return response()->json($commodities);
     }
 
+    public function storeIndicator(Request $request)
+    {
+        $validated = $request->validate([
+            'indikator' => 'required|string|max:255',
+        ]);
+
+        $indikator = Indicator::create($validated);
+
+        return response()->json($indikator);
+    }
+
+    public function storeUnitHarga(Request $request)
+    {
+        $validated = $request->validate([
+            'satuan_harga' => 'required|string|max:255',
+        ]);
+
+        $unit = UnitHarga::create($validated);
+
+        return response()->json($unit);
+    }
+
+    public function storeUnitProduksi(Request $request)
+    {
+        $validated = $request->validate([
+            'satuan_produksi' => 'required|string|max:255',
+        ]);
+
+        $unit = UnitProduksi::create($validated);
+
+        return response()->json($unit);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
