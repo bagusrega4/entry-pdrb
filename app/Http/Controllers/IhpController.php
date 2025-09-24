@@ -4,26 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Commodity;
-use App\Models\CommodityRasio;
+use App\Models\CommodityIhp;
 use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
 
-class RasioController extends Controller
+class IhpController extends Controller
 {
     public function index()
     {
         // Ambil semua komoditas root
         $commodities = Commodity::whereNull('parent_id')
-            ->with(['childrenRecursive', 'rasio'])
+            ->with(['childrenRecursive', 'ihp'])
             ->get();
 
-        return view('rasio.index', compact('commodities'));
+        return view('ihp.index', compact('commodities'));
     }
 
     public function getChildren(Commodity $commodity)
     {
-        $commodity->load(['childrenRecursive', 'rasio']);
+        $commodity->load(['childrenRecursive', 'ihp']);
         return response()->json($commodity->children);
     }
 
@@ -49,14 +49,14 @@ class RasioController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'rasio.indicator',
-            'rasio.unitHarga',
-            'rasio.unitProduksi'
+            'ihp.indicator',
+            'ihp.unitHarga',
+            'ihp.unitProduksi'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);
 
-        $years = CommodityRasio::whereIn('commodity_id', collect($flatten)->pluck('id'))
+        $years = CommodityIhp::whereIn('commodity_id', collect($flatten)->pluck('id'))
             ->pluck('tahun')->unique()->sort()->values();
 
         return response()->json([
@@ -71,15 +71,11 @@ class RasioController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // ambil rasio (dari tabel commodity_rasio)
-        $rasio_output_ikutan = [];
-        $rasio_wip_cbr = [];
-        $rasio_biaya_antara = [];
+        // ambil ihp (dari tabel commodity_ihp)
+        $ihp = [];
 
-        foreach ($commodity->rasio as $r) {
-            $rasio_output_ikutan[$r->tahun] = $r->rasio_output_ikutan ?? null;
-            $rasio_wip_cbr[$r->tahun]    = $r->rasio_wip_cbr ?? null;
-            $rasio_biaya_antara[$r->tahun]  = $r->rasio_biaya_antara ?? null;
+        foreach ($commodity->ihp as $r) {
+            $ihp[$r->tahun] = $r->ihp ?? null;
         }
 
         $isParent = $commodity->children->count() > 0;
@@ -92,10 +88,8 @@ class RasioController extends Controller
             'is_parent' => $isParent,
             'is_leaf' => !$isParent,
 
-            // data rasio per tahun
-            'rasio_output_ikutan' => $rasio_output_ikutan,
-            'rasio_wip_cbr' => $rasio_wip_cbr,
-            'rasio_biaya_antara' => $rasio_biaya_antara,
+            // data ihp per tahun
+            'ihp' => $ihp,
 
             // indikator & satuan tetap ambil dari commodities
             'indikator_id' => $commodity->indikator_id,
@@ -238,20 +232,16 @@ class RasioController extends Controller
         $validated = $request->validate([
             'commodity_id'       => 'required|exists:commodities,id',
             'tahun'              => 'required|integer',
-            'rasio_output_ikutan' => 'nullable|numeric',
-            'rasio_wip_cbr'      => 'nullable|numeric',
-            'rasio_biaya_antara' => 'nullable|numeric',
+            'ihp' => 'nullable|numeric',
         ]);
 
-        CommodityRasio::updateOrCreate(
+        CommodityIhp::updateOrCreate(
             [
                 'commodity_id' => $validated['commodity_id'],
                 'tahun'        => $validated['tahun'],
             ],
             [
-                'rasio_output_ikutan' => $validated['rasio_output_ikutan'] ?? null,
-                'rasio_wip_cbr'      => $validated['rasio_wip_cbr'] ?? null,
-                'rasio_biaya_antara' => $validated['rasio_biaya_antara'] ?? null,
+                'ihp' => $validated['ihp'] ?? null,
             ]
         );
 
@@ -266,15 +256,13 @@ class RasioController extends Controller
             $commodity = Commodity::find($row['commodity_id']);
             if (!$commodity) continue;
 
-            CommodityRasio::updateOrCreate(
+            CommodityIhp::updateOrCreate(
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
                 ],
                 [
-                    'rasio_output_ikutan' => $row['rasio_output_ikutan'] ?? null,
-                    'rasio_wip_cbr'      => $row['rasio_wip_cbr'] ?? null,
-                    'rasio_biaya_antara' => $row['rasio_biaya_antara'] ?? null,
+                    'ihp' => $row['ihp'] ?? null,
                 ]
             );
         }

@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PriceProductionController;
 use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\RasioController;
+use App\Http\Controllers\IhpController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -145,6 +146,51 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [RasioController::class, 'getAllCommodities'])
                 ->name('rasio.all_commodities');
+        });
+
+        // Input IHP
+        Route::prefix('ihp')->group(function () {
+            Route::get('/', [IhpController::class, 'index'])
+                ->name('ihp.index');
+
+            // ambil subtree (anak-anak komoditas)
+            Route::get('/commodities/{commodity}/subtree', [IhpController::class, 'getSubtree'])
+                ->name('ihp.subtree');
+
+            // generate kode otomatis untuk child baru
+            Route::get('/commodities/{parent}/next-code', [IhpController::class, 'generateNextCode'])
+                ->name('ihp.next_code');
+
+            // indikator & satuan
+            Route::get('/indicators', [IhpController::class, 'getIndicators'])
+                ->name('ihp.indicators');
+            Route::post('/indicators', [IhpController::class, 'storeIndicator'])
+                ->name('ihp.store_indicator');
+
+            Route::get('/unit-harga', [IhpController::class, 'getUnitHarga'])
+                ->name('ihp.unit_harga');
+            Route::post('/unit-harga', [IhpController::class, 'storeUnitHarga'])
+                ->name('ihp.store_unit_harga');
+
+            Route::get('/unit-produksi', [IhpController::class, 'getUnitProduksi'])
+                ->name('ihp.unit_produksi');
+            Route::post('/unit-produksi', [IhpController::class, 'storeUnitProduksi'])
+                ->name('ihp.store_unit_produksi');
+
+            // tambah komoditas baru
+            Route::post('/commodities', [IhpController::class, 'storeCommodity'])
+                ->name('ihp.store_commodity');
+
+            // input harga/produksi
+            Route::post('/', [IhpController::class, 'store'])
+                ->name('ihp.store');
+            Route::post('/bulk', [IhpController::class, 'bulkStore'])
+                ->name('ihp.bulk');
+            Route::post('/bulk-store', [IhpController::class, 'bulkStore'])
+                ->name('ihp.bulk_store');
+
+            Route::get('/commodities/all', [IhpController::class, 'getAllCommodities'])
+                ->name('ihp.all_commodities');
         });
 
         // Manage User

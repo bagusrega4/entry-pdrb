@@ -36,6 +36,11 @@ class Commodity extends Model
         return $this->hasMany(CommodityRasio::class, 'commodity_id');
     }
 
+    public function ihp()
+    {
+        return $this->hasMany(CommodityIhp::class, 'commodity_id');
+    }
+
     public function indicator()
     {
         return $this->belongsTo(Indicator::class, 'indikator_id');

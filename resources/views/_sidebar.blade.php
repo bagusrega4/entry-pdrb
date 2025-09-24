@@ -67,6 +67,14 @@
                     </a>
                 </li>
 
+                <!-- Input IHP -->
+                <li class="nav-item {{ request()->routeIs('ihp.*') ? 'active' : '' }}">
+                    <a href="{{ route('ihp.index') }}">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Input IHP</p>
+                    </a>
+                </li>
+
                 @if(in_array(Auth::user()->id_role, [2]))
                 <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
                     <a href="{{ route('manage.user.index') }}">

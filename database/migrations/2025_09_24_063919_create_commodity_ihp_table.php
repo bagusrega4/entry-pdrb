@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('commodity_rasio', function (Blueprint $table) {
+        Schema::create('commodity_ihp', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('commodity_id')
@@ -16,23 +16,19 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('rasio_output_ikutan', 15, 10)->nullable();
-
-            $table->decimal('rasio_wip_cbr', 15, 10)->nullable();
-
-            $table->decimal('rasio_biaya_antara', 15, 10)->nullable();
+            $table->decimal('ihp', 15, 10)->nullable();
 
             $table->timestamps();
 
             $table->unique(
                 ['commodity_id', 'tahun'],
-                'unique_rasio_per_year'
+                'unique_ihp_per_year'
             );
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('commodity_rasio');
+        Schema::dropIfExists('commodity_ihp');
     }
 };
