@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardOperatorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PriceProductionController;
 use App\Http\Controllers\ManageUserController;
+use App\Http\Controllers\RasioController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -56,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/edit-profile', [ProfileController::class, 'setPhotoProfile'])->name('edit.profile');
         Route::put('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
 
+        // Input Harga dan Produksi
         Route::prefix('prices-productions')->group(function () {
             Route::get('/', [PriceProductionController::class, 'index'])
                 ->name('prices_productions.index');
@@ -98,6 +100,51 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [PriceProductionController::class, 'getAllCommodities'])
                 ->name('prices_productions.all_commodities');
+        });
+
+        // Input Rasio
+        Route::prefix('rasio')->group(function () {
+            Route::get('/', [RasioController::class, 'index'])
+                ->name('rasio.index');
+
+            // ambil subtree (anak-anak komoditas)
+            Route::get('/commodities/{commodity}/subtree', [RasioController::class, 'getSubtree'])
+                ->name('rasio.subtree');
+
+            // generate kode otomatis untuk child baru
+            Route::get('/commodities/{parent}/next-code', [RasioController::class, 'generateNextCode'])
+                ->name('rasio.next_code');
+
+            // indikator & satuan
+            Route::get('/indicators', [RasioController::class, 'getIndicators'])
+                ->name('rasio.indicators');
+            Route::post('/indicators', [RasioController::class, 'storeIndicator'])
+                ->name('rasio.store_indicator');
+
+            Route::get('/unit-harga', [RasioController::class, 'getUnitHarga'])
+                ->name('rasio.unit_harga');
+            Route::post('/unit-harga', [RasioController::class, 'storeUnitHarga'])
+                ->name('rasio.store_unit_harga');
+
+            Route::get('/unit-produksi', [RasioController::class, 'getUnitProduksi'])
+                ->name('rasio.unit_produksi');
+            Route::post('/unit-produksi', [RasioController::class, 'storeUnitProduksi'])
+                ->name('rasio.store_unit_produksi');
+
+            // tambah komoditas baru
+            Route::post('/commodities', [RasioController::class, 'storeCommodity'])
+                ->name('rasio.store_commodity');
+
+            // input harga/produksi
+            Route::post('/', [RasioController::class, 'store'])
+                ->name('rasio.store');
+            Route::post('/bulk', [RasioController::class, 'bulkStore'])
+                ->name('rasio.bulk');
+            Route::post('/bulk-store', [RasioController::class, 'bulkStore'])
+                ->name('rasio.bulk_store');
+
+            Route::get('/commodities/all', [RasioController::class, 'getAllCommodities'])
+                ->name('rasio.all_commodities');
         });
 
         // Manage User

@@ -5,7 +5,7 @@
     <div class="page-inner">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
             <div>
-                <h3 class="fw-bold mb-3">Input Harga dan Produksi Komoditas</h3>
+                <h3 class="fw-bold mb-3">Input Rasio Output Ikutan, Rasio Jasa Pertanian, dan Rasio Biaya Antara</h3>
                 <h6 class="op-7 mb-2">Pilih komoditas -> seluruh tabel turunannya akan muncul.</h6>
             </div>
         </div>
@@ -35,12 +35,11 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="hargaTable">
+                <table class="table table-bordered" id="rasioTable">
                     <thead>
                         <tr>
                             <th style="min-width:260px;">Komoditas</th>
                             <th style="width:160px">Indikator</th>
-                            <th style="width:120px">Satuan Harga</th>
                             <th style="width:140px">Satuan Produksi</th>
                         </tr>
                     </thead>
@@ -122,78 +121,27 @@
         // --- parsing yang robust: menerima format ID/EN ---
         function parseNumberID(formatted) {
             if (formatted === null || formatted === undefined || formatted === '') return null;
-            let s = String(formatted).trim();
-
-            // hapus "Rp" dan spasi
-            s = s.replace(/Rp\s*/i, '').replace(/\s+/g, '');
-
-            // deteksi adanya dot/comma
-            const hasDot = s.indexOf('.') !== -1;
-            const hasComma = s.indexOf(',') !== -1;
-
-            if (hasDot && hasComma) {
-                // ada keduanya -> anggap separator terakhir adalah decimal
-                const lastDot = s.lastIndexOf('.');
-                const lastComma = s.lastIndexOf(',');
-                if (lastComma > lastDot) {
-                    // comma = decimal, dot = thousands
-                    s = s.replace(/\./g, '').replace(',', '.');
-                } else {
-                    // dot = decimal, comma = thousands
-                    s = s.replace(/,/g, '');
-                }
-            } else if (hasComma) {
-                // hanya comma: biasanya id-ID -> comma = decimal,
-                // tapi kalau lebih dari 1 comma kemungkinan comma sebagai thousands -> hapus semua
-                if ((s.match(/,/g) || []).length > 1) {
-                    s = s.replace(/,/g, '');
-                } else {
-                    s = s.replace(',', '.');
-                }
-            } else if (hasDot) {
-                // hanya dot: bisa jadi thousands (id) atau decimal (en).
-                const dotCount = (s.match(/\./g) || []).length;
-                if (dotCount > 1) {
-                    // banyak dot -> hampir pasti thousands grouping -> hapus semua dot
-                    s = s.replace(/\./g, '');
-                } else {
-                    // satu dot -> coba heuristik:
-                    // jika ada tepat 3 digit setelah dot -> anggap thousands (1.000 -> 1000)
-                    // otherwise anggap decimal (1000.5 -> 1000.5)
-                    const parts = s.split('.');
-                    if (parts.length === 2 && parts[1].length === 3 && parts[0].length > 0) {
-                        s = s.replace(/\./g, '');
-                    }
-                    // else: biarkan dot sebagai decimal
-                }
-            }
-
-            // bersihkan karakter non-digit kecuali dot/minus (sudah disesuaikan di atas)
-            s = s.replace(/[^0-9.\-]/g, '');
-
+            let s = String(formatted).trim().replace(',', '.');
             const num = parseFloat(s);
             return isNaN(num) ? null : num;
         }
 
-        function formatNumberID(value, isCurrency = false) {
+        function formatNumberID(value) {
             if (value === null || value === undefined || value === '') return '';
-            // pastikan value numeric
             let num = (typeof value === 'number') ? value : parseNumberID(value);
             if (num === null) return '';
-            // format dengan locale id-ID, 0-2 decimal places
-            const formatted = new Intl.NumberFormat('id-ID', {
+            return new Intl.NumberFormat('id-ID', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 10
             }).format(num);
-            return isCurrency ? 'Rp ' + formatted : formatted;
         }
 
         // ambil indikator, unit harga, dan unit produksi
         function fetchIndicatorsAndUnits() {
             return $.when(
-                $.get('/prices-productions/indicators').done(data => indikatorOptions = data || []),
-                $.get('/prices-productions/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/prices-productions/unit-produksi').done(data => unitProduksiOptions = data || [])
+                $.get('/rasio/indicators').done(data => indikatorOptions = data || []),
+                $.get('/rasio/unit-harga').done(data => unitHargaOptions = data || []),
+                $.get('/rasio/unit-produksi').done(data => unitProduksiOptions = data || [])
             ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
         }
 
@@ -204,7 +152,7 @@
         });
 
         function loadSubtree(rootId) {
-            $.get('/prices-productions/commodities/' + rootId + '/subtree', function(res) {
+            $.get('/rasio/commodities/' + rootId + '/subtree', function(res) {
                 itemsData = res.commodities || [];
                 let serverYears = res.years || [];
 
@@ -231,17 +179,16 @@
         }
 
         function buildTable(items, displayYears = years) {
-            let $theadRow = $('#hargaTable thead tr').empty();
+            let $theadRow = $('#rasioTable thead tr').empty();
             $theadRow.append('<th style="min-width:260px;">Komoditas</th>');
             $theadRow.append('<th style="width:160px">Indikator</th>');
-            $theadRow.append('<th style="width:120px">Satuan Harga</th>');
             $theadRow.append('<th style="width:140px">Satuan Produksi</th>');
 
             displayYears.forEach(y => {
-                $theadRow.append(`<th colspan="2" style="width:260px;" class="text-center">${y}</th>`);
+                $theadRow.append(`<th colspan="3" style="width:260px;" class="text-center">${y}</th>`);
             });
 
-            let $tbody = $('#hargaTable tbody').empty();
+            let $tbody = $('#rasioTable tbody').empty();
 
             items.forEach(it => {
                 let row = $(`<tr data-id="${it.id}"></tr>`);
@@ -255,37 +202,48 @@
                     let displayName = it.is_leaf ? escapeHtml(it.nama) : escapeHtml(it.kode + ' - ' + it.nama);
                     row.append(`<td>${displayName}</td>`);
                     row.append(`<td>${it.indicator_name ? escapeHtml(it.indicator_name) : ''}</td>`);
-                    row.append(`<td>${it.satuan_harga_name ? escapeHtml(it.satuan_harga_name) : ''}</td>`);
                     row.append(`<td>${it.satuan_produksi_name ? escapeHtml(it.satuan_produksi_name) : ''}</td>`);
 
                     displayYears.forEach(y => {
                         // ambil nilai asli (bisa number atau string)
-                        let hargaVal = (it.prices && it.prices[y] !== undefined) ? it.prices[y] : '';
-                        let prodVal = (it.productions && it.productions[y] !== undefined) ? it.productions[y] : '';
+                        let r1 = (it.rasio_output_ikutan && it.rasio_output_ikutan[y] !== undefined) ? it.rasio_output_ikutan[y] : '';
+                        let r2 = (it.rasio_wip_cbr && it.rasio_wip_cbr[y] !== undefined) ? it.rasio_wip_cbr[y] : '';
+                        let r3 = (it.rasio_biaya_antara && it.rasio_biaya_antara[y] !== undefined) ? it.rasio_biaya_antara[y] : '';
 
                         // simpan raw di data-raw (numeric) dan tampilkan formatted
-                        const hargaRaw = parseNumberID(hargaVal);
-                        const prodRaw = parseNumberID(prodVal);
+                        const rasioOutputIkutan = parseNumberID(r1);
+                        const rasioWipCbr = parseNumberID(r2);
+                        const rasioBiayaAntara = parseNumberID(r3);
 
                         row.append(`
                         <td>
                             <input type="text"
-                                class="form-control harga text-end"
+                                class="form-control rasioOutputIkutan text-end"
                                 data-year="${y}"
-                                data-raw="${hargaRaw !== null ? hargaRaw : ''}"
-                                value="${formatNumberID(hargaRaw, true)}"
-                                placeholder="Harga">
+                                data-raw="${rasioOutputIkutan !== null ? rasioOutputIkutan : ''}"
+                                value="${formatNumberID(rasioOutputIkutan, true)}"
+                                placeholder="Rasio Output Ikutan">
                         </td>
                     `);
 
                         row.append(`
                         <td>
                             <input type="text"
-                                class="form-control produksi text-end"
+                                class="form-control rasioWipCbr text-end"
                                 data-year="${y}"
-                                data-raw="${prodRaw !== null ? prodRaw : ''}"
-                                value="${formatNumberID(prodRaw)}"
-                                placeholder="Produksi">
+                                data-raw="${rasioWipCbr !== null ? rasioWipCbr : ''}"
+                                value="${formatNumberID(rasioWipCbr)}"
+                                placeholder="Rasio WIP/CBR">
+                        </td>
+                    `);
+                        row.append(`
+                        <td>
+                            <input type="text"
+                                class="form-control rasioBiayaAntara text-end"
+                                data-year="${y}"
+                                data-raw="${rasioBiayaAntara !== null ? rasioBiayaAntara : ''}"
+                                value="${formatNumberID(rasioBiayaAntara)}"
+                                placeholder="Rasio Biaya Antara">
                         </td>
                     `);
                     });
@@ -296,45 +254,20 @@
             attachFormatHandlers();
         }
 
-        // fokus → tampilkan raw untuk editing; blur → format kembali
         function attachFormatHandlers() {
-            // HARGA (currency)
-            $('#hargaTable').off('focus', 'input.harga blur', 'input.harga input', 'input.harga');
-            $('#hargaTable')
-                .on('focus', 'input.harga', function() {
-                    // tampilkan angka raw (tanpa Rp/format)
-                    const raw = $(this).data('raw');
-                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
-                    $(this).select();
-                })
-                .on('blur', 'input.harga', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                    $(this).val(formatNumberID(raw, true));
-                })
-                .on('input', 'input.harga', function() {
-                    // update data-raw live (optional)
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                });
-
-            // PRODUKSI (non-currency)
-            $('#hargaTable')
-                .off('focus', 'input.produksi blur', 'input.produksi input', 'input.produksi')
-                .on('focus', 'input.produksi', function() {
-                    const raw = $(this).data('raw');
-                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
-                    $(this).select();
-                })
-                .on('blur', 'input.produksi', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                    $(this).val(formatNumberID(raw));
-                })
-                .on('input', 'input.produksi', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                });
+            $('#rasioTable').off('focus blur input', 'input');
+            $('#rasioTable').on('focus', 'input', function() {
+                const raw = $(this).data('raw');
+                $(this).val(raw ?? '');
+                $(this).select();
+            }).on('blur', 'input', function() {
+                const raw = parseNumberID($(this).val());
+                $(this).data('raw', raw);
+                $(this).val(formatNumberID(raw));
+            }).on('input', 'input', function() {
+                const raw = parseNumberID($(this).val());
+                $(this).data('raw', raw);
+            });
         }
 
         function escapeHtml(text) {
@@ -372,7 +305,6 @@
                 years.push(newYear);
                 years.sort((a, b) => a - b);
 
-                // tambahkan ke dropdown Select2
                 let newOption = new Option(newYear, newYear, true, true);
                 $('#yearFilter').append(newOption).trigger('change');
 
@@ -382,33 +314,32 @@
             });
         });
 
-        // === Event Filter Tahun (Select2) ===
+        // Event filter tahun
         $('#yearFilter').on('change', function() {
             let selected = $(this).val()?.map(y => parseInt(y)) || [];
-            if (selected.length === 0) {
-                buildTable(itemsData);
-            } else {
-                buildTable(itemsData, selected);
-            }
+            buildTable(itemsData, selected.length ? selected : years);
         });
 
         $('#saveAll').on('click', function() {
             let payload = [];
-            $('#hargaTable tbody tr').each(function() {
+            $('#rasioTable tbody tr').each(function() {
                 let commodityId = $(this).data('id');
                 if (!commodityId) return;
 
-                $(this).find('input.harga').each(function() {
+                // loop berdasarkan input rasioOutputIkutan (karena setiap tahun pasti ada)
+                $(this).find('input.rasioOutputIkutan').each(function() {
                     let year = $(this).data('year');
-                    let harga = $(this).data('raw');
-                    let produksi = $(this).closest('tr').find(`input.produksi[data-year="${year}"]`).data('raw');
+                    let r1 = $(this).data('raw');
+                    let r2 = $(this).closest('tr').find(`input.rasioWipCbr[data-year="${year}"]`).data('raw');
+                    let r3 = $(this).closest('tr').find(`input.rasioBiayaAntara[data-year="${year}"]`).data('raw');
 
-                    if (harga || produksi) {
+                    if (r1 || r2 || r3) {
                         payload.push({
                             commodity_id: commodityId,
                             tahun: year,
-                            harga: harga || null,
-                            produksi: produksi || null
+                            rasio_output_ikutan: r1 || null,
+                            rasio_wip_cbr: r2 || null,
+                            rasio_biaya_antara: r3 || null
                         });
                     }
                 });
@@ -419,7 +350,7 @@
                 return;
             }
 
-            $.post('/prices-productions/bulk-store', {
+            $.post('/rasio/bulk-store', {
                 data: JSON.stringify(payload),
                 _token: '{{ csrf_token() }}'
             }).done(() => {
@@ -437,26 +368,26 @@
             $('#newSatuanHarga').empty().append('<option value="">-- Pilih Satuan Harga --</option>');
             $('#newSatuanProduksi').empty().append('<option value="">-- Pilih Satuan Produksi --</option>');
 
-            $.get('/prices-productions/commodities/all', function(res) {
+            $.get('/rasio/commodities/all', function(res) {
                 res.forEach(c => {
                     $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`);
                 });
             });
 
             // isi indikator
-            $.get('/prices-productions/indicators', function(res) {
+            $.get('/rasio/indicators', function(res) {
                 res.forEach(i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
                 $('#newIndikator').append('<option value="__new__">+ Tambah Baru...</option>');
             });
 
             // isi satuan harga
-            $.get('/prices-productions/unit-harga', function(res) {
+            $.get('/rasio/unit-harga', function(res) {
                 res.forEach(u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
                 $('#newSatuanHarga').append('<option value="__new__">+ Tambah Baru...</option>');
             });
 
             // isi satuan produksi
-            $.get('/prices-productions/unit-produksi', function(res) {
+            $.get('/rasio/unit-produksi', function(res) {
                 res.forEach(u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
                 $('#newSatuanProduksi').append('<option value="__new__">+ Tambah Baru...</option>');
             });
@@ -485,7 +416,7 @@
                         return;
                     }
 
-                    $.post('/prices-productions/indicators', {
+                    $.post('/rasio/indicators', {
                         indikator: res.value,
                         _token: '{{ csrf_token() }}'
                     }).done(data => {
@@ -514,7 +445,7 @@
                         $(this).val('');
                         return;
                     }
-                    $.post('/prices-productions/unit-harga', {
+                    $.post('/rasio/unit-harga', {
                         satuan_harga: res.value,
                         _token: '{{ csrf_token() }}'
                     }).done(data => {
@@ -545,7 +476,7 @@
                         $(this).val('');
                         return;
                     }
-                    $.post('/prices-productions/unit-produksi', {
+                    $.post('/rasio/unit-produksi', {
                         satuan_produksi: res.value,
                         _token: '{{ csrf_token() }}'
                     }).done(data => {
@@ -559,12 +490,12 @@
         $('#parentSelect').on('change', function() {
             let parentId = $(this).val();
             if (!parentId) {
-                $.get(`/prices-productions/commodities/next-code`, function(res) {
+                $.get(`/rasio/commodities/next-code`, function(res) {
                     $('#newKode').val(res.new_code);
                 });
                 return;
             }
-            $.get(`/prices-productions/commodities/${parentId}/next-code`, function(res) {
+            $.get(`/rasio/commodities/${parentId}/next-code`, function(res) {
                 $('#newKode').val(res.new_code);
             });
         });
@@ -583,7 +514,7 @@
                 return;
             }
 
-            $.post('/prices-productions/commodities', {
+            $.post('/rasio/commodities', {
                 parent_id: parentId || null,
                 kode: kode,
                 nama: nama,

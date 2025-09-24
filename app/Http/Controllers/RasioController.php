@@ -4,26 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Commodity;
+use App\Models\CommodityRasio;
 use App\Models\CommodityPriceProduction;
 use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
 
-class PriceProductionController extends Controller
+class RasioController extends Controller
 {
     public function index()
     {
-        // Ambil semua komoditas root (tanpa parent)
+        // Ambil semua komoditas root
         $commodities = Commodity::whereNull('parent_id')
-            ->with(['childrenRecursive', 'pricesProduction'])
+            ->with(['childrenRecursive', 'rasio'])
             ->get();
 
-        return view('prices_productions.index', compact('commodities'));
+        return view('rasio.index', compact('commodities'));
     }
 
     public function getChildren(Commodity $commodity)
     {
-        $commodity->load(['childrenRecursive', 'pricesProduction']);
+        $commodity->load(['childrenRecursive', 'rasio']);
         return response()->json($commodity->children);
     }
 
@@ -38,6 +39,7 @@ class PriceProductionController extends Controller
         $units = UnitHarga::select('id', 'satuan_harga')->get();
         return response()->json($units);
     }
+
     public function getUnitProduksi()
     {
         $units = UnitProduksi::select('id', 'satuan_produksi')->get();
@@ -48,9 +50,9 @@ class PriceProductionController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'pricesProduction.indicator',
-            'pricesProduction.unitHarga',
-            'pricesProduction.unitProduksi'
+            'rasio.indicator',
+            'rasio.unitHarga',
+            'rasio.unitProduksi'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);
@@ -70,12 +72,15 @@ class PriceProductionController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // ambil harga & produksi (dari tabel commodity_price_productions)
-        $prices = [];
-        $productions = [];
-        foreach ($commodity->pricesProduction as $p) {
-            $prices[$p->tahun] = $p->harga;
-            $productions[$p->tahun] = $p->produksi ?? null;
+        // ambil rasio (dari tabel commodity_rasio)
+        $rasio_output_ikutan = [];
+        $rasio_wip_cbr = [];
+        $rasio_biaya_antara = [];
+
+        foreach ($commodity->rasio as $r) {
+            $rasio_output_ikutan[$r->tahun] = $r->rasio_output_ikutan ?? null;
+            $rasio_wip_cbr[$r->tahun]    = $r->rasio_wip_cbr ?? null;
+            $rasio_biaya_antara[$r->tahun]  = $r->rasio_biaya_antara ?? null;
         }
 
         $isParent = $commodity->children->count() > 0;
@@ -87,21 +92,22 @@ class PriceProductionController extends Controller
             'full_name' => $name,
             'is_parent' => $isParent,
             'is_leaf' => !$isParent,
-            'prices' => $prices,
-            'productions' => $productions,
 
-            // indikator & satuan ambil langsung dari tabel commodities
+            // data rasio per tahun
+            'rasio_output_ikutan' => $rasio_output_ikutan,
+            'rasio_wip_cbr' => $rasio_wip_cbr,
+            'rasio_biaya_antara' => $rasio_biaya_antara,
+
+            // indikator & satuan tetap ambil dari commodities
             'indikator_id' => $commodity->indikator_id,
             'satuan_harga_id' => $commodity->satuan_harga_id,
             'satuan_produksi_id' => $commodity->satuan_produksi_id,
 
-            // nama relasi juga langsung dari commodities
             'indicator_name' => $commodity->indicator ? $commodity->indicator->indikator : null,
             'satuan_harga_name' => $commodity->unitHarga ? $commodity->unitHarga->satuan_harga : null,
             'satuan_produksi_name' => $commodity->unitProduksi ? $commodity->unitProduksi->satuan_produksi : null,
         ];
 
-        // recursive untuk anak
         foreach ($commodity->children as $child) {
             $rows = array_merge($rows, $this->flattenCommodity($child, $name, false));
         }
@@ -233,18 +239,20 @@ class PriceProductionController extends Controller
         $validated = $request->validate([
             'commodity_id'       => 'required|exists:commodities,id',
             'tahun'              => 'required|integer',
-            'harga'              => 'required|numeric',
-            'produksi'           => 'nullable|numeric',
+            'rasio_output_ikutan' => 'nullable|numeric',
+            'rasio_wip_cbr'      => 'nullable|numeric',
+            'rasio_biaya_antara' => 'nullable|numeric',
         ]);
 
-        CommodityPriceProduction::updateOrCreate(
+        CommodityRasio::updateOrCreate(
             [
-                'commodity_id'       => $validated['commodity_id'],
-                'tahun'              => $validated['tahun'],
+                'commodity_id' => $validated['commodity_id'],
+                'tahun'        => $validated['tahun'],
             ],
             [
-                'harga'              => $validated['harga'],
-                'produksi'           => $validated['produksi'] ?? null,
+                'rasio_output_ikutan' => $validated['rasio_output_ikutan'] ?? null,
+                'rasio_wip_cbr'      => $validated['rasio_wip_cbr'] ?? null,
+                'rasio_biaya_antara' => $validated['rasio_biaya_antara'] ?? null,
             ]
         );
 
@@ -257,18 +265,17 @@ class PriceProductionController extends Controller
 
         foreach ($data as $row) {
             $commodity = Commodity::find($row['commodity_id']);
-            if (!$commodity) {
-                continue;
-            }
+            if (!$commodity) continue;
 
-            CommodityPriceProduction::updateOrCreate(
+            CommodityRasio::updateOrCreate(
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
                 ],
                 [
-                    'harga'              => $row['harga'] ?? null,
-                    'produksi'           => $row['produksi'] ?? null,
+                    'rasio_output_ikutan' => $row['rasio_output_ikutan'] ?? null,
+                    'rasio_wip_cbr'      => $row['rasio_wip_cbr'] ?? null,
+                    'rasio_biaya_antara' => $row['rasio_biaya_antara'] ?? null,
                 ]
             );
         }

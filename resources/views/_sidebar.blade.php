@@ -58,6 +58,15 @@
                         <p>Input Harga & Produksi</p>
                     </a>
                 </li>
+
+                <!-- Input Rasio -->
+                <li class="nav-item {{ request()->routeIs('rasio.*') ? 'active' : '' }}">
+                    <a href="{{ route('rasio.index') }}">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Input Rasio</p>
+                    </a>
+                </li>
+
                 @if(in_array(Auth::user()->id_role, [2]))
                 <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
                     <a href="{{ route('manage.user.index') }}">

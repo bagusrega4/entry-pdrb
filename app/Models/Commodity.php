@@ -31,6 +31,11 @@ class Commodity extends Model
         return $this->hasMany(CommodityPriceProduction::class, 'commodity_id');
     }
 
+    public function rasio()
+    {
+        return $this->hasMany(CommodityRasio::class, 'commodity_id');
+    }
+
     public function indicator()
     {
         return $this->belongsTo(Indicator::class, 'indikator_id');
@@ -51,6 +56,7 @@ class Commodity extends Model
         return $this->children()->with([
             'childrenRecursive',
             'pricesProduction',
+            'rasio',
             'indicator',
             'unitHarga',
             'unitProduksi'

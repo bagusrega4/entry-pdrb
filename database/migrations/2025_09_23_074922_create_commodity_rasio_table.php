@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('commodity_prices_productions', function (Blueprint $table) {
+        Schema::create('commodity_rasio', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('commodity_id')
@@ -16,9 +16,11 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('harga', 15, 10)->nullable();
+            $table->decimal('rasio_output_ikutan', 15, 10)->nullable();
 
-            $table->decimal('produksi', 15, 10)->nullable();
+            $table->decimal('rasio_wip_cbr', 15, 10)->nullable();
+
+            $table->decimal('rasio_biaya_antara', 15, 10)->nullable();
 
             $table->timestamps();
 
@@ -31,6 +33,6 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('commodity_prices_productions');
+        Schema::dropIfExists('commodity_rasio');
     }
 };
