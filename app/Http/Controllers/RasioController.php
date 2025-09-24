@@ -49,9 +49,10 @@ class RasioController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'rasio.indicator',
-            'rasio.unitHarga',
-            'rasio.unitProduksi'
+            'rasio',
+            'indicator',
+            'unitHarga',
+            'unitProduksi'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);

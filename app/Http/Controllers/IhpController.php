@@ -49,9 +49,10 @@ class IhpController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'ihp.indicator',
-            'ihp.unitHarga',
-            'ihp.unitProduksi'
+            'ihp',           
+            'indicator',     
+            'unitHarga',    
+            'unitProduksi'   
         ]);
 
         $flatten = $this->flattenCommodity($commodity);

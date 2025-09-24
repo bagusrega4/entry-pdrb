@@ -188,20 +188,37 @@
             $theadRow.append('<th style="width:140px">Satuan Produksi</th>');
 
             displayYears.forEach(y => {
-                $theadRow.append(`<th colspan="1" style="width:260px;" class="text-center">${y}</th>`);
+                $theadRow.append(`<th style="width:260px;" class="text-center">${y}</th>`);
             });
 
             let $tbody = $('#ihpTable tbody').empty();
 
             items.forEach(it => {
                 let row = $(`<tr data-id="${it.id}"></tr>`);
+
                 if (it.is_parent) {
-                    row.append(
-                        `<td colspan="${4 + displayYears.length*2}" class="fw-bold bg-light">
-                        ${escapeHtml(it.kode + ' - ' + it.nama)}
-                    </td>`
-                    );
+                    row.append(`<td class="fw-bold bg-light">${escapeHtml(it.kode + ' - ' + it.nama)}</td>`);
+                    row.append(`<td class="bg-light"></td>`);
+                    row.append(`<td class="bg-light"></td>`);
+                    row.append(`<td class="bg-light"></td>`);
+
+                    displayYears.forEach(y => {
+                        let r1 = (it.ihp && it.ihp[y] !== undefined) ? it.ihp[y] : '';
+                        const ihp = parseNumberID(r1);
+
+                        row.append(`
+                            <td class="bg-light">
+                                <input type="text"
+                                    class="form-control ihp text-end fw-bold"
+                                    data-year="${y}"
+                                    data-raw="${ihp !== null ? ihp : ''}"
+                                    value="${formatNumberID(ihp, true)}"
+                                    placeholder="Input IHP">
+                            </td>
+                        `);
+                    });
                 } else {
+                    // --- Child row ---
                     let displayName = it.is_leaf ? escapeHtml(it.nama) : escapeHtml(it.kode + ' - ' + it.nama);
                     row.append(`<td>${displayName}</td>`);
                     row.append(`<td>${it.indicator_name ? escapeHtml(it.indicator_name) : ''}</td>`);
@@ -209,24 +226,22 @@
                     row.append(`<td>${it.satuan_produksi_name ? escapeHtml(it.satuan_produksi_name) : ''}</td>`);
 
                     displayYears.forEach(y => {
-                        // ambil nilai asli (bisa number atau string)
                         let r1 = (it.ihp && it.ihp[y] !== undefined) ? it.ihp[y] : '';
-
-                        // simpan raw di data-raw (numeric) dan tampilkan formatted
                         const ihp = parseNumberID(r1);
 
                         row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control ihp text-end"
-                                data-year="${y}"
-                                data-raw="${ihp !== null ? ihp : ''}"
-                                value="${formatNumberID(ihp, true)}"
-                                placeholder="Input IHP">
-                        </td>
-                    `);
+                    <td>
+                        <input type="text"
+                            class="form-control ihp text-end"
+                            data-year="${y}"
+                            data-raw="${ihp !== null ? ihp : ''}"
+                            value="${formatNumberID(ihp, true)}"
+                            placeholder="Input IHP">
+                    </td>
+                `);
                     });
                 }
+
                 $tbody.append(row);
             });
 

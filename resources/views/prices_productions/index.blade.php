@@ -232,64 +232,57 @@
 
         function buildTable(items, displayYears = years) {
             let $theadRow = $('#hargaTable thead tr').empty();
+
+            // Header utama
             $theadRow.append('<th style="min-width:260px;">Komoditas</th>');
             $theadRow.append('<th style="width:160px">Indikator</th>');
             $theadRow.append('<th style="width:120px">Satuan Harga</th>');
             $theadRow.append('<th style="width:140px">Satuan Produksi</th>');
 
+            // Header tahun
             displayYears.forEach(y => {
-                $theadRow.append(`<th colspan="2" style="width:260px;" class="text-center">${y}</th>`);
+                $theadRow.append(`<th colspan="2" class="text-center">${y}</th>`);
             });
 
             let $tbody = $('#hargaTable tbody').empty();
 
             items.forEach(it => {
                 let row = $(`<tr data-id="${it.id}"></tr>`);
-                if (it.is_parent) {
-                    row.append(
-                        `<td colspan="${4 + displayYears.length*2}" class="fw-bold bg-light">
-                        ${escapeHtml(it.kode + ' - ' + it.nama)}
-                    </td>`
-                    );
-                } else {
-                    let displayName = it.is_leaf ? escapeHtml(it.nama) : escapeHtml(it.kode + ' - ' + it.nama);
-                    row.append(`<td>${displayName}</td>`);
-                    row.append(`<td>${it.indicator_name ? escapeHtml(it.indicator_name) : ''}</td>`);
-                    row.append(`<td>${it.satuan_harga_name ? escapeHtml(it.satuan_harga_name) : ''}</td>`);
-                    row.append(`<td>${it.satuan_produksi_name ? escapeHtml(it.satuan_produksi_name) : ''}</td>`);
+                let tdClass = it.is_parent ? 'fw-bold bg-light' : '';
 
-                    displayYears.forEach(y => {
-                        // ambil nilai asli (bisa number atau string)
-                        let hargaVal = (it.prices && it.prices[y] !== undefined) ? it.prices[y] : '';
-                        let prodVal = (it.productions && it.productions[y] !== undefined) ? it.productions[y] : '';
+                let displayName = it.is_parent || !it.is_leaf ?
+                    escapeHtml(it.kode + ' - ' + it.nama) :
+                    escapeHtml(it.nama);
 
-                        // simpan raw di data-raw (numeric) dan tampilkan formatted
-                        const hargaRaw = parseNumberID(hargaVal);
-                        const prodRaw = parseNumberID(prodVal);
+                // Nama & satuan
+                row.append(`<td class="${tdClass}">${displayName}</td>`);
+                row.append(`<td class="${tdClass}">${it.indicator_name ?? ''}</td>`);
+                row.append(`<td class="${tdClass}">${it.satuan_harga_name ?? ''}</td>`);
+                row.append(`<td class="${tdClass}">${it.satuan_produksi_name ?? ''}</td>`);
 
-                        row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control harga text-end"
-                                data-year="${y}"
-                                data-raw="${hargaRaw !== null ? hargaRaw : ''}"
-                                value="${formatNumberID(hargaRaw, true)}"
+                // Input rasio (parent & child bisa isi)
+                displayYears.forEach(y => {
+                    let r1 = it.prices ? it.prices[y] : null;
+                    let r2 = it.productions ? it.productions[y] : null;
+
+                    row.append(`
+                        <td class="${tdClass}">
+                            <input type="text" class="form-control harga text-end"
+                                data-year="${y}" data-id="${it.id}"
+                                value="${formatNumberID(r1 ?? '', true)}"
                                 placeholder="Harga">
                         </td>
                     `);
-
-                        row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control produksi text-end"
-                                data-year="${y}"
-                                data-raw="${prodRaw !== null ? prodRaw : ''}"
-                                value="${formatNumberID(prodRaw)}"
+                    row.append(`
+                        <td class="${tdClass}">
+                            <input type="text" class="form-control produksi text-end"
+                                data-year="${y}" data-id="${it.id}"
+                                value="${formatNumberID(r2 ?? '')}"   // << TANPA true
                                 placeholder="Produksi">
                         </td>
                     `);
-                    });
-                }
+                });
+
                 $tbody.append(row);
             });
 

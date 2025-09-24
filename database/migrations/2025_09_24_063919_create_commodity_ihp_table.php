@@ -16,7 +16,7 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('ihp', 15, 10)->nullable();
+            $table->decimal('ihp', 30, 10)->nullable();
 
             $table->timestamps();
 

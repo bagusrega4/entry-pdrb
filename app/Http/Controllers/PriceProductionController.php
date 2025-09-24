@@ -48,9 +48,10 @@ class PriceProductionController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'pricesProduction.indicator',
-            'pricesProduction.unitHarga',
-            'pricesProduction.unitProduksi'
+            'pricesProduction',
+            'indicator',
+            'unitHarga',
+            'unitProduksi'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);

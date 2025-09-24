@@ -16,9 +16,9 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('harga', 15, 10)->nullable();
+            $table->decimal('harga', 30, 10)->nullable();
 
-            $table->decimal('produksi', 15, 10)->nullable();
+            $table->decimal('produksi', 30, 10)->nullable();
 
             $table->timestamps();
 

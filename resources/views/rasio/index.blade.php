@@ -180,74 +180,66 @@
 
         function buildTable(items, displayYears = years) {
             let $theadRow = $('#rasioTable thead tr').empty();
+
+            // Header utama
             $theadRow.append('<th style="min-width:260px;">Komoditas</th>');
             $theadRow.append('<th style="width:160px">Indikator</th>');
+            $theadRow.append('<th style="width:120px">Satuan Harga</th>');
             $theadRow.append('<th style="width:140px">Satuan Produksi</th>');
 
+            // Header tahun
             displayYears.forEach(y => {
-                $theadRow.append(`<th colspan="3" style="width:260px;" class="text-center">${y}</th>`);
+                $theadRow.append(`<th class="text-center" colspan="3">${y}</th>`);
             });
 
             let $tbody = $('#rasioTable tbody').empty();
 
             items.forEach(it => {
                 let row = $(`<tr data-id="${it.id}"></tr>`);
-                if (it.is_parent) {
-                    row.append(
-                        `<td colspan="${4 + displayYears.length*2}" class="fw-bold bg-light">
-                        ${escapeHtml(it.kode + ' - ' + it.nama)}
-                    </td>`
-                    );
-                } else {
-                    let displayName = it.is_leaf ? escapeHtml(it.nama) : escapeHtml(it.kode + ' - ' + it.nama);
-                    row.append(`<td>${displayName}</td>`);
-                    row.append(`<td>${it.indicator_name ? escapeHtml(it.indicator_name) : ''}</td>`);
-                    row.append(`<td>${it.satuan_produksi_name ? escapeHtml(it.satuan_produksi_name) : ''}</td>`);
+                let tdClass = it.is_parent ? 'fw-bold bg-light' : '';
 
-                    displayYears.forEach(y => {
-                        // ambil nilai asli (bisa number atau string)
-                        let r1 = (it.rasio_output_ikutan && it.rasio_output_ikutan[y] !== undefined) ? it.rasio_output_ikutan[y] : '';
-                        let r2 = (it.rasio_wip_cbr && it.rasio_wip_cbr[y] !== undefined) ? it.rasio_wip_cbr[y] : '';
-                        let r3 = (it.rasio_biaya_antara && it.rasio_biaya_antara[y] !== undefined) ? it.rasio_biaya_antara[y] : '';
+                let displayName = it.is_parent || !it.is_leaf ?
+                    escapeHtml(it.kode + ' - ' + it.nama) :
+                    escapeHtml(it.nama);
 
-                        // simpan raw di data-raw (numeric) dan tampilkan formatted
-                        const rasioOutputIkutan = parseNumberID(r1);
-                        const rasioWipCbr = parseNumberID(r2);
-                        const rasioBiayaAntara = parseNumberID(r3);
+                // Nama & satuan
+                row.append(`<td class="${tdClass}">${displayName}</td>`);
+                row.append(`<td class="${tdClass}">${it.indicator_name ?? ''}</td>`);
+                row.append(`<td class="${tdClass}">${it.satuan_harga_name ?? ''}</td>`);
+                row.append(`<td class="${tdClass}">${it.satuan_produksi_name ?? ''}</td>`);
 
-                        row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control rasioOutputIkutan text-end"
-                                data-year="${y}"
-                                data-raw="${rasioOutputIkutan !== null ? rasioOutputIkutan : ''}"
-                                value="${formatNumberID(rasioOutputIkutan, true)}"
-                                placeholder="Rasio Output Ikutan">
+                // Input rasio (parent & child bisa isi)
+                displayYears.forEach(y => {
+                    let r1 = it.rasio_output_ikutan ? it.rasio_output_ikutan[y] : null;
+                    let r2 = it.rasio_wip_cbr ? it.rasio_wip_cbr[y] : null;
+                    let r3 = it.rasio_biaya_antara ? it.rasio_biaya_antara[y] : null;
+
+                    row.append(`
+                        <td class="${tdClass}">
+                            <input type="text" class="form-control rasioOutputIkutan text-end"
+                                data-year="${y}" data-id="${it.id}"
+                                value="${formatNumberID(r1 ?? '', true)}"
+                                placeholder="Output Ikutan">
                         </td>
                     `);
+                            row.append(`
+                        <td class="${tdClass}">
+                            <input type="text" class="form-control rasioWipCbr text-end"
+                                data-year="${y}" data-id="${it.id}"
+                                value="${formatNumberID(r2 ?? '', true)}"
+                                placeholder="WIP/CBR">
+                        </td>
+                    `);
+                            row.append(`
+                        <td class="${tdClass}">
+                            <input type="text" class="form-control rasioBiayaAntara text-end"
+                                data-year="${y}" data-id="${it.id}"
+                                value="${formatNumberID(r3 ?? '', true)}"
+                                placeholder="Biaya Antara">
+                        </td>
+                    `);
+                });
 
-                        row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control rasioWipCbr text-end"
-                                data-year="${y}"
-                                data-raw="${rasioWipCbr !== null ? rasioWipCbr : ''}"
-                                value="${formatNumberID(rasioWipCbr)}"
-                                placeholder="Rasio WIP/CBR">
-                        </td>
-                    `);
-                        row.append(`
-                        <td>
-                            <input type="text"
-                                class="form-control rasioBiayaAntara text-end"
-                                data-year="${y}"
-                                data-raw="${rasioBiayaAntara !== null ? rasioBiayaAntara : ''}"
-                                value="${formatNumberID(rasioBiayaAntara)}"
-                                placeholder="Rasio Biaya Antara">
-                        </td>
-                    `);
-                    });
-                }
                 $tbody.append(row);
             });
 

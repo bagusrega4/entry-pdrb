@@ -16,11 +16,11 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('rasio_output_ikutan', 15, 10)->nullable();
+            $table->decimal('rasio_output_ikutan', 30, 10)->nullable();
 
-            $table->decimal('rasio_wip_cbr', 15, 10)->nullable();
+            $table->decimal('rasio_wip_cbr', 30, 10)->nullable();
 
-            $table->decimal('rasio_biaya_antara', 15, 10)->nullable();
+            $table->decimal('rasio_biaya_antara', 30, 10)->nullable();
 
             $table->timestamps();
 
