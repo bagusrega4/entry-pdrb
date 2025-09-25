@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(IndicatorSeeder::class);
         $this->call(UnitHargaSeeder::class);
         $this->call(UnitProduksiSeeder::class);
+        $this->call(TriwulanSeeder::class);
         $this->call(TimSeeder::class);
     }
 }

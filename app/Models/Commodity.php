@@ -56,12 +56,19 @@ class Commodity extends Model
         return $this->belongsTo(UnitProduksi::class, 'satuan_produksi_id');
     }
 
+    public function triwulanan()
+    {
+        return $this->belongsTo(Triwulan::class, 'triwulan_id');
+    }
+
     public function childrenRecursive()
     {
         return $this->children()->with([
             'childrenRecursive',
             'pricesProduction',
             'rasio',
+            'ihp',
+            'triwulanan',
             'indicator',
             'unitHarga',
             'unitProduksi'

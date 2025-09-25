@@ -8,6 +8,7 @@ use App\Models\CommodityPriceProduction;
 use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
+use App\Models\Triwulan;
 
 class PriceProductionController extends Controller
 {
@@ -38,17 +39,24 @@ class PriceProductionController extends Controller
         $units = UnitHarga::select('id', 'satuan_harga')->get();
         return response()->json($units);
     }
+
     public function getUnitProduksi()
     {
         $units = UnitProduksi::select('id', 'satuan_produksi')->get();
         return response()->json($units);
     }
 
+    public function getTriwulans()
+    {
+        $triwulans = Triwulan::select('id', 'triwulan')->get();
+        return response()->json($triwulans);
+    }
+
     public function getSubtree(Commodity $commodity)
     {
         $commodity->load([
             'childrenRecursive',
-            'pricesProduction',
+            'pricesProduction.triwulan',
             'indicator',
             'unitHarga',
             'unitProduksi'
@@ -56,8 +64,14 @@ class PriceProductionController extends Controller
 
         $flatten = $this->flattenCommodity($commodity);
 
+        // Ambil kombinasi tahun + triwulan_id + nama triwulan
         $years = CommodityPriceProduction::whereIn('commodity_id', collect($flatten)->pluck('id'))
-            ->pluck('tahun')->unique()->sort()->values();
+            ->join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_prices_productions.tahun as year', 'commodity_prices_productions.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct()
+            ->orderBy('year')
+            ->orderBy('commodity_prices_productions.triwulan_id')
+            ->get();
 
         return response()->json([
             'commodities' => $flatten,
@@ -71,12 +85,22 @@ class PriceProductionController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // ambil harga & produksi (dari tabel commodity_price_productions)
+        // ambil harga & produksi (dari tabel commodity_prices_productions)
         $prices = [];
         $productions = [];
+
         foreach ($commodity->pricesProduction as $p) {
-            $prices[$p->tahun] = $p->harga;
-            $productions[$p->tahun] = $p->produksi ?? null;
+            $key = $p->tahun . '-' . $p->triwulan_id;
+            $prices[$key] = [
+                'id'   => $p->triwulan_id,
+                'nama' => $p->triwulan ? $p->triwulan->triwulan : null,
+                'harga' => $p->harga,
+            ];
+            $productions[$key] = [
+                'id'   => $p->triwulan_id,
+                'nama' => $p->triwulan ? $p->triwulan->triwulan : null,
+                'produksi' => $p->produksi ?? null,
+            ];
         }
 
         $isParent = $commodity->children->count() > 0;
@@ -232,20 +256,22 @@ class PriceProductionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'commodity_id'       => 'required|exists:commodities,id',
-            'tahun'              => 'required|integer',
-            'harga'              => 'required|numeric',
-            'produksi'           => 'nullable|numeric',
+            'commodity_id' => 'required|exists:commodities,id',
+            'tahun'        => 'required|integer',
+            'triwulan_id'  => 'required|exists:triwulanan,id',
+            'harga'        => 'required|numeric',
+            'produksi'     => 'nullable|numeric',
         ]);
 
         CommodityPriceProduction::updateOrCreate(
             [
-                'commodity_id'       => $validated['commodity_id'],
-                'tahun'              => $validated['tahun'],
+                'commodity_id' => $validated['commodity_id'],
+                'tahun'        => $validated['tahun'],
+                'triwulan_id'  => $validated['triwulan_id'],
             ],
             [
-                'harga'              => $validated['harga'],
-                'produksi'           => $validated['produksi'] ?? null,
+                'harga'    => $validated['harga'],
+                'produksi' => $validated['produksi'] ?? null,
             ]
         );
 
@@ -266,10 +292,11 @@ class PriceProductionController extends Controller
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
+                    'triwulan_id'  => $row['triwulan_id'] ?? null,
                 ],
                 [
-                    'harga'              => $row['harga'] ?? null,
-                    'produksi'           => $row['produksi'] ?? null,
+                    'harga'    => $row['harga'] ?? null,
+                    'produksi' => $row['produksi'] ?? null,
                 ]
             );
         }

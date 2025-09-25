@@ -117,7 +117,6 @@
         let unitProduksiOptions = [];
         let years = [];
         let itemsData = [];
-        const requiredYear = 2010;
         let currentRootId = null;
 
         // --- parsing yang robust: menerima format ID/EN ---
@@ -159,7 +158,6 @@
                 let serverYears = res.years || [];
 
                 let set = new Set(serverYears.map(y => parseInt(y)));
-                set.add(requiredYear);
                 years = Array.from(set).sort((a, b) => a - b);
 
                 // isi dropdown tahun

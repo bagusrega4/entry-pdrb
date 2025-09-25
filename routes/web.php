@@ -87,6 +87,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/unit-produksi', [PriceProductionController::class, 'storeUnitProduksi'])
                 ->name('prices_productions.store_unit_produksi');
 
+            // Triwulan
+            Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
+                ->name('prices_productions.triwulans');
+
             // tambah komoditas baru
             Route::post('/commodities', [PriceProductionController::class, 'storeCommodity'])
                 ->name('prices_productions.store_commodity');
@@ -132,6 +136,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/unit-produksi', [RasioController::class, 'storeUnitProduksi'])
                 ->name('rasio.store_unit_produksi');
 
+            // Triwulan
+            Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
+                ->name('rasio.triwulans');
+
             // tambah komoditas baru
             Route::post('/commodities', [RasioController::class, 'storeCommodity'])
                 ->name('rasio.store_commodity');
@@ -176,6 +184,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('ihp.unit_produksi');
             Route::post('/unit-produksi', [IhpController::class, 'storeUnitProduksi'])
                 ->name('ihp.store_unit_produksi');
+
+            // Triwulan
+            Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
+                ->name('ihp.triwulans');
 
             // tambah komoditas baru
             Route::post('/commodities', [IhpController::class, 'storeCommodity'])

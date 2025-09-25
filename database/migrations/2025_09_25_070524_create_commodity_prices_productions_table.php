@@ -16,15 +16,19 @@ return new class extends Migration {
 
             $table->year('tahun');
 
-            $table->decimal('harga', 30, 10)->nullable();
+            $table->foreignId('triwulan_id')
+                ->nullable()
+                ->constrained('triwulanan')
+                ->onDelete('set null');
 
+            $table->decimal('harga', 30, 10)->nullable();
             $table->decimal('produksi', 30, 10)->nullable();
 
             $table->timestamps();
 
             $table->unique(
-                ['commodity_id', 'tahun'],
-                'unique_price_production_per_year'
+                ['commodity_id', 'tahun', 'triwulan_id'],
+                'unique_price_production_per_year_triwulan'
             );
         });
     }

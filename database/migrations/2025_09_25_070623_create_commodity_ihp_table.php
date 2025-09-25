@@ -16,13 +16,18 @@ return new class extends Migration {
 
             $table->year('tahun');
 
+            $table->foreignId('triwulan_id')
+                ->nullable()
+                ->constrained('triwulanan')
+                ->onDelete('set null');
+
             $table->decimal('ihp', 30, 10)->nullable();
 
             $table->timestamps();
 
             $table->unique(
-                ['commodity_id', 'tahun'],
-                'unique_ihp_per_year'
+                ['commodity_id', 'tahun', 'triwulan_id'],
+                'unique_ihp_per_year_triwulan'
             );
         });
     }

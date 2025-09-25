@@ -16,6 +16,11 @@ return new class extends Migration {
 
             $table->year('tahun');
 
+            $table->foreignId('triwulan_id')
+                ->nullable()
+                ->constrained('triwulanan')
+                ->onDelete('set null');
+
             $table->decimal('rasio_output_ikutan', 30, 10)->nullable();
 
             $table->decimal('rasio_wip_cbr', 30, 10)->nullable();
@@ -25,8 +30,8 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->unique(
-                ['commodity_id', 'tahun'],
-                'unique_rasio_per_year'
+                ['commodity_id', 'tahun', 'triwulan_id'],
+                'unique_rasio_per_year_triwulan'
             );
         });
     }

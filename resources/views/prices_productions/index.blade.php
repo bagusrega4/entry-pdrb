@@ -26,11 +26,15 @@
         <div id="table-container" style="display:none;" class="mt-3">
             <div class="d-flex justify-content-between mb-2">
                 <h5>Daftar Harga dan Produksi per Komoditas</h5>
-                <div class="d-flex gap-2">
-                    <select id="yearFilter" multiple="multiple" style="width: 250px;"></select>
-                    <button id="addYear" class="btn btn-sm btn-success">Tambah Tahun</button>
-                    <button id="addCommodity" class="btn btn-sm btn-warning">Tambah Komoditas</button>
-                    <button id="saveAll" class="btn btn-primary">Simpan Semua</button>
+                <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                    <div style="flex:1; min-width:300px;">
+                        <select id="yearFilter" multiple="multiple" style="width:100%;"></select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button id="addYear" class="btn btn-success">Tambah Tahun</button>
+                        <button id="addCommodity" class="btn btn-warning">Tambah Komoditas</button>
+                        <button id="saveAll" class="btn btn-primary">Simpan Semua</button>
+                    </div>
                 </div>
             </div>
 
@@ -77,21 +81,15 @@
                 <hr>
                 <div class="mb-2">
                     <label>Indikator</label>
-                    <select id="newIndikator" class="form-control">
-                        <option value="">-- Pilih Indikator --</option>
-                    </select>
+                    <select id="newIndikator" class="form-control"></select>
                 </div>
                 <div class="mb-2">
                     <label>Satuan Harga</label>
-                    <select id="newSatuanHarga" class="form-control">
-                        <option value="">-- Pilih Satuan Harga --</option>
-                    </select>
+                    <select id="newSatuanHarga" class="form-control"></select>
                 </div>
                 <div class="mb-2">
                     <label>Satuan Produksi</label>
-                    <select id="newSatuanProduksi" class="form-control">
-                        <option value="">-- Pilih Satuan Produksi --</option>
-                    </select>
+                    <select id="newSatuanProduksi" class="form-control"></select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -101,6 +99,49 @@
         </div>
     </div>
 </div>
+
+<style>
+    .select2-selection__choice {
+        font-size: 14px !important;
+        padding: 4px 8px !important;
+    }
+
+    #table-container .btn {
+        white-space: nowrap;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    #table-container .select2-container {
+        width: 100% !important;
+    }
+
+    #table-container .select2-selection--multiple {
+        min-height: 50px !important;
+    }
+
+    #table-container .btn {
+        white-space: nowrap;
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    #yearFilter+.select2-container .select2-selection--multiple {
+        min-height: 38px !important;
+        height: 38px !important;
+        display: flex;
+        align-items: center;
+    }
+
+    #yearFilter+.select2-container .select2-selection__rendered {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        margin: 0;
+        padding: 0;
+    }
+</style>
 @endsection
 
 @section('script')
@@ -110,488 +151,373 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(function() {
-        let indikatorOptions = [];
-        let unitHargaOptions = [];
-        let unitProduksiOptions = [];
-        let years = [];
-        let itemsData = [];
-        const requiredYear = 2010;
-        let currentRootId = null;
+$(function() {
+    let itemsData = [], currentRootId = null, allYears = [], selectedYears = [];
 
-        // --- parsing yang robust: menerima format ID/EN ---
-        function parseNumberID(formatted) {
-            if (formatted === null || formatted === undefined || formatted === '') return null;
-            let s = String(formatted).trim();
-
-            // hapus "Rp" dan spasi
-            s = s.replace(/Rp\s*/i, '').replace(/\s+/g, '');
-
-            // deteksi adanya dot/comma
-            const hasDot = s.indexOf('.') !== -1;
-            const hasComma = s.indexOf(',') !== -1;
-
-            if (hasDot && hasComma) {
-                // ada keduanya -> anggap separator terakhir adalah decimal
-                const lastDot = s.lastIndexOf('.');
-                const lastComma = s.lastIndexOf(',');
-                if (lastComma > lastDot) {
-                    // comma = decimal, dot = thousands
-                    s = s.replace(/\./g, '').replace(',', '.');
-                } else {
-                    // dot = decimal, comma = thousands
-                    s = s.replace(/,/g, '');
-                }
-            } else if (hasComma) {
-                // hanya comma: biasanya id-ID -> comma = decimal,
-                // tapi kalau lebih dari 1 comma kemungkinan comma sebagai thousands -> hapus semua
-                if ((s.match(/,/g) || []).length > 1) {
-                    s = s.replace(/,/g, '');
-                } else {
-                    s = s.replace(',', '.');
-                }
-            } else if (hasDot) {
-                // hanya dot: bisa jadi thousands (id) atau decimal (en).
-                const dotCount = (s.match(/\./g) || []).length;
-                if (dotCount > 1) {
-                    // banyak dot -> hampir pasti thousands grouping -> hapus semua dot
-                    s = s.replace(/\./g, '');
-                } else {
-                    // satu dot -> coba heuristik:
-                    // jika ada tepat 3 digit setelah dot -> anggap thousands (1.000 -> 1000)
-                    // otherwise anggap decimal (1000.5 -> 1000.5)
-                    const parts = s.split('.');
-                    if (parts.length === 2 && parts[1].length === 3 && parts[0].length > 0) {
-                        s = s.replace(/\./g, '');
-                    }
-                    // else: biarkan dot sebagai decimal
-                }
+    // Utility functions
+    function parseNumberID(formatted) {
+        if (!formatted) return null;
+        let s = String(formatted).trim()
+            .replace(/Rp\s*/i, '').replace(/\s+/g, '');
+        
+        const hasDot = s.includes('.');
+        const hasComma = s.includes(',');
+        
+        if (hasDot && hasComma) {
+            s = s.lastIndexOf(',') > s.lastIndexOf('.') 
+                ? s.replace(/\./g, '').replace(',', '.')
+                : s.replace(/,/g, '');
+        } else if (hasComma) {
+            s = (s.match(/,/g) || []).length > 1 
+                ? s.replace(/,/g, '') 
+                : s.replace(',', '.');
+        } else if (hasDot) {
+            const parts = s.split('.');
+            if (parts.length === 2 && parts[1].length === 3 && parts[0].length > 0) {
+                s = s.replace(/\./g, '');
             }
-
-            // bersihkan karakter non-digit kecuali dot/minus (sudah disesuaikan di atas)
-            s = s.replace(/[^0-9.\-]/g, '');
-
-            const num = parseFloat(s);
-            return isNaN(num) ? null : num;
         }
+        
+        s = s.replace(/[^0-9.\-]/g, '');
+        const num = parseFloat(s);
+        return isNaN(num) ? null : num;
+    }
 
-        function formatNumberID(value, isCurrency = false) {
-            if (value === null || value === undefined || value === '') return '';
-            // pastikan value numeric
-            let num = (typeof value === 'number') ? value : parseNumberID(value);
-            if (num === null) return '';
-            // format dengan locale id-ID, 0-2 decimal places
-            const formatted = new Intl.NumberFormat('id-ID', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 10
-            }).format(num);
-            return isCurrency ? 'Rp ' + formatted : formatted;
-        }
+    function formatNumberID(value, isCurrency = false) {
+        if (value == null || value === '') return '';
+        const num = typeof value === 'number' ? value : parseNumberID(value);
+        if (num === null) return '';
+        const formatted = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 10
+        }).format(num);
+        return isCurrency ? 'Rp ' + formatted : formatted;
+    }
 
-        // ambil indikator, unit harga, dan unit produksi
-        function fetchIndicatorsAndUnits() {
-            return $.when(
-                $.get('/prices-productions/indicators').done(data => indikatorOptions = data || []),
-                $.get('/prices-productions/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/prices-productions/unit-produksi').done(data => unitProduksiOptions = data || [])
-            ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
-        }
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-        $('#level1').on('change', function() {
-            currentRootId = $(this).val();
-            if (!currentRootId) return $('#table-container').hide();
-            fetchIndicatorsAndUnits().then(() => loadSubtree(currentRootId));
+    // Main functions
+    function loadSubtree(rootId) {
+        $.get('/prices-productions/commodities/' + rootId + '/subtree', function(res) {
+            itemsData = res.commodities || [];
+            
+            allYears = (res.years || []).map(y => ({
+                year: parseInt(y.year || y),
+                triwulan_id: y.triwulan_id ?? 0,
+                triwulan_name: y.triwulan_name || y.triwulan_nama || (y.triwulan_obj?.triwulan)
+            }));
+            
+            // Setup year filter
+            const $yearFilter = $('#yearFilter').empty();
+            allYears.forEach(y => {
+                const val = `${y.year}-${y.triwulan_id ?? 0}`;
+                const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
+                $yearFilter.append(`<option value="${val}">${label}</option>`);
+            });
+            
+            $yearFilter.select2({
+                placeholder: "Pilih Tahun",
+                allowClear: true,
+                width: '250px',
+                multiple: true
+            }).val(null).trigger('change');
+            
+            selectedYears = [];
+            buildTable();
+            $('#table-container').show();
+        }).fail(() => Swal.fire('Error', 'Gagal mengambil data subtree', 'error'));
+    }
+
+    function buildTable() {
+        const $theadRow = $('#hargaTable thead tr').empty();
+        
+        // Headers
+        $theadRow.html(`
+            <th style="min-width:260px;">Komoditas</th>
+            <th style="width:160px">Indikator</th>
+            <th style="width:120px">Satuan Harga</th>
+            <th style="width:140px">Satuan Produksi</th>
+        `);
+        
+        selectedYears.forEach(y => {
+            const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
+            $theadRow.append(`<th colspan="2" class="text-center">${label}</th>`);
         });
-
-        function loadSubtree(rootId) {
-            $.get('/prices-productions/commodities/' + rootId + '/subtree', function(res) {
-                itemsData = res.commodities || [];
-                let serverYears = res.years || [];
-
-                let set = new Set(serverYears.map(y => parseInt(y)));
-                set.add(requiredYear);
-                years = Array.from(set).sort((a, b) => a - b);
-
-                // isi dropdown tahun
-                let $yearFilter = $('#yearFilter').empty();
-                years.forEach(y => {
-                    $yearFilter.append(`<option value="${y}" selected>${y}</option>`);
-                });
-
-                // aktifkan select2
-                $yearFilter.select2({
-                    placeholder: "Pilih Tahun",
-                    allowClear: true,
-                    width: '250px'
-                });
-
-                buildTable(itemsData);
-                $('#table-container').show();
-            }).fail(() => Swal.fire('Error', 'Gagal mengambil data subtree', 'error'));
-        }
-
-        function buildTable(items, displayYears = years) {
-            let $theadRow = $('#hargaTable thead tr').empty();
-
-            // Header utama
-            $theadRow.append('<th style="min-width:260px;">Komoditas</th>');
-            $theadRow.append('<th style="width:160px">Indikator</th>');
-            $theadRow.append('<th style="width:120px">Satuan Harga</th>');
-            $theadRow.append('<th style="width:140px">Satuan Produksi</th>');
-
-            // Header tahun
-            displayYears.forEach(y => {
-                $theadRow.append(`<th colspan="2" class="text-center">${y}</th>`);
+        
+        const $tbody = $('#hargaTable tbody').empty();
+        
+        itemsData.forEach(it => {
+            const tdClass = it.is_parent ? 'fw-bold bg-light' : '';
+            const displayName = it.is_parent || !it.is_leaf 
+                ? escapeHtml(it.kode + ' - ' + it.nama) 
+                : escapeHtml(it.nama);
+            
+            let row = `<tr data-id="${it.id}">
+                <td class="${tdClass}">${displayName}</td>
+                <td class="${tdClass}">${it.indicator_name ?? ''}</td>
+                <td class="${tdClass}">${it.satuan_harga_name ?? ''}</td>
+                <td class="${tdClass}">${it.satuan_produksi_name ?? ''}</td>`;
+            
+            selectedYears.forEach(y => {
+                const triId = y.triwulan_id ?? 0;
+                const key = `${y.year}-${triId}`;
+                
+                const priceEntry = it.prices?.[key];
+                const prodEntry = it.productions?.[key];
+                
+                const hargaVal = priceEntry?.harga ?? priceEntry ?? '';
+                const produksiVal = prodEntry?.produksi ?? prodEntry ?? '';
+                
+                row += `
+                    <td class="${tdClass}">
+                        <input type="text" class="form-control harga text-end"
+                            data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                            value="${formatNumberID(hargaVal, true)}" placeholder="Harga">
+                    </td>
+                    <td class="${tdClass}">
+                        <input type="text" class="form-control produksi text-end"
+                            data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                            value="${formatNumberID(produksiVal)}" placeholder="Produksi">
+                    </td>`;
             });
+            
+            row += '</tr>';
+            $tbody.append(row);
+        });
+        
+        attachFormatHandlers();
+    }
 
-            let $tbody = $('#hargaTable tbody').empty();
+    function attachFormatHandlers() {
+        const handleFocus = function(isHarga) {
+            return function() {
+                const raw = $(this).data('raw');
+                $(this).val(raw ?? '').select();
+            };
+        };
+        
+        const handleBlur = function(isHarga) {
+            return function() {
+                const raw = parseNumberID($(this).val());
+                $(this).data('raw', raw);
+                $(this).val(formatNumberID(raw, isHarga));
+            };
+        };
+        
+        $('#hargaTable')
+            .off('focus blur', 'input.harga, input.produksi')
+            .on('focus', 'input.harga', handleFocus(true))
+            .on('blur', 'input.harga', handleBlur(true))
+            .on('focus', 'input.produksi', handleFocus(false))
+            .on('blur', 'input.produksi', handleBlur(false));
+    }
 
-            items.forEach(it => {
-                let row = $(`<tr data-id="${it.id}"></tr>`);
-                let tdClass = it.is_parent ? 'fw-bold bg-light' : '';
+    function setupDropdown(selector, endpoint, label, callback) {
+        $.get(endpoint, function(res) {
+            const $el = $(selector).empty().append(`<option value="">-- Pilih ${label} --</option>`);
+            res.forEach(callback);
+            $el.append(`<option value="__new__">+ Tambah Baru...</option>`);
+        });
+    }
 
-                let displayName = it.is_parent || !it.is_leaf ?
-                    escapeHtml(it.kode + ' - ' + it.nama) :
-                    escapeHtml(it.nama);
-
-                // Nama & satuan
-                row.append(`<td class="${tdClass}">${displayName}</td>`);
-                row.append(`<td class="${tdClass}">${it.indicator_name ?? ''}</td>`);
-                row.append(`<td class="${tdClass}">${it.satuan_harga_name ?? ''}</td>`);
-                row.append(`<td class="${tdClass}">${it.satuan_produksi_name ?? ''}</td>`);
-
-                // Input rasio (parent & child bisa isi)
-                displayYears.forEach(y => {
-                    let r1 = it.prices ? it.prices[y] : null;
-                    let r2 = it.productions ? it.productions[y] : null;
-
-                    row.append(`
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control harga text-end"
-                                data-year="${y}" data-id="${it.id}"
-                                value="${formatNumberID(r1 ?? '', true)}"
-                                placeholder="Harga">
-                        </td>
-                    `);
-                    row.append(`
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control produksi text-end"
-                                data-year="${y}" data-id="${it.id}"
-                                value="${formatNumberID(r2 ?? '')}"   // << TANPA true
-                                placeholder="Produksi">
-                        </td>
-                    `);
-                });
-
-                $tbody.append(row);
-            });
-
-            attachFormatHandlers();
+    // Event handlers
+    $('#level1').on('change', function() {
+        currentRootId = $(this).val();
+        if (currentRootId) {
+            $.when(
+                $.get('/prices-productions/indicators'),
+                $.get('/prices-productions/unit-harga'),
+                $.get('/prices-productions/unit-produksi')
+            ).then(() => loadSubtree(currentRootId));
+        } else {
+            $('#table-container').hide();
         }
+    });
 
-        // fokus → tampilkan raw untuk editing; blur → format kembali
-        function attachFormatHandlers() {
-            // HARGA (currency)
-            $('#hargaTable').off('focus', 'input.harga blur', 'input.harga input', 'input.harga');
-            $('#hargaTable')
-                .on('focus', 'input.harga', function() {
-                    // tampilkan angka raw (tanpa Rp/format)
-                    const raw = $(this).data('raw');
-                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
-                    $(this).select();
-                })
-                .on('blur', 'input.harga', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                    $(this).val(formatNumberID(raw, true));
-                })
-                .on('input', 'input.harga', function() {
-                    // update data-raw live (optional)
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                });
+    $('#yearFilter').on('change', function() {
+        const selectedKeys = $(this).val() || [];
+        selectedYears = allYears.filter(y => 
+            selectedKeys.includes(`${y.year}-${y.triwulan_id ?? 0}`)
+        );
+        buildTable();
+    });
 
-            // PRODUKSI (non-currency)
-            $('#hargaTable')
-                .off('focus', 'input.produksi blur', 'input.produksi input', 'input.produksi')
-                .on('focus', 'input.produksi', function() {
-                    const raw = $(this).data('raw');
-                    $(this).val(raw !== undefined && raw !== '' && raw !== null ? raw : '');
-                    $(this).select();
-                })
-                .on('blur', 'input.produksi', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                    $(this).val(formatNumberID(raw));
-                })
-                .on('input', 'input.produksi', function() {
-                    const raw = parseNumberID($(this).val());
-                    $(this).data('raw', raw);
-                });
-        }
-
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return '';
-            return String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // === Tambah Tahun ===
-        $('#addYear').on('click', function() {
+    $('#addYear').on('click', function() {
+        $.get('/prices-productions/triwulans').done(triwulans => {
             Swal.fire({
-                title: 'Tambah Tahun Baru',
-                input: 'number',
-                inputLabel: 'Masukkan Tahun',
-                inputAttributes: {
-                    min: 1900,
-                    max: 2100
-                },
+                title: 'Tambah Tahun',
+                html: `
+                    <input id="swalYearInput" type="number" min="1900" max="2100" 
+                        class="swal2-input" placeholder="Masukkan Tahun">
+                    <select id="swalTriwulanSelect" class="swal2-select">
+                        <option value="">-- Pilih Triwulan --</option>
+                        ${triwulans.map(t => `<option value="${t.id}">${t.triwulan}</option>`).join('')}
+                    </select>`,
                 showCancelButton: true,
-                confirmButtonText: 'Tambah'
-            }).then(res => {
-                if (!res.isConfirmed) return;
-                let newYear = parseInt(res.value);
-                if (!newYear) return;
+                preConfirm: () => {
+                    const newYear = parseInt($('#swalYearInput').val());
+                    const triwulanId = $('#swalTriwulanSelect').val();
+                    const triwulanName = $('#swalTriwulanSelect option:selected').text();
+                    
+                    if (!newYear || !triwulanId) {
+                        Swal.showValidationMessage('Tahun dan Triwulan wajib diisi!');
+                        return false;
+                    }
+                    return { newYear, triwulanId, triwulanName };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { newYear, triwulanId, triwulanName } = result.value;
+                    
+                    if (allYears.some(y => y.year === newYear && y.triwulan_id == triwulanId)) {
+                        Swal.fire('Gagal', 'Tahun & triwulan sudah ada!', 'error');
+                        return;
+                    }
+                    
+                    const newYearObj = { year: newYear, triwulan_id: triwulanId, triwulan_name: triwulanName };
+                    allYears.push(newYearObj);
+                    selectedYears.push(newYearObj);
+                    
+                    $('#yearFilter').append(
+                        `<option value="${newYear}-${triwulanId}" selected>${newYear} - ${triwulanName}</option>`
+                    ).trigger('change');
+                    
+                    buildTable();
+                    Swal.fire('Berhasil', 'Tahun berhasil ditambahkan!', 'success');
+                }
+            });
+        }).fail(() => Swal.fire('Error', 'Gagal mengambil data triwulan', 'error'));
+    });
 
-                if (years.includes(newYear)) {
-                    Swal.fire('Error', 'Tahun sudah ada', 'error');
+    $('#saveAll').on('click', function() {
+        const payload = [];
+        
+        $('#hargaTable tbody tr').each(function() {
+            const commodityId = $(this).data('id');
+            if (!commodityId) return;
+            
+            $(this).find('input.harga').each(function() {
+                const year = $(this).data('year');
+                const triwulanId = $(this).data('triwulan');
+                const harga = $(this).data('raw');
+                const produksi = $(this).closest('tr')
+                    .find(`input.produksi[data-year="${year}"][data-triwulan="${triwulanId}"]`)
+                    .data('raw');
+                
+                if (harga || produksi) {
+                    payload.push({
+                        commodity_id: commodityId,
+                        tahun: year,
+                        triwulan_id: triwulanId,
+                        harga: harga || null,
+                        produksi: produksi || null
+                    });
+                }
+            });
+        });
+        
+        if (!payload.length) {
+            Swal.fire('Info', 'Tidak ada data untuk disimpan', 'info');
+            return;
+        }
+        
+        $.post('/prices-productions/bulk-store', {
+            data: JSON.stringify(payload),
+            _token: '{{ csrf_token() }}'
+        }).done(() => {
+            Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
+            if (currentRootId) loadSubtree(currentRootId);
+        }).fail(() => Swal.fire('Error', 'Gagal menyimpan data', 'error'));
+    });
+
+    $('#addCommodity').on('click', function() {
+        $('#newNama, #newKode').val('');
+        $('#parentSelect').empty().append('<option value="">-- Root (tanpa parent) --</option>');
+        
+        $.get('/prices-productions/commodities/all', res => {
+            res.forEach(c => $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`));
+        });
+        
+        setupDropdown('#newIndikator', '/prices-productions/indicators', 'Indikator', 
+            i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
+        setupDropdown('#newSatuanHarga', '/prices-productions/unit-harga', 'Satuan Harga', 
+            u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
+        setupDropdown('#newSatuanProduksi', '/prices-productions/unit-produksi', 'Satuan Produksi', 
+            u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
+        
+        $('#commodityModal').modal('show');
+    });
+
+    // Handle dynamic option additions
+    ['#newIndikator', '#newSatuanHarga', '#newSatuanProduksi'].forEach(selector => {
+        $(selector).on('change', function() {
+            if ($(this).val() !== '__new__') return;
+            
+            const typeMap = {
+                '#newIndikator': { title: 'Indikator', endpoint: '/prices-productions/indicators', field: 'indikator' },
+                '#newSatuanHarga': { title: 'Satuan Harga', endpoint: '/prices-productions/unit-harga', field: 'satuan_harga' },
+                '#newSatuanProduksi': { title: 'Satuan Produksi', endpoint: '/prices-productions/unit-produksi', field: 'satuan_produksi' }
+            };
+            
+            const config = typeMap[selector];
+            $('#commodityModal').modal('hide');
+            
+            Swal.fire({
+                title: `Tambah ${config.title} Baru`,
+                input: 'text',
+                inputLabel: `Nama ${config.title}`,
+                showCancelButton: true
+            }).then(res => {
+                $('#commodityModal').modal('show');
+                if (!res.isConfirmed || !res.value) {
+                    $(this).val('');
                     return;
                 }
-
-                years.push(newYear);
-                years.sort((a, b) => a - b);
-
-                // tambahkan ke dropdown Select2
-                let newOption = new Option(newYear, newYear, true, true);
-                $('#yearFilter').append(newOption).trigger('change');
-
-                buildTable(itemsData, $('#yearFilter').val().map(y => parseInt(y)));
-
-                Swal.fire('Sukses', `Tahun ${newYear} berhasil ditambahkan`, 'success');
+                
+                const postData = { [config.field]: res.value, _token: '{{ csrf_token() }}' };
+                $.post(config.endpoint, postData).done(data => {
+                    const newOpt = new Option(data[config.field], data.id, true, true);
+                    $(selector).append(newOpt).trigger('change');
+                }).fail(() => Swal.fire('Error', `Gagal menambah ${config.title.toLowerCase()}`, 'error'));
             });
-        });
-
-        // === Event Filter Tahun (Select2) ===
-        $('#yearFilter').on('change', function() {
-            let selected = $(this).val()?.map(y => parseInt(y)) || [];
-            if (selected.length === 0) {
-                buildTable(itemsData);
-            } else {
-                buildTable(itemsData, selected);
-            }
-        });
-
-        $('#saveAll').on('click', function() {
-            let payload = [];
-            $('#hargaTable tbody tr').each(function() {
-                let commodityId = $(this).data('id');
-                if (!commodityId) return;
-
-                $(this).find('input.harga').each(function() {
-                    let year = $(this).data('year');
-                    let harga = $(this).data('raw');
-                    let produksi = $(this).closest('tr').find(`input.produksi[data-year="${year}"]`).data('raw');
-
-                    if (harga || produksi) {
-                        payload.push({
-                            commodity_id: commodityId,
-                            tahun: year,
-                            harga: harga || null,
-                            produksi: produksi || null
-                        });
-                    }
-                });
-            });
-
-            if (payload.length === 0) {
-                Swal.fire('Info', 'Tidak ada data untuk disimpan', 'info');
-                return;
-            }
-
-            $.post('/prices-productions/bulk-store', {
-                data: JSON.stringify(payload),
-                _token: '{{ csrf_token() }}'
-            }).done(() => {
-                Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
-                if (currentRootId) loadSubtree(currentRootId);
-            }).fail(() => Swal.fire('Error', 'Gagal menyimpan data', 'error'));
-        });
-
-        // === Tambah Komoditas (modal) ===
-        $('#addCommodity').on('click', function() {
-            $('#newNama').val('');
-            $('#newKode').val('');
-            $('#parentSelect').empty().append('<option value="">-- Root (tanpa parent) --</option>');
-            $('#newIndikator').empty().append('<option value="">-- Pilih Indikator --</option>');
-            $('#newSatuanHarga').empty().append('<option value="">-- Pilih Satuan Harga --</option>');
-            $('#newSatuanProduksi').empty().append('<option value="">-- Pilih Satuan Produksi --</option>');
-
-            $.get('/prices-productions/commodities/all', function(res) {
-                res.forEach(c => {
-                    $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`);
-                });
-            });
-
-            // isi indikator
-            $.get('/prices-productions/indicators', function(res) {
-                res.forEach(i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
-                $('#newIndikator').append('<option value="__new__">+ Tambah Baru...</option>');
-            });
-
-            // isi satuan harga
-            $.get('/prices-productions/unit-harga', function(res) {
-                res.forEach(u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
-                $('#newSatuanHarga').append('<option value="__new__">+ Tambah Baru...</option>');
-            });
-
-            // isi satuan produksi
-            $.get('/prices-productions/unit-produksi', function(res) {
-                res.forEach(u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
-                $('#newSatuanProduksi').append('<option value="__new__">+ Tambah Baru...</option>');
-            });
-
-            $('#commodityModal').modal('show');
-        });
-
-        // Tambah baru Indikator
-        $('#newIndikator').on('change', function() {
-            if ($(this).val() === '__new__') {
-                // modal parent cuma disembunyikan
-                $('#commodityModal').modal('hide');
-
-                Swal.fire({
-                    title: 'Tambah Indikator Baru',
-                    input: 'text',
-                    inputLabel: 'Nama Indikator',
-                    showCancelButton: true,
-                    confirmButtonText: 'Simpan'
-                }).then(res => {
-                    // tampilkan kembali modal parent dengan isi yang sama
-                    $('#commodityModal').modal('show');
-
-                    if (!res.isConfirmed || !res.value) {
-                        $(this).val('');
-                        return;
-                    }
-
-                    $.post('/prices-productions/indicators', {
-                        indikator: res.value,
-                        _token: '{{ csrf_token() }}'
-                    }).done(data => {
-                        let newOpt = new Option(data.indikator, data.id, true, true);
-                        $('#newIndikator').append(newOpt).trigger('change');
-                    }).fail(() => Swal.fire('Error', 'Gagal menambah indikator', 'error'));
-                });
-            }
-        });
-
-        // Tambah baru Satuan Harga
-        $('#newSatuanHarga').on('change', function() {
-            if ($(this).val() === '__new__') {
-                $('#commodityModal').modal('hide');
-
-                Swal.fire({
-                    title: 'Tambah Satuan Harga Baru',
-                    input: 'text',
-                    inputLabel: 'Nama Satuan Harga',
-                    showCancelButton: true,
-                    confirmButtonText: 'Simpan'
-                }).then(res => {
-                    $('#commodityModal').modal('show');
-
-                    if (!res.isConfirmed || !res.value) {
-                        $(this).val('');
-                        return;
-                    }
-                    $.post('/prices-productions/unit-harga', {
-                        satuan_harga: res.value,
-                        _token: '{{ csrf_token() }}'
-                    }).done(data => {
-                        let newOpt = new Option(data.satuan_harga, data.id, true, true);
-                        $('#newSatuanHarga').append(newOpt).trigger('change');
-                    }).fail(() => Swal.fire('Error', 'Gagal menambah satuan harga', 'error'));
-                });
-            }
-        });
-
-        // Tambah baru Satuan Produksi
-        $('#newSatuanProduksi').on('change', function() {
-            if ($(this).val() === '__new__') {
-                // tutup modal parent dulu
-                $('#commodityModal').modal('hide');
-
-                Swal.fire({
-                    title: 'Tambah Satuan Produksi Baru',
-                    input: 'text',
-                    inputLabel: 'Nama Satuan Produksi',
-                    showCancelButton: true,
-                    confirmButtonText: 'Simpan'
-                }).then(res => {
-                    // buka lagi modal parent
-                    $('#commodityModal').modal('show');
-
-                    if (!res.isConfirmed || !res.value) {
-                        $(this).val('');
-                        return;
-                    }
-                    $.post('/prices-productions/unit-produksi', {
-                        satuan_produksi: res.value,
-                        _token: '{{ csrf_token() }}'
-                    }).done(data => {
-                        let newOpt = new Option(data.satuan_produksi, data.id, true, true);
-                        $('#newSatuanProduksi').append(newOpt).trigger('change');
-                    }).fail(() => Swal.fire('Error', 'Gagal menambah satuan produksi', 'error'));
-                });
-            }
-        });
-
-        $('#parentSelect').on('change', function() {
-            let parentId = $(this).val();
-            if (!parentId) {
-                $.get(`/prices-productions/commodities/next-code`, function(res) {
-                    $('#newKode').val(res.new_code);
-                });
-                return;
-            }
-            $.get(`/prices-productions/commodities/${parentId}/next-code`, function(res) {
-                $('#newKode').val(res.new_code);
-            });
-        });
-
-        $('#saveCommodity').on('click', function() {
-            let parentId = $('#parentSelect').val();
-            let kode = $('#newKode').val();
-            let nama = $('#newNama').val();
-            let indikator = $('#newIndikator').val();
-            let satuanHarga = $('#newSatuanHarga').val();
-            let satuanProduksi = $('#newSatuanProduksi').val();
-
-            // === VALIDASI BARU ===
-            if (!kode || !nama) {
-                Swal.fire('Error', 'Parent, kode, dan nama wajib diisi', 'error');
-                return;
-            }
-
-            $.post('/prices-productions/commodities', {
-                parent_id: parentId || null,
-                kode: kode,
-                nama: nama,
-                indikator_id: indikator || null,
-                satuan_harga_id: satuanHarga || null,
-                satuan_produksi_id: satuanProduksi || null,
-                _token: '{{ csrf_token() }}'
-            }).done(function() {
-                $('#commodityModal').modal('hide');
-                Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
-                if (currentRootId) {
-                    loadSubtree(currentRootId);
-                }
-            }).fail(() => Swal.fire('Error', 'Gagal menambah komoditas', 'error'));
         });
     });
+
+    $('#parentSelect').on('change', function() {
+        const parentId = $(this).val();
+        const endpoint = parentId 
+            ? `/prices-productions/commodities/${parentId}/next-code`
+            : `/prices-productions/commodities/next-code`;
+        $.get(endpoint, res => $('#newKode').val(res.new_code));
+    });
+
+    $('#saveCommodity').on('click', function() {
+        const data = {
+            parent_id: $('#parentSelect').val() || null,
+            kode: $('#newKode').val(),
+            nama: $('#newNama').val(),
+            indikator_id: $('#newIndikator').val() || null,
+            satuan_harga_id: $('#newSatuanHarga').val() || null,
+            satuan_produksi_id: $('#newSatuanProduksi').val() || null,
+            _token: '{{ csrf_token() }}'
+        };
+        
+        if (!data.kode || !data.nama) {
+            Swal.fire('Error', 'Kode dan nama wajib diisi', 'error');
+            return;
+        }
+        
+        $.post('/prices-productions/commodities', data).done(() => {
+            $('#commodityModal').modal('hide');
+            Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
+            if (currentRootId) loadSubtree(currentRootId);
+        }).fail(() => Swal.fire('Error', 'Gagal menambah komoditas', 'error'));
+    });
+});
 </script>
 @endsection
