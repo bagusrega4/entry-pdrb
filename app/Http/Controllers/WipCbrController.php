@@ -15,21 +15,21 @@ use App\Models\Triwulan;
 use App\Models\UnitPerawatan;
 use App\Models\UnitLuas;
 
-class RasioController extends Controller
+class WipCbrController extends Controller
 {
     public function index()
     {
         // Ambil semua komoditas root
         $commodities = Commodity::whereNull('parent_id')
-            ->with(['childrenRecursive', 'rasio'])
+            ->with(['childrenRecursive', 'wipCbr'])
             ->get();
 
-        return view('rasio.index', compact('commodities'));
+        return view('wip-cbr.index', compact('commodities'));
     }
 
     public function getChildren(Commodity $commodity)
     {
-        $commodity->load(['childrenRecursive', 'rasio']);
+        $commodity->load(['childrenRecursive', 'wipCbr']);
         return response()->json($commodity->children);
     }
 
@@ -73,10 +73,10 @@ class RasioController extends Controller
     {
         $commodity->load([
             'childrenRecursive',
-            'rasio.triwulan',
+            'wipCbr.triwulan',
             'indicator',
-            'unitHarga',
-            'unitProduksi'
+            'unitLuas',
+            'unitPerawatan'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);
@@ -119,14 +119,13 @@ class RasioController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // Ambil data rasio dan kelompokkan per tahun-triwulan
-        $rasioData = [];
-        foreach ($commodity->rasio as $r) {
+        // Ambil data WIP-CBR dan kelompokkan per tahun-triwulan
+        $wipCbrData = [];
+        foreach ($commodity->wipCbr as $r) {
             $key = $r->tahun . '-' . $r->triwulan_id;
-            $rasioData[$key] = [
-                'rasio_output_ikutan' => $r->rasio_output_ikutan,
-                'rasio_wip_cbr' => $r->rasio_wip_cbr,
-                'rasio_biaya_antara' => $r->rasio_biaya_antara,
+            $wipCbrData[$key] = [
+                'luas_tanam_akhir_tahun' => $r->luas_tanam_akhir_tahun,
+                'biaya_perawatan' => $r->biaya_perawatan,
             ];
         }
 
@@ -139,16 +138,16 @@ class RasioController extends Controller
             'full_name' => $name,
             'is_parent' => $isParent,
             'is_leaf' => !$isParent,
-            'rasio' => $rasioData, // Data rasio yang sudah dikelompokkan
+            'wip_cbr' => $wipCbrData, // Data WIP-CBR yang sudah dikelompokkan
 
             // indikator & satuan tetap ambil dari commodities
             'indikator_id' => $commodity->indikator_id,
-            'satuan_harga_id' => $commodity->satuan_harga_id,
-            'satuan_produksi_id' => $commodity->satuan_produksi_id,
+            'satuan_luas_id' => $commodity->satuan_luas_id,
+            'satuan_perawatan_id' => $commodity->satuan_perawatan_id,
 
             'indicator_name' => $commodity->indicator ? $commodity->indicator->indikator : null,
-            'satuan_harga_name' => $commodity->unitHarga ? $commodity->unitHarga->satuan_harga : null,
-            'satuan_produksi_name' => $commodity->unitProduksi ? $commodity->unitProduksi->satuan_produksi : null,
+            'satuan_luas_name' => $commodity->unitLuas ? $commodity->unitLuas->satuan_luas_tanam : null,
+            'satuan_perawatan_name' => $commodity->unitPerawatan ? $commodity->unitPerawatan->satuan_biaya_perawatan : null,
         ];
 
         foreach ($commodity->children as $child) {
@@ -306,24 +305,22 @@ class RasioController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'commodity_id'        => 'required|exists:commodities,id',
-            'tahun'               => 'required|integer',
-            'triwulan_id'         => 'required|exists:triwulanan,id',
-            'rasio_output_ikutan' => 'nullable|numeric',
-            'rasio_wip_cbr'       => 'nullable|numeric',
-            'rasio_biaya_antara'  => 'nullable|numeric',
+            'commodity_id'              => 'required|exists:commodities,id',
+            'tahun'                     => 'required|integer',
+            'triwulan_id'               => 'required|exists:triwulanan,id',
+            'luas_tanam_akhir_tahun'    => 'nullable|numeric',
+            'biaya_perawatan'           => 'nullable|numeric',
         ]);
 
-        CommodityRasio::updateOrCreate(
+        CommodityWipCbr::updateOrCreate(
             [
                 'commodity_id' => $validated['commodity_id'],
                 'tahun'        => $validated['tahun'],
                 'triwulan_id'  => $validated['triwulan_id'],
             ],
             [
-                'rasio_output_ikutan' => $validated['rasio_output_ikutan'] ?? null,
-                'rasio_wip_cbr'       => $validated['rasio_wip_cbr'] ?? null,
-                'rasio_biaya_antara'  => $validated['rasio_biaya_antara'] ?? null,
+                'luas_tanam_akhir_tahun' => $validated['luas_tanam_akhir_tahun'] ?? null,
+                'biaya_perawatan'        => $validated['biaya_perawatan'] ?? null,
             ]
         );
 
@@ -356,16 +353,15 @@ class RasioController extends Controller
                 continue; // Skip jika triwulan_id tidak valid
             }
 
-            CommodityRasio::updateOrCreate(
+            CommodityWipCbr::updateOrCreate(
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
                     'triwulan_id'  => $triwulanId,
                 ],
                 [
-                    'rasio_output_ikutan' => isset($row['rasio_output_ikutan']) ? $row['rasio_output_ikutan'] : null,
-                    'rasio_wip_cbr'       => isset($row['rasio_wip_cbr']) ? $row['rasio_wip_cbr'] : null,
-                    'rasio_biaya_antara'  => isset($row['rasio_biaya_antara']) ? $row['rasio_biaya_antara'] : null,
+                    'luas_tanam_akhir_tahun' => isset($row['luas_tanam_akhir_tahun']) ? $row['luas_tanam_akhir_tahun'] : null,
+                    'biaya_perawatan'        => isset($row['biaya_perawatan']) ? $row['biaya_perawatan'] : null,
                 ]
             );
         }

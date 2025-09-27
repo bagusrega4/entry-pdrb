@@ -3,27 +3,23 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\UnitProduksi;
+use App\Models\UnitLuas;
 
-class UnitProduksiSeeder extends Seeder
+class UnitLuasSeeder extends Seeder
 {
     public function run(): void
     {
         $data = [
+            'Ha',
+            'Ha (Pohon)',
             'Ton',
-            'Tangkai',
-            'Pohon',
-            'Rumpun',
-            'Kg',
             'Ekor',
-            'Liter',
             'M3',
-            'Ekor',
             '000 Ekor',
         ];
 
         foreach ($data as $satuan) {
-            UnitProduksi::create(['satuan_produksi' => $satuan]);
+            UnitLuas::create(['satuan_luas_tanam' => $satuan]);
         }
     }
 }

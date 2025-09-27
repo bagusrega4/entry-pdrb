@@ -31,6 +31,8 @@ class CommoditySeeder extends Seeder
                 'indikator_id'      => $item['indikator_id'] ?? null,
                 'satuan_harga_id'   => $item['satuan_harga_id'] ?? null,
                 'satuan_produksi_id' => $item['satuan_produksi_id'] ?? null,
+                'satuan_luas_tanam_id' => $item['satuan_luas_tanam_id'] ?? null,
+                'satuan_biaya_perawatan_id' => $item['satuan_biaya_perawatan_id'] ?? null,
             ]);
 
             // kalau ada children, rekursif

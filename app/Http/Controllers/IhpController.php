@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Commodity;
+use App\Models\CommodityWipCbr;
 use App\Models\CommodityIhp;
 use App\Models\CommodityPriceProduction;
 use App\Models\CommodityRasio;
@@ -11,6 +12,8 @@ use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
 use App\Models\Triwulan;
+use App\Models\UnitPerawatan;
+use App\Models\UnitLuas;
 
 class IhpController extends Controller
 {
@@ -48,6 +51,18 @@ class IhpController extends Controller
         return response()->json($units);
     }
 
+    public function getUnitLuas()
+    {
+        $units = UnitLuas::select('id', 'satuan_luas_tanam')->get();
+        return response()->json($units);
+    }
+
+    public function getUnitPerawatan()
+    {
+        $units = UnitPerawatan::select('id', 'satuan_biaya_perawatan')->get();
+        return response()->json($units);
+    }
+
     public function getTriwulans()
     {
         $triwulans = Triwulan::select('id', 'triwulan')->get();
@@ -66,29 +81,24 @@ class IhpController extends Controller
 
         $flatten = $this->flattenCommodity($commodity);
 
-        // Ambil kombinasi tahun + triwulan_id dari SEMUA TIGA tabel
-        $commodityIds = collect($flatten)->pluck('id');
-
-        // Dari tabel IHP
-        $ihpYears = CommodityIhp::whereIn('commodity_id', $commodityIds)
-            ->join('triwulanan', 'commodity_ihp.triwulan_id', '=', 'triwulanan.id')
+        $ihpYears = CommodityIhp::join('triwulanan', 'commodity_ihp.triwulan_id', '=', 'triwulanan.id')
             ->select('commodity_ihp.tahun as year', 'commodity_ihp.triwulan_id', 'triwulanan.triwulan as triwulan_name')
             ->distinct();
 
-        // Dari tabel harga-produksi
-        $pricesYears = CommodityPriceProduction::whereIn('commodity_id', $commodityIds)
-            ->join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
+        $pricesYears = CommodityPriceProduction::join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
             ->select('commodity_prices_productions.tahun as year', 'commodity_prices_productions.triwulan_id', 'triwulanan.triwulan as triwulan_name')
             ->distinct();
 
-        // Dari tabel rasio
-        $rasioYears = CommodityRasio::whereIn('commodity_id', $commodityIds)
-            ->join('triwulanan', 'commodity_rasio.triwulan_id', '=', 'triwulanan.id')
+        $rasioYears = CommodityRasio::join('triwulanan', 'commodity_rasio.triwulan_id', '=', 'triwulanan.id')
             ->select('commodity_rasio.tahun as year', 'commodity_rasio.triwulan_id', 'triwulanan.triwulan as triwulan_name')
             ->distinct();
 
-        // Gabungkan ketiga query dengan UNION dan ambil data distinct
-        $allYears = $ihpYears->union($pricesYears)->union($rasioYears)
+        $wipCbrYears = CommodityWipCbr::join('triwulanan', 'commodity_wip_cbr.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_wip_cbr.tahun as year', 'commodity_wip_cbr.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Gabungkan semua tahun dari semua tabel dan ambil yang unik
+        $allYears = $ihpYears->union($pricesYears)->union($rasioYears)->union($wipCbrYears)
             ->orderBy('year')
             ->orderBy('triwulan_id')
             ->get()
@@ -191,12 +201,14 @@ class IhpController extends Controller
     public function storeCommodity(Request $request)
     {
         $validated = $request->validate([
-            'parent_id'           => 'nullable|exists:commodities,id',
-            'kode'                => 'required|string|max:50|unique:commodities,kode',
-            'nama'                => 'required|string|max:255',
-            'indikator_id'        => 'nullable|exists:indicators,id',
-            'satuan_harga_id'     => 'nullable|exists:units_harga,id',
-            'satuan_produksi_id'  => 'nullable|exists:units_produksi,id',
+            'parent_id'              => 'nullable|exists:commodities,id',
+            'kode'                   => 'required|string|max:50|unique:commodities,kode',
+            'nama'                   => 'required|string|max:255',
+            'indikator_id'           => 'nullable|exists:indicators,id',
+            'satuan_harga_id'        => 'nullable|exists:units_harga,id',
+            'satuan_produksi_id'     => 'nullable|exists:units_produksi,id',
+            'satuan_luas_id'         => 'nullable|exists:units_luas,id',
+            'satuan_perawatan_id'    => 'nullable|exists:units_perawatan,id',
         ]);
 
         $level = 0;
@@ -205,13 +217,15 @@ class IhpController extends Controller
         }
 
         $commodity = Commodity::create([
-            'parent_id'          => $validated['parent_id'] ?? null,
-            'kode'               => $validated['kode'],
-            'nama'               => $validated['nama'],
-            'indikator_id'       => $validated['indikator_id'] ?? null,
-            'satuan_harga_id'    => $validated['satuan_harga_id'] ?? null,
-            'satuan_produksi_id' => $validated['satuan_produksi_id'] ?? null,
-            'level'              => $level,
+            'parent_id'              => $validated['parent_id'] ?? null,
+            'kode'                   => $validated['kode'],
+            'nama'                   => $validated['nama'],
+            'indikator_id'           => $validated['indikator_id'] ?? null,
+            'satuan_harga_id'        => $validated['satuan_harga_id'] ?? null,
+            'satuan_produksi_id'     => $validated['satuan_produksi_id'] ?? null,
+            'satuan_luas_id'         => $validated['satuan_luas_id'] ?? null,
+            'satuan_perawatan_id'    => $validated['satuan_perawatan_id'] ?? null,
+            'level'                  => $level,
         ]);
 
         return response()->json($commodity);
@@ -261,6 +275,28 @@ class IhpController extends Controller
         ]);
 
         $unit = UnitProduksi::create($validated);
+
+        return response()->json($unit);
+    }
+
+    public function storeUnitLuas(Request $request)
+    {
+        $validated = $request->validate([
+            'satuan_luas_tanam' => 'required|string|max:255',
+        ]);
+
+        $unit = UnitLuas::create($validated);
+
+        return response()->json($unit);
+    }
+
+    public function storeUnitPerawatan(Request $request)
+    {
+        $validated = $request->validate([
+            'satuan_biaya_perawatan' => 'required|string|max:255',
+        ]);
+
+        $unit = UnitPerawatan::create($validated);
 
         return response()->json($unit);
     }

@@ -8,8 +8,9 @@
 
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
             <div>
-                <h3 class="fw-bold mb-3">Input Rasio Output Ikutan, Rasio Jasa Pertanian, dan Rasio Biaya Antara</h3>
+                <h3 class="fw-bold mb-3">Input WIP (Work in Progress)/CBR (Cultivated Biological Resources)</h3>
                 <h6 class="op-7 mb-2">Pilih komoditas -> seluruh tabel turunannya akan muncul.</h6>
+                <h6 class="op-7 mb-2">*Input Luas Tanam Akhir Tahun dan Biaya Perawatan</h6>
             </div>
         </div>
 
@@ -28,7 +29,7 @@
         <!-- tabel spreadsheet -->
         <div id="table-container" style="display:none;" class="mt-3">
             <div class="d-flex justify-content-between mb-2">
-                <h5>Daftar Rasio per Komoditas</h5>
+                <h5>Daftar Luas Tanam & Biaya Perawatan per Komoditas</h5>
                 <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
                     <div style="flex:1; min-width:300px;">
                         <select id="yearFilter" multiple="multiple" style="width:100%;"></select>
@@ -42,12 +43,13 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered" id="rasioTable">
+                <table class="table table-bordered" id="wipcbrTable">
                     <thead>
                         <tr>
                             <th style="min-width:260px;">Komoditas</th>
                             <th style="width:160px">Indikator</th>
-                            <th style="width:140px">Satuan Produksi</th>
+                            <th style="width:140px">Satuan Luas Tanam</th>
+                            <th style="width:140px">Satuan Biaya Perawatan</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -191,11 +193,11 @@
         // ambil semua indikator dan unit yang diperlukan
         function fetchIndicatorsAndUnits() {
             return $.when(
-                $.get('/rasio/indicators').done(data => indikatorOptions = data || []),
-                $.get('/rasio/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/rasio/unit-produksi').done(data => unitProduksiOptions = data || []),
-                $.get('/rasio/unit-luas').done(data => unitLuasOptions = data || []),
-                $.get('/rasio/unit-perawatan').done(data => unitPerawatanOptions = data || [])
+                $.get('/wip-cbr/indicators').done(data => indikatorOptions = data || []),
+                $.get('/wip-cbr/unit-harga').done(data => unitHargaOptions = data || []),
+                $.get('/wip-cbr/unit-produksi').done(data => unitProduksiOptions = data || []),
+                $.get('/wip-cbr/unit-luas').done(data => unitLuasOptions = data || []),
+                $.get('/wip-cbr/unit-perawatan').done(data => unitPerawatanOptions = data || [])
             ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
         }
 
@@ -203,11 +205,11 @@
             currentRootId = $(this).val();
             if (currentRootId) {
                 $.when(
-                    $.get('/rasio/indicators'),
-                    $.get('/rasio/unit-harga'),
-                    $.get('/rasio/unit-produksi'),
-                    $.get('/rasio/unit-luas'),
-                    $.get('/rasio/unit-perawatan')
+                    $.get('/wip-cbr/indicators'),
+                    $.get('/wip-cbr/unit-harga'),
+                    $.get('/wip-cbr/unit-produksi'),
+                    $.get('/wip-cbr/unit-luas'),
+                    $.get('/wip-cbr/unit-perawatan')
                 ).then(() => loadSubtree(currentRootId));
             } else {
                 $('#table-container').hide();
@@ -224,7 +226,7 @@
         function loadSubtree(rootId) {
             const previouslySelectedYears = [...selectedYears];
 
-            $.get('/rasio/commodities/' + rootId + '/subtree', function(res) {
+            $.get('/wip-cbr/commodities/' + rootId + '/subtree', function(res) {
                 itemsData = res.commodities || [];
 
                 allYears = (res.years || []).map(y => ({
@@ -269,22 +271,24 @@
         function buildTable() {
             const items = itemsData;
 
-            let $theadRow = $('#rasioTable thead tr').empty();
+            let $theadRow = $('#wipcbrTable thead tr').empty();
 
             $theadRow.html(`
                 <th style="min-width:260px;">Komoditas</th>
                 <th style="width:160px">Indikator</th>
-                <th style="width:140px">Satuan Produksi</th>
+                <th style="width:140px">Satuan Luas Tanam</th>
+                <th style="width:140px">Satuan Biaya Perawatan</th>
             `);
 
             selectedYears.forEach(y => {
                 const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
-                $theadRow.append(`<th colspan="3" class="text-center">${label}</th>`);
+                $theadRow.append(`<th colspan="2" class="text-center">${label}</th>`);
             });
 
-            // Tambahkan sub-header untuk 3 kolom rasio
+            // Tambahkan sub-header untuk Luas Tanam dan Biaya Perawatan
             const $subheadRow = $('<tr></tr>');
             $subheadRow.html(`
+                <th rowspan="2"></th>
                 <th rowspan="2"></th>
                 <th rowspan="2"></th>
                 <th rowspan="2"></th>
@@ -292,16 +296,15 @@
             
             selectedYears.forEach(y => {
                 $subheadRow.append(`
-                    <th class="text-center bg-light">Output Ikutan</th>
-                    <th class="text-center bg-light">WIP/CBR</th>
-                    <th class="text-center bg-light">Biaya Antara</th>
+                    <th class="text-center bg-light">Luas Tanam Akhir Tahun</th>
+                    <th class="text-center bg-light">Biaya Perawatan</th>
                 `);
             });
 
             // Hapus header lama dan tambahkan yang baru dengan sub-header
-            $('#rasioTable thead').empty().append($theadRow);
+            $('#wipcbrTable thead').empty().append($theadRow);
 
-            const $tbody = $('#rasioTable tbody').empty();
+            const $tbody = $('#wipcbrTable tbody').empty();
 
             items.forEach(it => {
                 const tdClass = it.is_parent ? 'fw-bold bg-light' : '';
@@ -312,36 +315,30 @@
                 let row = `<tr data-id="${it.id}">
                     <td class="${tdClass}">${displayName}</td>
                     <td class="${tdClass}">${it.indicator_name ?? ''}</td>
-                    <td class="${tdClass}">${it.satuan_produksi_name ?? ''}</td>`;
+                    <td class="${tdClass}">${it.satuan_luas_name ?? ''}</td>
+                    <td class="${tdClass}">${it.satuan_perawatan_name ?? ''}</td>`;
 
                 selectedYears.forEach(y => {
                     const triId = y.triwulan_id ?? 0;
                     const key = `${y.year}-${triId}`;
 
                     // Ambil data dari response API
-                    const rasioData = it.rasio?.[key] || {};
-                    const outputVal = rasioData.rasio_output_ikutan ?? '';
-                    const wipVal = rasioData.rasio_wip_cbr ?? '';
-                    const antaraVal = rasioData.rasio_biaya_antara ?? '';
+                    const wipCbrData = it.wip_cbr?.[key] || {};
+                    const luasTanamVal = wipCbrData.luas_tanam_akhir_tahun ?? '';
+                    const biayaPerawatanVal = wipCbrData.biaya_perawatan ?? '';
 
                     row += `
                         <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-output-ikutan text-end"
+                            <input type="text" class="form-control luas-tanam text-end"
                                 data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${outputVal}"
-                                value="${formatNumberID(outputVal)}" placeholder="Output Ikutan">
+                                data-raw="${luasTanamVal}"
+                                value="${formatNumberID(luasTanamVal)}" placeholder="Luas Tanam">
                         </td>
                         <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-wip-cbr text-end"
+                            <input type="text" class="form-control biaya-perawatan text-end"
                                 data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${wipVal}"
-                                value="${formatNumberID(wipVal)}" placeholder="WIP/CBR">
-                        </td>
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-biaya-antara text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${antaraVal}"
-                                value="${formatNumberID(antaraVal)}" placeholder="Biaya Antara">
+                                data-raw="${biayaPerawatanVal}"
+                                value="${formatNumberID(biayaPerawatanVal)}" placeholder="Biaya Perawatan">
                         </td>`;
                 });
 
@@ -353,8 +350,8 @@
         }
 
         function attachFormatHandlers() {
-            $('#rasioTable').off('focus blur input', 'input');
-            $('#rasioTable').on('focus', 'input', function() {
+            $('#wipcbrTable').off('focus blur input', 'input');
+            $('#wipcbrTable').on('focus', 'input', function() {
                 const raw = $(this).data('raw');
                 $(this).val(raw ?? '');
                 $(this).select();
@@ -377,7 +374,7 @@
         }
 
         $('#addYear').on('click', function() {
-            $.get('/rasio/triwulans').done(triwulans => {
+            $.get('/wip-cbr/triwulans').done(triwulans => {
                 Swal.fire({
                     title: 'Tambah Tahun',
                     html: `
@@ -458,14 +455,14 @@
         $('#saveAll').on('click', function() {
             const payload = [];
 
-            $('#rasioTable tbody tr').each(function() {
+            $('#wipcbrTable tbody tr').each(function() {
                 const commodityId = $(this).data('id');
                 if (!commodityId) return;
 
                 const inputData = {};
                 
                 // Kumpulkan data per tahun-triwulan
-                $(this).find('input.rasio-output-ikutan, input.rasio-wip-cbr, input.rasio-biaya-antara').each(function() {
+                $(this).find('input.luas-tanam, input.biaya-perawatan').each(function() {
                     const year = $(this).data('year');
                     const triwulanId = $(this).data('triwulan');
                     const key = `${year}-${triwulanId}`;
@@ -479,20 +476,17 @@
                     }
                     
                     const rawValue = $(this).data('raw');
-                    if ($(this).hasClass('rasio-output-ikutan')) {
-                        inputData[key].rasio_output_ikutan = rawValue;
-                    } else if ($(this).hasClass('rasio-wip-cbr')) {
-                        inputData[key].rasio_wip_cbr = rawValue;
-                    } else if ($(this).hasClass('rasio-biaya-antara')) {
-                        inputData[key].rasio_biaya_antara = rawValue;
+                    if ($(this).hasClass('luas-tanam')) {
+                        inputData[key].luas_tanam_akhir_tahun = rawValue;
+                    } else if ($(this).hasClass('biaya-perawatan')) {
+                        inputData[key].biaya_perawatan = rawValue;
                     }
                 });
 
                 // Tambahkan ke payload jika ada data yang tidak kosong
                 Object.values(inputData).forEach(data => {
-                    if (data.rasio_output_ikutan !== null && data.rasio_output_ikutan !== undefined && data.rasio_output_ikutan !== '' ||
-                        data.rasio_wip_cbr !== null && data.rasio_wip_cbr !== undefined && data.rasio_wip_cbr !== '' ||
-                        data.rasio_biaya_antara !== null && data.rasio_biaya_antara !== undefined && data.rasio_biaya_antara !== '') {
+                    if (data.luas_tanam_akhir_tahun !== null && data.luas_tanam_akhir_tahun !== undefined && data.luas_tanam_akhir_tahun !== '' ||
+                        data.biaya_perawatan !== null && data.biaya_perawatan !== undefined && data.biaya_perawatan !== '') {
                         payload.push(data);
                     }
                 });
@@ -505,7 +499,7 @@
 
             console.log('Payload yang akan dikirim:', payload);
 
-            $.post('/rasio/bulk-store', {
+            $.post('/wip-cbr/bulk-store', {
                 data: JSON.stringify(payload)
             }).done(() => {
                 Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
@@ -523,19 +517,19 @@
             $('#newNama, #newKode').val('');
             $('#parentSelect').empty().append('<option value="">-- Root (tanpa parent) --</option>');
 
-            $.get('/rasio/commodities/all', res => {
+            $.get('/wip-cbr/commodities/all', res => {
                 res.forEach(c => $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`));
             });
 
-            setupDropdown('#newIndikator', '/rasio/indicators', 'Indikator',
+            setupDropdown('#newIndikator', '/wip-cbr/indicators', 'Indikator',
                 i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
-            setupDropdown('#newSatuanHarga', '/rasio/unit-harga', 'Satuan Harga',
+            setupDropdown('#newSatuanHarga', '/wip-cbr/unit-harga', 'Satuan Harga',
                 u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
-            setupDropdown('#newSatuanProduksi', '/rasio/unit-produksi', 'Satuan Produksi',
+            setupDropdown('#newSatuanProduksi', '/wip-cbr/unit-produksi', 'Satuan Produksi',
                 u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
-            setupDropdown('#newSatuanLuasTanam', '/rasio/unit-luas', 'Satuan Luas Tanam',
+            setupDropdown('#newSatuanLuasTanam', '/wip-cbr/unit-luas', 'Satuan Luas Tanam',
                 u => $('#newSatuanLuasTanam').append(`<option value="${u.id}">${u.satuan_luas_tanam}</option>`));
-            setupDropdown('#newSatuanBiayaPerawatan', '/rasio/unit-perawatan', 'Satuan Biaya Perawatan',
+            setupDropdown('#newSatuanBiayaPerawatan', '/wip-cbr/unit-perawatan', 'Satuan Biaya Perawatan',
                 u => $('#newSatuanBiayaPerawatan').append(`<option value="${u.id}">${u.satuan_biaya_perawatan}</option>`));
 
             $('#commodityModal').modal('show');
@@ -548,27 +542,27 @@
                 const typeMap = {
                     '#newIndikator': {
                         title: 'Indikator',
-                        endpoint: '/rasio/indicators',
+                        endpoint: '/wip-cbr/indicators',
                         field: 'indikator'
                     },
                     '#newSatuanHarga': {
                         title: 'Satuan Harga',
-                        endpoint: '/rasio/unit-harga',
+                        endpoint: '/wip-cbr/unit-harga',
                         field: 'satuan_harga'
                     },
                     '#newSatuanProduksi': {
                         title: 'Satuan Produksi',
-                        endpoint: '/rasio/unit-produksi',
+                        endpoint: '/wip-cbr/unit-produksi',
                         field: 'satuan_produksi'
                     },
                     '#newSatuanLuasTanam': {
                         title: 'Satuan Luas Tanam',
-                        endpoint: '/rasio/unit-luas',
+                        endpoint: '/wip-cbr/unit-luas',
                         field: 'satuan_luas_tanam'
                     },
                     '#newSatuanBiayaPerawatan': {
                         title: 'Satuan Biaya Perawatan',
-                        endpoint: '/rasio/unit-perawatan',
+                        endpoint: '/wip-cbr/unit-perawatan',
                         field: 'satuan_biaya_perawatan'
                     }
                 };
@@ -602,8 +596,8 @@
         $('#parentSelect').on('change', function() {
             const parentId = $(this).val();
             const endpoint = parentId ?
-                `/rasio/commodities/${parentId}/next-code` :
-                `/rasio/commodities/next-code`;
+                `/wip-cbr/commodities/${parentId}/next-code` :
+                `/wip-cbr/commodities/next-code`;
             $.get(endpoint, res => $('#newKode').val(res.new_code));
         });
 
@@ -624,7 +618,7 @@
                 return;
             }
 
-            $.post('/rasio/commodities', data).done(() => {
+            $.post('/wip-cbr/commodities', data).done(() => {
                 $('#commodityModal').modal('hide');
                 Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
                 // Reload data dengan mempertahankan selectedYears

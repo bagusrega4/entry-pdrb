@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\UnitPerawatan;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -22,5 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UnitProduksiSeeder::class);
         $this->call(TriwulanSeeder::class);
         $this->call(TimSeeder::class);
+        $this->call(UnitLuasSeeder::class);
+        $this->call(UnitPerawatanSeeder::class);
     }
 }

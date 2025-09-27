@@ -13,7 +13,9 @@ class Commodity extends Model
         'level',
         'indikator_id',
         'satuan_harga_id',
-        'satuan_produksi_id'
+        'satuan_produksi_id',
+        'satuan_luas_tanam_id',
+        'satuan_biaya_perawatan_id'
     ];
 
     public function parent()
@@ -41,6 +43,11 @@ class Commodity extends Model
         return $this->hasMany(CommodityIhp::class, 'commodity_id');
     }
 
+    public function wipcbr()
+    {
+        return $this->hasMany(CommodityWipCbr::class, 'commodity_id');
+    }
+
     public function indicator()
     {
         return $this->belongsTo(Indicator::class, 'indikator_id');
@@ -56,6 +63,16 @@ class Commodity extends Model
         return $this->belongsTo(UnitProduksi::class, 'satuan_produksi_id');
     }
 
+    public function unitLuas()
+    {
+        return $this->belongsTo(UnitLuas::class, 'satuan_luas_tanam_id');
+    }
+
+    public function unitPerawatan()
+    {
+        return $this->belongsTo(UnitPerawatan::class, 'satuan_biaya_perawatan_id');
+    }
+
     public function triwulanan()
     {
         return $this->belongsTo(Triwulan::class, 'triwulan_id');
@@ -68,10 +85,13 @@ class Commodity extends Model
             'pricesProduction',
             'rasio',
             'ihp',
+            'wipcbr',
             'triwulanan',
             'indicator',
             'unitHarga',
-            'unitProduksi'
+            'unitProduksi',
+            'unitLuas',
+            'unitPerawatan',
         ]);
     }
 }

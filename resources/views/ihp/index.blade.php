@@ -61,7 +61,7 @@
 
 <!-- Modal Tambah Komoditas -->
 <div class="modal fade" id="commodityModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah Komoditas Baru</h5>
@@ -83,17 +83,27 @@
                     <input type="text" id="newNama" class="form-control">
                 </div>
                 <hr>
-                <div class="mb-2">
-                    <label>Indikator</label>
-                    <select id="newIndikator" class="form-control"></select>
-                </div>
-                <div class="mb-2">
-                    <label>Satuan Harga</label>
-                    <select id="newSatuanHarga" class="form-control"></select>
-                </div>
-                <div class="mb-2">
-                    <label>Satuan Produksi</label>
-                    <select id="newSatuanProduksi" class="form-control"></select>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label>Indikator</label>
+                        <select id="newIndikator" class="form-control"></select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Satuan Harga</label>
+                        <select id="newSatuanHarga" class="form-control"></select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Satuan Produksi</label>
+                        <select id="newSatuanProduksi" class="form-control"></select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Satuan Luas Tanam</label>
+                        <select id="newSatuanLuasTanam" class="form-control"></select>
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <label>Satuan Biaya Perawatan</label>
+                        <select id="newSatuanBiayaPerawatan" class="form-control"></select>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -180,12 +190,14 @@
             }).format(num);
         }
 
-        // ambil indikator, unit harga, dan unit produksi
+        // ambil semua indikator dan unit yang diperlukan
         function fetchIndicatorsAndUnits() {
             return $.when(
                 $.get('/ihp/indicators').done(data => indikatorOptions = data || []),
                 $.get('/ihp/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/ihp/unit-produksi').done(data => unitProduksiOptions = data || [])
+                $.get('/ihp/unit-produksi').done(data => unitProduksiOptions = data || []),
+                $.get('/ihp/unit-luas').done(data => unitLuasOptions = data || []),
+                $.get('/ihp/unit-perawatan').done(data => unitPerawatanOptions = data || [])
             ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
         }
 
@@ -195,7 +207,9 @@
                 $.when(
                     $.get('/ihp/indicators'),
                     $.get('/ihp/unit-harga'),
-                    $.get('/ihp/unit-produksi')
+                    $.get('/ihp/unit-produksi'),
+                    $.get('/ihp/unit-luas'),
+                    $.get('/ihp/unit-perawatan')
                 ).then(() => loadSubtree(currentRootId));
             } else {
                 $('#table-container').hide();
@@ -470,29 +484,43 @@
                 u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
             setupDropdown('#newSatuanProduksi', '/ihp/unit-produksi', 'Satuan Produksi',
                 u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
+            setupDropdown('#newSatuanLuasTanam', '/ihp/unit-luas', 'Satuan Luas Tanam',
+                u => $('#newSatuanLuasTanam').append(`<option value="${u.id}">${u.satuan_luas_tanam}</option>`));
+            setupDropdown('#newSatuanBiayaPerawatan', '/ihp/unit-perawatan', 'Satuan Biaya Perawatan',
+                u => $('#newSatuanBiayaPerawatan').append(`<option value="${u.id}">${u.satuan_biaya_perawatan}</option>`));
 
             $('#commodityModal').modal('show');
         });
 
-        ['#newIndikator', '#newSatuanHarga', '#newSatuanProduksi'].forEach(selector => {
+        ['#newIndikator', '#newSatuanHarga', '#newSatuanProduksi', '#newSatuanLuasTanam', '#newSatuanBiayaPerawatan'].forEach(selector => {
             $(selector).on('change', function() {
                 if ($(this).val() !== '__new__') return;
 
                 const typeMap = {
                     '#newIndikator': {
                         title: 'Indikator',
-                        endpoint: '/prices-productions/indicators',
+                        endpoint: '/ihp/indicators',
                         field: 'indikator'
                     },
                     '#newSatuanHarga': {
                         title: 'Satuan Harga',
-                        endpoint: '/prices-productions/unit-harga',
+                        endpoint: '/ihp/unit-harga',
                         field: 'satuan_harga'
                     },
                     '#newSatuanProduksi': {
                         title: 'Satuan Produksi',
-                        endpoint: '/prices-productions/unit-produksi',
+                        endpoint: '/ihp/unit-produksi',
                         field: 'satuan_produksi'
+                    },
+                    '#newSatuanLuasTanam': {
+                        title: 'Satuan Luas Tanam',
+                        endpoint: '/ihp/unit-luas',
+                        field: 'satuan_luas_tanam'
+                    },
+                    '#newSatuanBiayaPerawatan': {
+                        title: 'Satuan Biaya Perawatan',
+                        endpoint: '/ihp/unit-perawatan',
+                        field: 'satuan_biaya_perawatan'
                     }
                 };
 
@@ -537,7 +565,9 @@
                 nama: $('#newNama').val(),
                 indikator_id: $('#newIndikator').val() || null,
                 satuan_harga_id: $('#newSatuanHarga').val() || null,
-                satuan_produksi_id: $('#newSatuanProduksi').val() || null
+                satuan_produksi_id: $('#newSatuanProduksi').val() || null,
+                satuan_luas_id: $('#newSatuanLuasTanam').val() || null,
+                satuan_perawatan_id: $('#newSatuanBiayaPerawatan').val() || null
             };
 
             if (!data.kode || !data.nama) {
@@ -545,7 +575,7 @@
                 return;
             }
 
-            $.post('/prices-productions/commodities', data).done(() => {
+            $.post('/ihp/commodities', data).done(() => {
                 $('#commodityModal').modal('hide');
                 Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
                 // Reload data dengan mempertahankan selectedYears

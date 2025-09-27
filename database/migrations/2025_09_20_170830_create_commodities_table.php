@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->string('indikator_id')->nullable();
             $table->string('satuan_harga_id')->nullable();
             $table->string('satuan_produksi_id')->nullable();
+            $table->string('satuan_luas_tanam_id')->nullable();
+            $table->string('satuan_biaya_perawatan_id')->nullable();
 
             $table->timestamps();
         });

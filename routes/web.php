@@ -9,6 +9,7 @@ use App\Http\Controllers\PriceProductionController;
 use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\RasioController;
 use App\Http\Controllers\IhpController;
+use App\Http\Controllers\WipCbrController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -87,6 +88,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/unit-produksi', [PriceProductionController::class, 'storeUnitProduksi'])
                 ->name('prices_productions.store_unit_produksi');
 
+            Route::get('/unit-luas', [WipCbrController::class, 'getUnitLuas'])
+                ->name('prices_productions.unit_luas');
+            Route::post('/unit-luas', [WipCbrController::class, 'storeUnitLuas'])
+                ->name('prices_productions.store_unit_luas');
+            Route::get('/unit-perawatan', [WipCbrController::class, 'getUnitPerawatan'])
+                ->name('prices_productions.unit_perawatan');
+            Route::post('/unit-perawatan', [WipCbrController::class, 'storeUnitPerawatan'])
+                ->name('prices_productions.store_unit_perawatan');
+
             // Triwulan
             Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
                 ->name('prices_productions.triwulans');
@@ -135,6 +145,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('rasio.unit_produksi');
             Route::post('/unit-produksi', [RasioController::class, 'storeUnitProduksi'])
                 ->name('rasio.store_unit_produksi');
+
+            Route::get('/unit-luas', [WipCbrController::class, 'getUnitLuas'])
+                ->name('rasio.unit_luas');
+            Route::post('/unit-luas', [WipCbrController::class, 'storeUnitLuas'])
+                ->name('rasio.store_unit_luas');
+            Route::get('/unit-perawatan', [WipCbrController::class, 'getUnitPerawatan'])
+                ->name('rasio.unit_perawatan');
+            Route::post('/unit-perawatan', [WipCbrController::class, 'storeUnitPerawatan'])
+                ->name('rasio.store_unit_perawatan');
 
             // Triwulan
             Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
@@ -185,6 +204,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/unit-produksi', [IhpController::class, 'storeUnitProduksi'])
                 ->name('ihp.store_unit_produksi');
 
+            Route::get('/unit-luas', [WipCbrController::class, 'getUnitLuas'])
+                ->name('ihp.unit_luas');
+            Route::post('/unit-luas', [WipCbrController::class, 'storeUnitLuas'])
+                ->name('ihp.store_unit_luas');
+            Route::get('/unit-perawatan', [WipCbrController::class, 'getUnitPerawatan'])
+                ->name('ihp.unit_perawatan');
+            Route::post('/unit-perawatan', [WipCbrController::class, 'storeUnitPerawatan'])
+                ->name('ihp.store_unit_perawatan');
+
             // Triwulan
             Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
                 ->name('ihp.triwulans');
@@ -203,6 +231,69 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [IhpController::class, 'getAllCommodities'])
                 ->name('ihp.all_commodities');
+        });
+
+        // Input WIP/CBR
+        Route::prefix('wip-cbr')->group(function () {
+            Route::get('/', [WipCbrController::class, 'index'])
+                ->name('wip-cbr.index');
+
+            // ambil subtree (anak-anak komoditas)
+            Route::get('/commodities/{commodity}/subtree', [WipCbrController::class, 'getSubtree'])
+                ->name('wip-cbr.subtree');
+
+            // generate kode otomatis untuk child baru
+            Route::get('/commodities/{parent}/next-code', [WipCbrController::class, 'generateNextCode'])
+                ->name('wip-cbr.next_code');
+
+            // generate kode untuk root baru (tanpa parent)
+            Route::get('/commodities/next-code', [WipCbrController::class, 'generateNextCode'])
+                ->name('wip-cbr.next_code_root');
+
+            // indikator & satuan
+            Route::get('/indicators', [WipCbrController::class, 'getIndicators'])
+                ->name('wip-cbr.indicators');
+            Route::post('/indicators', [WipCbrController::class, 'storeIndicator'])
+                ->name('wip-cbr.store_indicator');
+
+            Route::get('/unit-harga', [WipCbrController::class, 'getUnitHarga'])
+                ->name('wip-cbr.unit_harga');
+            Route::post('/unit-harga', [WipCbrController::class, 'storeUnitHarga'])
+                ->name('wip-cbr.store_unit_harga');
+
+            Route::get('/unit-produksi', [WipCbrController::class, 'getUnitProduksi'])
+                ->name('wip-cbr.unit_produksi');
+            Route::post('/unit-produksi', [WipCbrController::class, 'storeUnitProduksi'])
+                ->name('wip-cbr.store_unit_produksi');
+
+            Route::get('/unit-luas', [WipCbrController::class, 'getUnitLuas'])
+                ->name('wip-cbr.unit_luas');
+            Route::post('/unit-luas', [WipCbrController::class, 'storeUnitLuas'])
+                ->name('wip-cbr.store_unit_luas');
+            Route::get('/unit-perawatan', [WipCbrController::class, 'getUnitPerawatan'])
+                ->name('wip-cbr.unit_perawatan');
+            Route::post('/unit-perawatan', [WipCbrController::class, 'storeUnitPerawatan'])
+                ->name('wip-cbr.store_unit_perawatan');
+
+            // Triwulan
+            Route::get('/triwulans', [WipCbrController::class, 'getTriwulans'])
+                ->name('wip-cbr.triwulans');
+
+            // tambah komoditas baru
+            Route::post('/commodities', [WipCbrController::class, 'storeCommodity'])
+                ->name('wip-cbr.store_commodity');
+
+            // get all commodities untuk dropdown parent
+            Route::get('/commodities/all', [WipCbrController::class, 'getAllCommodities'])
+                ->name('wip-cbr.all_commodities');
+
+            // input WIP-CBR data
+            Route::post('/', [WipCbrController::class, 'store'])
+                ->name('wip-cbr.store');
+            Route::post('/bulk', [WipCbrController::class, 'bulkStore'])
+                ->name('wip-cbr.bulk');
+            Route::post('/bulk-store', [WipCbrController::class, 'bulkStore'])
+                ->name('wip-cbr.bulk_store');
         });
 
         // Manage User

@@ -75,6 +75,14 @@
                     </a>
                 </li>
 
+                <!-- Input WIP/CBR -->
+                <li class="nav-item {{ request()->routeIs('wip-cbr.*') ? 'active' : '' }}">
+                    <a href="{{ route('wip-cbr.index') }}">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Input WIP/CBR</p>
+                    </a>
+                </li>
+
                 @if(in_array(Auth::user()->id_role, [2]))
                 <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
                     <a href="{{ route('manage.user.index') }}">
