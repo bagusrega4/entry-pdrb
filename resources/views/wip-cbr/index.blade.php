@@ -10,7 +10,6 @@
             <div>
                 <h3 class="fw-bold mb-3">Input WIP (Work in Progress)/CBR (Cultivated Biological Resources)</h3>
                 <h6 class="op-7 mb-2">Pilih komoditas -> seluruh tabel turunannya akan muncul.</h6>
-                <h6 class="op-7 mb-2">*Input Luas Tanam Akhir Tahun dan Biaya Perawatan</h6>
             </div>
         </div>
 
