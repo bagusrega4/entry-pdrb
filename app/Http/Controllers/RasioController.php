@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Commodity;
 use App\Models\CommodityRasio;
+use App\Models\CommodityPriceProduction;
 use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
+use App\Models\Triwulan;
+use App\Models\CommodityIhp;
 
 class RasioController extends Controller
 {
@@ -45,11 +48,17 @@ class RasioController extends Controller
         return response()->json($units);
     }
 
+    public function getTriwulans()
+    {
+        $triwulans = Triwulan::select('id', 'triwulan')->get();
+        return response()->json($triwulans);
+    }
+
     public function getSubtree(Commodity $commodity)
     {
         $commodity->load([
             'childrenRecursive',
-            'rasio',
+            'rasio.triwulan',
             'indicator',
             'unitHarga',
             'unitProduksi'
@@ -57,12 +66,40 @@ class RasioController extends Controller
 
         $flatten = $this->flattenCommodity($commodity);
 
-        $years = CommodityRasio::whereIn('commodity_id', collect($flatten)->pluck('id'))
-            ->pluck('tahun')->unique()->sort()->values();
+        // Ambil kombinasi tahun + triwulan_id dari SEMUA TIGA tabel
+        $commodityIds = collect($flatten)->pluck('id');
+
+        // Dari tabel rasio
+        $rasioYears = CommodityRasio::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_rasio.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_rasio.tahun as year', 'commodity_rasio.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Dari tabel harga-produksi
+        $pricesYears = CommodityPriceProduction::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_prices_productions.tahun as year', 'commodity_prices_productions.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Dari tabel IHP
+        $ihpYears = CommodityIhp::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_ihp.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_ihp.tahun as year', 'commodity_ihp.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Gabungkan ketiga query dengan UNION dan ambil data distinct
+        $allYears = $rasioYears->union($pricesYears)->union($ihpYears)
+            ->orderBy('year')
+            ->orderBy('triwulan_id')
+            ->get()
+            ->unique(function ($item) {
+                return $item->year . '-' . $item->triwulan_id;
+            })
+            ->values(); // Reset index setelah unique
 
         return response()->json([
             'commodities' => $flatten,
-            'years' => $years
+            'years' => $allYears
         ]);
     }
 
@@ -72,15 +109,15 @@ class RasioController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // ambil rasio (dari tabel commodity_rasio)
-        $rasio_output_ikutan = [];
-        $rasio_wip_cbr = [];
-        $rasio_biaya_antara = [];
-
+        // Ambil data rasio dan kelompokkan per tahun-triwulan
+        $rasioData = [];
         foreach ($commodity->rasio as $r) {
-            $rasio_output_ikutan[$r->tahun] = $r->rasio_output_ikutan ?? null;
-            $rasio_wip_cbr[$r->tahun]    = $r->rasio_wip_cbr ?? null;
-            $rasio_biaya_antara[$r->tahun]  = $r->rasio_biaya_antara ?? null;
+            $key = $r->tahun . '-' . $r->triwulan_id;
+            $rasioData[$key] = [
+                'rasio_output_ikutan' => $r->rasio_output_ikutan,
+                'rasio_wip_cbr' => $r->rasio_wip_cbr,
+                'rasio_biaya_antara' => $r->rasio_biaya_antara,
+            ];
         }
 
         $isParent = $commodity->children->count() > 0;
@@ -92,11 +129,7 @@ class RasioController extends Controller
             'full_name' => $name,
             'is_parent' => $isParent,
             'is_leaf' => !$isParent,
-
-            // data rasio per tahun
-            'rasio_output_ikutan' => $rasio_output_ikutan,
-            'rasio_wip_cbr' => $rasio_wip_cbr,
-            'rasio_biaya_antara' => $rasio_biaya_antara,
+            'rasio' => $rasioData, // Data rasio yang sudah dikelompokkan
 
             // indikator & satuan tetap ambil dari commodities
             'indikator_id' => $commodity->indikator_id,
@@ -237,22 +270,24 @@ class RasioController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'commodity_id'       => 'required|exists:commodities,id',
-            'tahun'              => 'required|integer',
+            'commodity_id'        => 'required|exists:commodities,id',
+            'tahun'               => 'required|integer',
+            'triwulan_id'         => 'required|exists:triwulanan,id',
             'rasio_output_ikutan' => 'nullable|numeric',
-            'rasio_wip_cbr'      => 'nullable|numeric',
-            'rasio_biaya_antara' => 'nullable|numeric',
+            'rasio_wip_cbr'       => 'nullable|numeric',
+            'rasio_biaya_antara'  => 'nullable|numeric',
         ]);
 
         CommodityRasio::updateOrCreate(
             [
                 'commodity_id' => $validated['commodity_id'],
                 'tahun'        => $validated['tahun'],
+                'triwulan_id'  => $validated['triwulan_id'],
             ],
             [
                 'rasio_output_ikutan' => $validated['rasio_output_ikutan'] ?? null,
-                'rasio_wip_cbr'      => $validated['rasio_wip_cbr'] ?? null,
-                'rasio_biaya_antara' => $validated['rasio_biaya_antara'] ?? null,
+                'rasio_wip_cbr'       => $validated['rasio_wip_cbr'] ?? null,
+                'rasio_biaya_antara'  => $validated['rasio_biaya_antara'] ?? null,
             ]
         );
 
@@ -263,23 +298,42 @@ class RasioController extends Controller
     {
         $data = json_decode($request->input('data'), true);
 
+        if (!$data || !is_array($data)) {
+            return response()->json(['success' => false, 'message' => 'Invalid data format'], 400);
+        }
+
         foreach ($data as $row) {
+            // Validasi data setiap baris
+            if (!isset($row['commodity_id']) || !isset($row['tahun'])) {
+                continue; // Skip baris yang tidak valid
+            }
+
             $commodity = Commodity::find($row['commodity_id']);
             if (!$commodity) continue;
+
+            // Pastikan triwulan_id ada, jika tidak set ke null atau default
+            $triwulanId = isset($row['triwulan_id']) && !empty($row['triwulan_id']) ?
+                (int)$row['triwulan_id'] : null;
+
+            // Validasi triwulan_id jika ada
+            if ($triwulanId && !Triwulan::find($triwulanId)) {
+                continue; // Skip jika triwulan_id tidak valid
+            }
 
             CommodityRasio::updateOrCreate(
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
+                    'triwulan_id'  => $triwulanId,
                 ],
                 [
-                    'rasio_output_ikutan' => $row['rasio_output_ikutan'] ?? null,
-                    'rasio_wip_cbr'      => $row['rasio_wip_cbr'] ?? null,
-                    'rasio_biaya_antara' => $row['rasio_biaya_antara'] ?? null,
+                    'rasio_output_ikutan' => isset($row['rasio_output_ikutan']) ? $row['rasio_output_ikutan'] : null,
+                    'rasio_wip_cbr'       => isset($row['rasio_wip_cbr']) ? $row['rasio_wip_cbr'] : null,
+                    'rasio_biaya_antara'  => isset($row['rasio_biaya_antara']) ? $row['rasio_biaya_antara'] : null,
                 ]
             );
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Data berhasil disimpan']);
     }
 }

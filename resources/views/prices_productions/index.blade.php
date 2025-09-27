@@ -153,32 +153,69 @@
 <script>
 $(function() {
     let itemsData = [], currentRootId = null, allYears = [], selectedYears = [];
+    let isRestoringSelection = false;
 
     // Utility functions
     function parseNumberID(formatted) {
-        if (!formatted) return null;
-        let s = String(formatted).trim()
-            .replace(/Rp\s*/i, '').replace(/\s+/g, '');
+        if (formatted === null || formatted === undefined || formatted === '') return null;
         
+        // Remove currency symbols and extra spaces
+        let s = String(formatted).trim()
+            .replace(/Rp\s*/i, '')
+            .replace(/\s+/g, '');
+        
+        // Handle Indonesian number format (dot as thousands separator, comma as decimal)
+        // But also handle international format
         const hasDot = s.includes('.');
         const hasComma = s.includes(',');
         
         if (hasDot && hasComma) {
-            s = s.lastIndexOf(',') > s.lastIndexOf('.') 
-                ? s.replace(/\./g, '').replace(',', '.')
-                : s.replace(/,/g, '');
+            // Both dot and comma present
+            const lastDotIndex = s.lastIndexOf('.');
+            const lastCommaIndex = s.lastIndexOf(',');
+            
+            if (lastCommaIndex > lastDotIndex) {
+                // Format: 1.234.567,89 (Indonesian)
+                s = s.replace(/\./g, '').replace(',', '.');
+            } else {
+                // Format: 1,234,567.89 (International)
+                s = s.replace(/,/g, '');
+            }
         } else if (hasComma) {
-            s = (s.match(/,/g) || []).length > 1 
-                ? s.replace(/,/g, '') 
-                : s.replace(',', '.');
+            // Only comma present
+            const commaCount = (s.match(/,/g) || []).length;
+            if (commaCount === 1) {
+                // Check if it's decimal (less than 3 digits after comma)
+                const afterComma = s.split(',')[1];
+                if (afterComma && afterComma.length <= 3) {
+                    s = s.replace(',', '.'); // Decimal separator
+                } else {
+                    s = s.replace(/,/g, ''); // Thousands separator
+                }
+            } else {
+                // Multiple commas = thousands separators
+                s = s.replace(/,/g, '');
+            }
         } else if (hasDot) {
-            const parts = s.split('.');
-            if (parts.length === 2 && parts[1].length === 3 && parts[0].length > 0) {
+            // Only dot present
+            const dotCount = (s.match(/\./g) || []).length;
+            if (dotCount === 1) {
+                // Check if it's likely a thousands separator (3 digits after dot)
+                const afterDot = s.split('.')[1];
+                if (afterDot && afterDot.length === 3 && !afterDot.includes('0')) {
+                    // Likely thousands separator like 1.000
+                    s = s.replace(/\./g, '');
+                }
+                // Otherwise keep as decimal
+            } else {
+                // Multiple dots = thousands separators
                 s = s.replace(/\./g, '');
             }
         }
         
+        // Remove any remaining non-numeric characters except decimal point and minus
         s = s.replace(/[^0-9.\-]/g, '');
+        
         const num = parseFloat(s);
         return isNaN(num) ? null : num;
     }
@@ -201,14 +238,17 @@ $(function() {
         return div.innerHTML;
     }
 
-    // Main functions
+    // Main functions - FIXED VERSION WITH PREVENT EVENT CONFLICT
     function loadSubtree(rootId) {
+        // SIMPAN selectedYears yang sudah ada sebelum reload
+        const previouslySelectedYears = [...selectedYears];
+
         $.get('/prices-productions/commodities/' + rootId + '/subtree', function(res) {
             itemsData = res.commodities || [];
             
             allYears = (res.years || []).map(y => ({
                 year: parseInt(y.year || y),
-                triwulan_id: y.triwulan_id ?? 0,
+                triwulan_id: parseInt(y.triwulan_id ?? 0),
                 triwulan_name: y.triwulan_name || y.triwulan_nama || (y.triwulan_obj?.triwulan)
             }));
             
@@ -225,9 +265,32 @@ $(function() {
                 allowClear: true,
                 width: '250px',
                 multiple: true
-            }).val(null).trigger('change');
+            });
+
+            // RESTORE selectedYears yang sudah ada sebelumnya
+            if (previouslySelectedYears.length > 0) {
+                isRestoringSelection = true; // SET FLAG
+                
+                // Filter selectedYears berdasarkan yang masih tersedia di allYears
+                selectedYears = allYears.filter(y => 
+                    previouslySelectedYears.some(prev => 
+                        prev.year === y.year && prev.triwulan_id === y.triwulan_id
+                    )
+                );
+                
+                // Set nilai select2 berdasarkan selectedYears yang sudah difilter
+                const selectedValues = selectedYears.map(y => `${y.year}-${y.triwulan_id ?? 0}`);
+                $yearFilter.val(selectedValues).trigger('change');
+                
+                // Reset flag setelah selesai restore
+                setTimeout(() => {
+                    isRestoringSelection = false;
+                }, 100);
+            } else {
+                selectedYears = [];
+                $yearFilter.val(null).trigger('change');
+            }
             
-            selectedYears = [];
             buildTable();
             $('#table-container').show();
         }).fail(() => Swal.fire('Error', 'Gagal mengambil data subtree', 'error'));
@@ -270,19 +333,26 @@ $(function() {
                 const priceEntry = it.prices?.[key];
                 const prodEntry = it.productions?.[key];
                 
+                // Extract raw values
                 const hargaVal = priceEntry?.harga ?? priceEntry ?? '';
                 const produksiVal = prodEntry?.produksi ?? prodEntry ?? '';
+                
+                // Parse to ensure we have proper numbers
+                const hargaRaw = parseNumberID(hargaVal);
+                const produksiRaw = parseNumberID(produksiVal);
                 
                 row += `
                     <td class="${tdClass}">
                         <input type="text" class="form-control harga text-end"
                             data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                            value="${formatNumberID(hargaVal, true)}" placeholder="Harga">
+                            data-raw="${hargaRaw !== null ? hargaRaw : ''}"
+                            value="${formatNumberID(hargaRaw, true)}" placeholder="Harga">
                     </td>
                     <td class="${tdClass}">
                         <input type="text" class="form-control produksi text-end"
                             data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                            value="${formatNumberID(produksiVal)}" placeholder="Produksi">
+                            data-raw="${produksiRaw !== null ? produksiRaw : ''}"
+                            value="${formatNumberID(produksiRaw)}" placeholder="Produksi">
                     </td>`;
             });
             
@@ -294,34 +364,37 @@ $(function() {
     }
 
     function attachFormatHandlers() {
-        const handleFocus = function(isHarga) {
-            return function() {
-                const raw = $(this).data('raw');
-                $(this).val(raw ?? '').select();
-            };
-        };
+        $('#hargaTable').off('focus blur input', 'input');
         
-        const handleBlur = function(isHarga) {
-            return function() {
-                const raw = parseNumberID($(this).val());
-                $(this).data('raw', raw);
-                $(this).val(formatNumberID(raw, isHarga));
-            };
-        };
-        
-        $('#hargaTable')
-            .off('focus blur', 'input.harga, input.produksi')
-            .on('focus', 'input.harga', handleFocus(true))
-            .on('blur', 'input.harga', handleBlur(true))
-            .on('focus', 'input.produksi', handleFocus(false))
-            .on('blur', 'input.produksi', handleBlur(false));
+        $('#hargaTable').on('focus', 'input', function() {
+            // Get raw value or current display value
+            const raw = $(this).data('raw');
+            const displayValue = raw !== null && raw !== undefined ? raw : '';
+            $(this).val(displayValue).select();
+        }).on('blur', 'input', function() {
+            // Parse and store raw value
+            const inputValue = $(this).val();
+            const raw = parseNumberID(inputValue);
+            $(this).data('raw', raw);
+            
+            // Format for display
+            const isHarga = $(this).hasClass('harga');
+            $(this).val(formatNumberID(raw, isHarga));
+        }).on('input', 'input', function() {
+            // Store parsed value on every input change
+            const inputValue = $(this).val();
+            const raw = parseNumberID(inputValue);
+            $(this).data('raw', raw);
+        });
     }
 
     function setupDropdown(selector, endpoint, label, callback) {
-        $.get(endpoint, function(res) {
+        return $.get(endpoint, function(res) {
             const $el = $(selector).empty().append(`<option value="">-- Pilih ${label} --</option>`);
             res.forEach(callback);
             $el.append(`<option value="__new__">+ Tambah Baru...</option>`);
+        }).fail(function() {
+            Swal.fire('Error', `Gagal mengambil data ${label}`, 'error');
         });
     }
 
@@ -339,7 +412,13 @@ $(function() {
         }
     });
 
+    // FIXED EVENT HANDLER DENGAN FLAG CHECK
     $('#yearFilter').on('change', function() {
+        // Jika sedang dalam proses restore, skip event handler ini
+        if (isRestoringSelection) {
+            return;
+        }
+        
         const selectedKeys = $(this).val() || [];
         selectedYears = allYears.filter(y => 
             selectedKeys.includes(`${y.year}-${y.triwulan_id ?? 0}`)
@@ -361,7 +440,7 @@ $(function() {
                 showCancelButton: true,
                 preConfirm: () => {
                     const newYear = parseInt($('#swalYearInput').val());
-                    const triwulanId = $('#swalTriwulanSelect').val();
+                    const triwulanId = parseInt($('#swalTriwulanSelect').val());
                     const triwulanName = $('#swalTriwulanSelect option:selected').text();
                     
                     if (!newYear || !triwulanId) {
@@ -374,19 +453,35 @@ $(function() {
                 if (result.isConfirmed) {
                     const { newYear, triwulanId, triwulanName } = result.value;
                     
-                    if (allYears.some(y => y.year === newYear && y.triwulan_id == triwulanId)) {
+                    // Cek apakah kombinasi tahun+triwulan sudah ada
+                    if (allYears.some(y => y.year === newYear && y.triwulan_id === triwulanId)) {
                         Swal.fire('Gagal', 'Tahun & triwulan sudah ada!', 'error');
                         return;
                     }
                     
-                    const newYearObj = { year: newYear, triwulan_id: triwulanId, triwulan_name: triwulanName };
+                    const newYearObj = { 
+                        year: newYear, 
+                        triwulan_id: triwulanId, 
+                        triwulan_name: triwulanName 
+                    };
+                    
+                    // Tambahkan ke allYears
                     allYears.push(newYearObj);
+                    
+                    // Tambahkan ke selectedYears untuk langsung dipilih
                     selectedYears.push(newYearObj);
                     
-                    $('#yearFilter').append(
-                        `<option value="${newYear}-${triwulanId}" selected>${newYear} - ${triwulanName}</option>`
-                    ).trigger('change');
+                    // Update dropdown dengan option yang baru
+                    const optionValue = `${newYear}-${triwulanId}`;
+                    const optionLabel = `${newYear} - ${triwulanName}`;
+                    $('#yearFilter').append(`<option value="${optionValue}">${optionLabel}</option>`);
                     
+                    // Set nilai yang dipilih (termasuk yang sudah ada sebelumnya + yang baru)
+                    const currentSelected = $('#yearFilter').val() || [];
+                    currentSelected.push(optionValue);
+                    $('#yearFilter').val(currentSelected).trigger('change');
+                    
+                    // Rebuild tabel dengan kolom baru
                     buildTable();
                     Swal.fire('Berhasil', 'Tahun berhasil ditambahkan!', 'success');
                 }
@@ -428,29 +523,62 @@ $(function() {
         
         $.post('/prices-productions/bulk-store', {
             data: JSON.stringify(payload),
-            _token: '{{ csrf_token() }}'
+            _token: $('meta[name="csrf-token"]').attr('content') // Fixed CSRF token
         }).done(() => {
             Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
-            if (currentRootId) loadSubtree(currentRootId);
-        }).fail(() => Swal.fire('Error', 'Gagal menyimpan data', 'error'));
+            // Reload data dengan mempertahankan selectedYears
+            if (currentRootId) {
+                loadSubtree(currentRootId);
+            }
+        }).fail(xhr => {
+            Swal.fire('Error', 'Gagal menyimpan data', 'error');
+        });
     });
 
-    $('#addCommodity').on('click', function() {
+    // Add Commodity Button Event Handler
+    $('#addCommodity').on('click', function(e) {
+        e.preventDefault(); // Prevent default behavior
+        
+        // Check if modal exists in DOM
+        if ($('#commodityModal').length === 0) {
+            Swal.fire('Error', 'Modal tidak ditemukan. Pastikan modal HTML sudah ada di halaman.', 'error');
+            return;
+        }
+        
+        // Reset form fields
         $('#newNama, #newKode').val('');
         $('#parentSelect').empty().append('<option value="">-- Root (tanpa parent) --</option>');
         
-        $.get('/prices-productions/commodities/all', res => {
-            res.forEach(c => $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`));
-        });
+        // Load parent commodities
+        $.get('/prices-productions/commodities/all')
+            .done(function(res) {
+                res.forEach(c => {
+                    $('#parentSelect').append(`<option value="${c.id}">${c.full_name}</option>`);
+                });
+            })
+            .fail(function() {
+                // Failed to load parent commodities
+            });
         
-        setupDropdown('#newIndikator', '/prices-productions/indicators', 'Indikator', 
-            i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`));
-        setupDropdown('#newSatuanHarga', '/prices-productions/unit-harga', 'Satuan Harga', 
-            u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`));
-        setupDropdown('#newSatuanProduksi', '/prices-productions/unit-produksi', 'Satuan Produksi', 
-            u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`));
+        // Setup dropdowns with better error handling
+        const dropdownPromises = [
+            setupDropdown('#newIndikator', '/prices-productions/indicators', 'Indikator', 
+                i => $('#newIndikator').append(`<option value="${i.id}">${i.indikator}</option>`)),
+            setupDropdown('#newSatuanHarga', '/prices-productions/unit-harga', 'Satuan Harga', 
+                u => $('#newSatuanHarga').append(`<option value="${u.id}">${u.satuan_harga}</option>`)),
+            setupDropdown('#newSatuanProduksi', '/prices-productions/unit-produksi', 'Satuan Produksi', 
+                u => $('#newSatuanProduksi').append(`<option value="${u.id}">${u.satuan_produksi}</option>`))
+        ];
         
-        $('#commodityModal').modal('show');
+        // Wait for all dropdowns to load, then show modal
+        $.when.apply($, dropdownPromises)
+            .done(function() {
+                $('#commodityModal').modal('show');
+            })
+            .fail(function() {
+                // Show modal anyway, user can try to reload
+                $('#commodityModal').modal('show');
+            });
     });
 
     // Handle dynamic option additions
@@ -479,7 +607,10 @@ $(function() {
                     return;
                 }
                 
-                const postData = { [config.field]: res.value, _token: '{{ csrf_token() }}' };
+                const postData = { 
+                    [config.field]: res.value, 
+                    _token: $('meta[name="csrf-token"]').attr('content') // Fixed CSRF token
+                };
                 $.post(config.endpoint, postData).done(data => {
                     const newOpt = new Option(data[config.field], data.id, true, true);
                     $(selector).append(newOpt).trigger('change');
@@ -504,7 +635,7 @@ $(function() {
             indikator_id: $('#newIndikator').val() || null,
             satuan_harga_id: $('#newSatuanHarga').val() || null,
             satuan_produksi_id: $('#newSatuanProduksi').val() || null,
-            _token: '{{ csrf_token() }}'
+            _token: $('meta[name="csrf-token"]').attr('content') // Fixed CSRF token
         };
         
         if (!data.kode || !data.nama) {
@@ -515,9 +646,13 @@ $(function() {
         $.post('/prices-productions/commodities', data).done(() => {
             $('#commodityModal').modal('hide');
             Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
-            if (currentRootId) loadSubtree(currentRootId);
+            // Reload data dengan mempertahankan selectedYears
+            if (currentRootId) {
+                loadSubtree(currentRootId);
+            }
         }).fail(() => Swal.fire('Error', 'Gagal menambah komoditas', 'error'));
     });
+
 });
 </script>
 @endsection

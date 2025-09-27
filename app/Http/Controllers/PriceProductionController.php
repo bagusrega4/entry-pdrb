@@ -9,6 +9,8 @@ use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
 use App\Models\Triwulan;
+use App\Models\CommodityRasio;
+use App\Models\CommodityIhp;
 
 class PriceProductionController extends Controller
 {
@@ -64,18 +66,40 @@ class PriceProductionController extends Controller
 
         $flatten = $this->flattenCommodity($commodity);
 
-        // Ambil kombinasi tahun + triwulan_id + nama triwulan
-        $years = CommodityPriceProduction::whereIn('commodity_id', collect($flatten)->pluck('id'))
+        // Ambil kombinasi tahun + triwulan_id dari SEMUA TIGA tabel
+        $commodityIds = collect($flatten)->pluck('id');
+
+        // Dari tabel harga-produksi
+        $pricesYears = CommodityPriceProduction::whereIn('commodity_id', $commodityIds)
             ->join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
             ->select('commodity_prices_productions.tahun as year', 'commodity_prices_productions.triwulan_id', 'triwulanan.triwulan as triwulan_name')
-            ->distinct()
+            ->distinct();
+
+        // Dari tabel rasio
+        $rasioYears = CommodityRasio::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_rasio.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_rasio.tahun as year', 'commodity_rasio.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Dari tabel IHP
+        $ihpYears = CommodityIhp::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_ihp.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_ihp.tahun as year', 'commodity_ihp.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Gabungkan ketiga query dengan UNION dan ambil data distinct
+        $allYears = $pricesYears->union($rasioYears)->union($ihpYears)
             ->orderBy('year')
-            ->orderBy('commodity_prices_productions.triwulan_id')
-            ->get();
+            ->orderBy('triwulan_id')
+            ->get()
+            ->unique(function ($item) {
+                return $item->year . '-' . $item->triwulan_id;
+            })
+            ->values(); // Reset index setelah unique
 
         return response()->json([
             'commodities' => $flatten,
-            'years' => $years
+            'years' => $allYears
         ]);
     }
 
@@ -120,7 +144,6 @@ class PriceProductionController extends Controller
             'satuan_harga_id' => $commodity->satuan_harga_id,
             'satuan_produksi_id' => $commodity->satuan_produksi_id,
 
-            // nama relasi juga langsung dari commodities
             'indicator_name' => $commodity->indicator ? $commodity->indicator->indikator : null,
             'satuan_harga_name' => $commodity->unitHarga ? $commodity->unitHarga->satuan_harga : null,
             'satuan_produksi_name' => $commodity->unitProduksi ? $commodity->unitProduksi->satuan_produksi : null,

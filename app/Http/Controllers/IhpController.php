@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Commodity;
 use App\Models\CommodityIhp;
+use App\Models\CommodityPriceProduction;
+use App\Models\CommodityRasio;
 use App\Models\Indicator;
 use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
+use App\Models\Triwulan;
 
 class IhpController extends Controller
 {
@@ -45,24 +48,58 @@ class IhpController extends Controller
         return response()->json($units);
     }
 
+    public function getTriwulans()
+    {
+        $triwulans = Triwulan::select('id', 'triwulan')->get();
+        return response()->json($triwulans);
+    }
+
     public function getSubtree(Commodity $commodity)
     {
         $commodity->load([
             'childrenRecursive',
-            'ihp',           
-            'indicator',     
-            'unitHarga',    
-            'unitProduksi'   
+            'ihp.triwulan',
+            'indicator',
+            'unitHarga',
+            'unitProduksi'
         ]);
 
         $flatten = $this->flattenCommodity($commodity);
 
-        $years = CommodityIhp::whereIn('commodity_id', collect($flatten)->pluck('id'))
-            ->pluck('tahun')->unique()->sort()->values();
+        // Ambil kombinasi tahun + triwulan_id dari SEMUA TIGA tabel
+        $commodityIds = collect($flatten)->pluck('id');
+
+        // Dari tabel IHP
+        $ihpYears = CommodityIhp::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_ihp.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_ihp.tahun as year', 'commodity_ihp.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Dari tabel harga-produksi
+        $pricesYears = CommodityPriceProduction::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_prices_productions.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_prices_productions.tahun as year', 'commodity_prices_productions.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Dari tabel rasio
+        $rasioYears = CommodityRasio::whereIn('commodity_id', $commodityIds)
+            ->join('triwulanan', 'commodity_rasio.triwulan_id', '=', 'triwulanan.id')
+            ->select('commodity_rasio.tahun as year', 'commodity_rasio.triwulan_id', 'triwulanan.triwulan as triwulan_name')
+            ->distinct();
+
+        // Gabungkan ketiga query dengan UNION dan ambil data distinct
+        $allYears = $ihpYears->union($pricesYears)->union($rasioYears)
+            ->orderBy('year')
+            ->orderBy('triwulan_id')
+            ->get()
+            ->unique(function ($item) {
+                return $item->year . '-' . $item->triwulan_id;
+            })
+            ->values(); // Reset index setelah unique
 
         return response()->json([
             'commodities' => $flatten,
-            'years' => $years
+            'years' => $allYears
         ]);
     }
 
@@ -72,11 +109,13 @@ class IhpController extends Controller
 
         $name = trim(($prefix ? $prefix . ' ' : '') . $commodity->kode . ' - ' . $commodity->nama);
 
-        // ambil ihp (dari tabel commodity_ihp)
-        $ihp = [];
-
+        // Ambil data IHP dan kelompokkan per tahun-triwulan
+        $ihpData = [];
         foreach ($commodity->ihp as $r) {
-            $ihp[$r->tahun] = $r->ihp ?? null;
+            $key = $r->tahun . '-' . $r->triwulan_id;
+            $ihpData[$key] = [
+                'ihp' => $r->ihp,
+            ];
         }
 
         $isParent = $commodity->children->count() > 0;
@@ -88,9 +127,7 @@ class IhpController extends Controller
             'full_name' => $name,
             'is_parent' => $isParent,
             'is_leaf' => !$isParent,
-
-            // data ihp per tahun
-            'ihp' => $ihp,
+            'ihp' => $ihpData, // Data IHP yang sudah dikelompokkan
 
             // indikator & satuan tetap ambil dari commodities
             'indikator_id' => $commodity->indikator_id,
@@ -233,13 +270,15 @@ class IhpController extends Controller
         $validated = $request->validate([
             'commodity_id'       => 'required|exists:commodities,id',
             'tahun'              => 'required|integer',
-            'ihp' => 'nullable|numeric',
+            'triwulan_id'        => 'required|exists:triwulanan,id',
+            'ihp'                => 'nullable|numeric',
         ]);
 
         CommodityIhp::updateOrCreate(
             [
                 'commodity_id' => $validated['commodity_id'],
                 'tahun'        => $validated['tahun'],
+                'triwulan_id'  => $validated['triwulan_id'],
             ],
             [
                 'ihp' => $validated['ihp'] ?? null,
@@ -253,21 +292,40 @@ class IhpController extends Controller
     {
         $data = json_decode($request->input('data'), true);
 
+        if (!$data || !is_array($data)) {
+            return response()->json(['success' => false, 'message' => 'Invalid data format'], 400);
+        }
+
         foreach ($data as $row) {
+            // Validasi data setiap baris
+            if (!isset($row['commodity_id']) || !isset($row['tahun'])) {
+                continue; // Skip baris yang tidak valid
+            }
+
             $commodity = Commodity::find($row['commodity_id']);
             if (!$commodity) continue;
+
+            // Pastikan triwulan_id ada, jika tidak set ke null atau default
+            $triwulanId = isset($row['triwulan_id']) && !empty($row['triwulan_id']) ?
+                (int)$row['triwulan_id'] : null;
+
+            // Validasi triwulan_id jika ada
+            if ($triwulanId && !Triwulan::find($triwulanId)) {
+                continue; // Skip jika triwulan_id tidak valid
+            }
 
             CommodityIhp::updateOrCreate(
                 [
                     'commodity_id' => $row['commodity_id'],
                     'tahun'        => $row['tahun'],
+                    'triwulan_id'  => $triwulanId,
                 ],
                 [
-                    'ihp' => $row['ihp'] ?? null,
+                    'ihp' => isset($row['ihp']) ? $row['ihp'] : null,
                 ]
             );
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Data berhasil disimpan']);
     }
 }
