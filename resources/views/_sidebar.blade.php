@@ -83,6 +83,14 @@
                     </a>
                 </li>
 
+                <!-- Download -->
+                <li class="nav-item {{ request()->routeIs('download.*') ? 'active' : '' }}">
+                    <a href="{{ route('download.index') }}">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Download</p>
+                    </a>
+                </li>
+
                 @if(in_array(Auth::user()->id_role, [2]))
                 <li class="nav-item {{ request()->routeIs('manage.user.*') || request()->routeIs('manage.user.create') || request()->routeIs('manage.user.edit') ? 'active' : '' }}">
                     <a href="{{ route('manage.user.index') }}">

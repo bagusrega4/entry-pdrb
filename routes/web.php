@@ -10,6 +10,7 @@ use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\RasioController;
 use App\Http\Controllers\IhpController;
 use App\Http\Controllers\WipCbrController;
+use App\Http\Controllers\DownloadController;
 
 // -------------------------------------------------------------------
 // Halaman Home
@@ -306,6 +307,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/edit/{id}', [ManageUserController::class, 'edit'])->name('edit');
             Route::put('/{id}', [ManageUserController::class, 'update'])->name('update');
             Route::delete('/{id}', [ManageUserController::class, 'destroy'])->name('destroy');
+        });
+
+        // Download
+        Route::prefix('download')->group(function () {
+            Route::get('/', [DownloadController::class, 'index'])
+                ->name('download.index');
+            Route::post('/generate-pdf', [DownloadController::class, 'generatePdf'])
+                ->name('download.generate-pdf');
         });
     });
 });
