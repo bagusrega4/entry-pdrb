@@ -315,6 +315,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('download.index');
             Route::post('/generate-pdf', [DownloadController::class, 'generatePdf'])
                 ->name('download.generate-pdf');
+            Route::post('/update-column-config', [DownloadController::class, 'updateColumnConfig'])
+                ->name('download.update-column-config');
         });
     });
 });

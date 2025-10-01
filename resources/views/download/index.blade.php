@@ -17,13 +17,6 @@
                         <h4 class="card-title">Download Data PDRB</h4>
                     </div>
                     <div class="card-body">
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
                         <form action="{{ route('download.generate-pdf') }}" method="POST" id="downloadForm">
                             @csrf
                             
@@ -72,6 +65,12 @@
                                 @enderror
                             </div>
 
+                            <div class="form-group mb-4">
+                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#columnConfigModal">
+                                    <i class="fa fa-cog"></i> Konfigurasi Kolom
+                                </button>
+                            </div>
+
                             <div class="form-group">
                                 <button type="submit" class="btn btn-primary" id="downloadBtn">
                                     <i class="fa fa-download"></i> Download PDF
@@ -97,19 +96,84 @@
                         </p>
                         <hr class="bg-white">
                         <small>
+                            <strong>Fitur Baru:</strong><br>
+                            • Konfigurasi kolom yang muncul di PDF<br>
+                            • Klik "Konfigurasi Kolom" untuk mengatur<br>
+                            • Kolom kategori & komoditas wajib muncul<br>
+                        </small>
+                        <hr class="bg-white">
+                        <small>
                             <strong>Format Output:</strong><br>
                             • Header: Badan Pusat Statistik<br>
                             • Judul: Data PDRB Triwulan<br>
                             • Tabel data sesuai kategori yang dipilih<br>
-                            • Orientasi: Potrait (A4)
-                        </small>
-                        <hr class="bg-white">
-                        <small>
-                            <strong>Data yang ditampilkan:</strong><br>
-                            • Harga & Produksi<br>
+                            • Orientasi: Landscape (A4)
                         </small>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfigurasi Kolom -->
+<div class="modal fade" id="columnConfigModal" tabindex="-1" aria-labelledby="columnConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="columnConfigModalLabel">Konfigurasi Kolom PDF</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> 
+                    Centang kolom yang ingin ditampilkan dalam PDF. Kolom bertanda <span class="badge bg-danger">Wajib</span> tidak dapat diubah.
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="10%" class="text-center">Tampilkan</th>
+                                <th>Nama Kolom</th>
+                                <th width="15%" class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($columnConfigs as $config)
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-flex justify-content-center">
+                                        <input 
+                                            class="form-check-input column-checkbox" 
+                                            type="checkbox" 
+                                            data-config-id="{{ $config->id }}"
+                                            {{ $config->is_visible ? 'checked' : '' }}
+                                            {{ $config->is_mandatory ? 'disabled' : '' }}
+                                        >
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ $config->column_label }}
+                                </td>
+                                <td class="text-center">
+                                    @if($config->is_mandatory)
+                                        <span class="badge bg-danger">Wajib</span>
+                                    @else
+                                        <span class="badge bg-secondary">Opsional</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="saveColumnConfig">
+                    <i class="fa fa-save"></i> Simpan Konfigurasi
+                </button>
             </div>
         </div>
     </div>
@@ -118,26 +182,251 @@
 
 @section('script')
 <script>
+    // Restore form values dari localStorage saat halaman load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedKategori = localStorage.getItem('download_kategori_id');
+        const savedTahun = localStorage.getItem('download_tahun');
+        const savedTriwulan = localStorage.getItem('download_triwulan_id');
+
+        if (savedKategori) {
+            document.getElementById('kategori_id').value = savedKategori;
+        }
+        if (savedTahun) {
+            document.getElementById('tahun').value = savedTahun;
+        }
+        if (savedTriwulan) {
+            document.getElementById('triwulan_id').value = savedTriwulan;
+        }
+
+        // Clear localStorage setelah restore (agar tidak persistent)
+        // Komentar baris ini jika ingin nilai tetap tersimpan
+        // localStorage.removeItem('download_kategori_id');
+        // localStorage.removeItem('download_tahun');
+        // localStorage.removeItem('download_triwulan_id');
+    });
+
+    // Auto-save form values ke localStorage saat berubah
+    document.getElementById('kategori_id').addEventListener('change', function() {
+        localStorage.setItem('download_kategori_id', this.value);
+    });
+    document.getElementById('tahun').addEventListener('change', function() {
+        localStorage.setItem('download_tahun', this.value);
+    });
+    document.getElementById('triwulan_id').addEventListener('change', function() {
+        localStorage.setItem('download_triwulan_id', this.value);
+    });
+
+    // Show SweetAlert for session messages
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#d33'
+        });
+    @endif
+
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Validasi Gagal',
+            html: '<ul style="text-align: left;">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
+            confirmButtonColor: '#d33'
+        });
+    @endif
+
     document.getElementById('downloadForm').addEventListener('submit', function(e) {
-        const btn = document.getElementById('downloadBtn');
-        const kategori = document.getElementById('kategori_id').value;
-        const tahun = document.getElementById('tahun').value;
-        const triwulan = document.getElementById('triwulan_id').value;
+        e.preventDefault();
         
-        if (!kategori || !tahun || !triwulan) {
-            e.preventDefault();
-            alert('Mohon lengkapi semua field yang required!');
+        const btn = document.getElementById('downloadBtn');
+        const kategori = document.getElementById('kategori_id');
+        const tahun = document.getElementById('tahun').value;
+        const triwulan = document.getElementById('triwulan_id');
+        
+        if (!kategori.value || !tahun || !triwulan.value) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Data Tidak Lengkap',
+                text: 'Mohon lengkapi semua field yang required!',
+                confirmButtonColor: '#3085d6'
+            });
             return false;
         }
         
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating PDF...';
-        btn.disabled = true;
+        // Get selected option text
+        const kategoriText = kategori.options[kategori.selectedIndex].text;
+        const triwulanText = triwulan.options[triwulan.selectedIndex].text;
         
-        // Re-enable button after 10 seconds (in case of error)
-        setTimeout(function() {
-            btn.innerHTML = '<i class="fa fa-download"></i> Download PDF';
-            btn.disabled = false;
-        }, 10000);
+        // Confirmation before download
+        Swal.fire({
+            title: 'Konfirmasi Download',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Kategori:</strong> ${kategoriText}</p>
+                    <p><strong>Tahun:</strong> ${tahun}</p>
+                    <p><strong>Triwulan:</strong> ${triwulanText}</p>
+                </div>
+                <hr>
+                <p>Apakah Anda yakin ingin mendownload PDF dengan data di atas?</p>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<i class="fa fa-download"></i> Ya, Download!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Generating PDF...',
+                    html: 'Mohon tunggu, PDF sedang dibuat<br><small>Proses ini mungkin memakan waktu beberapa detik</small>',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Generating PDF...';
+                btn.disabled = true;
+                
+                // Submit form
+                e.target.submit();
+                
+                // Auto close loading after 10 seconds
+                setTimeout(function() {
+                    Swal.close();
+                    btn.innerHTML = '<i class="fa fa-download"></i> Download PDF';
+                    btn.disabled = false;
+                    
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Download Selesai!',
+                        text: 'PDF berhasil di-generate',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }, 10000);
+            }
+        });
+    });
+
+    // Simpan konfigurasi kolom
+    document.getElementById('saveColumnConfig').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const checkboxes = document.querySelectorAll('.column-checkbox:not([disabled])');
+        const configs = [];
+
+        checkboxes.forEach(checkbox => {
+            configs.push({
+                id: parseInt(checkbox.getAttribute('data-config-id')),
+                is_visible: checkbox.checked
+            });
+        });
+
+        console.log('Configs to save:', configs); // Debug
+
+        // Tutup modal terlebih dahulu
+        const modal = bootstrap.Modal.getInstance(document.getElementById('columnConfigModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // Tunggu modal benar-benar tertutup sebelum menampilkan SweetAlert
+        setTimeout(() => {
+            // Show loading
+            Swal.fire({
+                title: 'Menyimpan...',
+                html: 'Mohon tunggu',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('{{ route("download.update-column-config") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ configs: configs })
+            })
+            .then(response => {
+                console.log('Response status:', response.status); // Debug
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data); // Debug
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message || 'Konfigurasi kolom berhasil disimpan!',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    // TIDAK RELOAD - biarkan user tetap di form
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: data.message || 'Gagal menyimpan konfigurasi kolom!',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error); // Debug
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan: ' + error.message,
+                    confirmButtonColor: '#d33'
+                });
+            });
+        }, 300);
+    });
+
+    // Reset form confirmation
+    document.querySelector('button[onclick="window.location.reload()"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Reset Form?',
+            text: "Semua inputan akan dikosongkan!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Reset!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Clear localStorage
+                localStorage.removeItem('download_kategori_id');
+                localStorage.removeItem('download_tahun');
+                localStorage.removeItem('download_triwulan_id');
+                window.location.reload();
+            }
+        });
     });
 </script>
 @endsection

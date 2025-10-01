@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use App\Models\Commodity;
+use App\Models\CommodityWipCbr;
+use App\Models\CommodityIhp;
+use App\Models\CommodityPriceProduction;
+use App\Models\CommodityRasio;
 use App\Models\Indicator;
+use App\Models\UnitHarga;
 use App\Models\UnitProduksi;
+use App\Models\Triwulan;
+use App\Models\UnitPerawatan;
+use App\Models\UnitLuas;
+use App\Models\DownloadColumnConfig;
+use Mpdf\Mpdf;
 
 class DownloadController extends Controller
 {
@@ -28,93 +38,230 @@ class DownloadController extends Controller
         // Ambil data triwulan
         $triwulans = DB::table('triwulanan')->orderBy('id')->get();
 
-        return view('download.index', compact('kategoris', 'tahuns', 'triwulans'));
+        // Ambil konfigurasi kolom
+        $columnConfigs = DownloadColumnConfig::ordered()->get();
+
+        return view('download.index', compact('kategoris', 'tahuns', 'triwulans', 'columnConfigs'));
+    }
+
+    public function updateColumnConfig(Request $request)
+    {
+        try {
+            $request->validate([
+                'configs' => 'required|array',
+                'configs.*.id' => 'required|exists:download_column_configs,id',
+                'configs.*.is_visible' => 'required|boolean',
+            ]);
+
+            $updatedCount = 0;
+            foreach ($request->configs as $config) {
+                $updated = DownloadColumnConfig::where('id', $config['id'])
+                    ->update(['is_visible' => $config['is_visible']]);
+                if ($updated) {
+                    $updatedCount++;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Berhasil memperbarui {$updatedCount} konfigurasi kolom"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function generatePdf(Request $request)
     {
-        $request->validate([
-            'kategori_id' => 'required|exists:commodities,id',
-            'tahun' => 'required|integer',
-            'triwulan_id' => 'required|exists:triwulanan,id',
-        ]);
+        // TAMBAHKAN INI DI AWAL: Tingkatkan limit untuk menangani HTML besar
+        ini_set('pcre.backtrack_limit', '10000000'); // 10 juta
+        ini_set('pcre.recursion_limit', '10000000');
+        ini_set('memory_limit', '512M'); // Tingkatkan memory limit juga
+        ini_set('max_execution_time', '300'); // 5 menit timeout
+        
+        try {
+            $request->validate([
+                'kategori_id' => 'required|exists:commodities,id',
+                'tahun' => 'required|integer',
+                'triwulan_id' => 'required|exists:triwulanan,id',
+            ]);
 
-        $kategoriId = $request->kategori_id;
-        $tahun = $request->tahun;
-        $triwulanId = $request->triwulan_id;
+            $kategoriId = $request->kategori_id;
+            $tahun = $request->tahun;
+            $triwulanId = $request->triwulan_id;
 
-        // Ambil data kategori (level 1)
-        $kategori = DB::table('commodities')
-            ->where('id', $kategoriId)
-            ->first();
-
-        // Ambil data triwulan
-        $triwulan = DB::table('triwulanan')
-            ->where('id', $triwulanId)
-            ->first();
-
-        // Ambil semua child IDs dari kategori ini
-        $allChildIds = $this->getAllChildIds($kategoriId);
-
-        // Ambil semua commodities dalam hierarchy
-        $commodities = DB::table('commodities')
-            ->whereIn('id', $allChildIds)
-            ->orderBy('level')
-            ->orderBy('kode')
-            ->get();
-
-        // Siapkan data dengan structure yang benar
-        $data = [];
-
-        foreach ($commodities as $commodity) {
-            // Ambil data prices & productions
-            $priceProduction = DB::table('commodity_prices_productions')
-                ->where('commodity_id', $commodity->id)
-                ->where('tahun', $tahun)
-                ->where('triwulan_id', $triwulanId)
+            // Ambil data kategori (level 1)
+            $kategori = DB::table('commodities')
+                ->where('id', $kategoriId)
                 ->first();
 
-            // Ambil data relasi
-            $indikator = $commodity->indikator_id
-                ? Indicator::find($commodity->indikator_id)
-                : null;
+            if (!$kategori) {
+                return redirect()->back()
+                    ->with('error', 'Kategori tidak ditemukan!')
+                    ->withInput();
+            }
 
-            $satuanProduksi = $commodity->satuan_produksi_id
-                ? UnitProduksi::find($commodity->satuan_produksi_id)
-                : null;
+            // Ambil data triwulan
+            $triwulan = DB::table('triwulanan')
+                ->where('id', $triwulanId)
+                ->first();
 
-            // Build hierarchy path untuk commodity ini
-            $hierarchyPath = $this->buildHierarchyPath($commodity, $commodities);
+            if (!$triwulan) {
+                return redirect()->back()
+                    ->with('error', 'Triwulan tidak ditemukan!')
+                    ->withInput();
+            }
 
-            // Tambahkan ke data array
-            $data[] = [
-                'commodity' => $commodity,
-                'indikator' => $indikator,
-                'satuan_produksi' => $satuanProduksi,
-                'price_production' => $priceProduction,
-                'hierarchy' => $hierarchyPath,
-            ];
+            // Ambil konfigurasi kolom yang visible
+            $visibleColumns = DownloadColumnConfig::visible()->ordered()->get();
+
+            if ($visibleColumns->isEmpty()) {
+                return redirect()->back()
+                    ->with('error', 'Tidak ada kolom yang aktif! Silakan aktifkan minimal 1 kolom.')
+                    ->withInput();
+            }
+
+            // Ambil semua child IDs dari kategori ini
+            $allChildIds = $this->getAllChildIds($kategoriId);
+
+            // Ambil semua commodities dalam hierarchy dengan sorting yang benar
+            $commodities = DB::table('commodities')
+                ->whereIn('id', $allChildIds)
+                ->orderByRaw('CAST(SUBSTRING_INDEX(kode, ".", 1) AS UNSIGNED)')
+                ->orderByRaw('CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(kode, ".", 2), ".", -1) AS UNSIGNED)')
+                ->orderByRaw('SUBSTRING_INDEX(SUBSTRING_INDEX(kode, ".", 3), ".", -1)')
+                ->orderByRaw('SUBSTRING_INDEX(SUBSTRING_INDEX(kode, ".", 4), ".", -1)')
+                ->orderByRaw('SUBSTRING_INDEX(kode, ".", -1)')
+                ->get();
+
+            if ($commodities->isEmpty()) {
+                return redirect()->back()
+                    ->with('error', 'Tidak ada data komoditas untuk kategori yang dipilih!')
+                    ->withInput();
+            }
+
+            // Siapkan data dengan structure yang benar
+            $data = [];
+
+            foreach ($commodities as $commodity) {
+                // Ambil data prices & productions
+                $priceProduction = DB::table('commodity_prices_productions')
+                    ->where('commodity_id', $commodity->id)
+                    ->where('tahun', $tahun)
+                    ->where('triwulan_id', $triwulanId)
+                    ->first();
+
+                // PERBAIKAN: Ambil data rasio dari tabel commodity_rasio
+                $rasio = DB::table('commodity_rasio')
+                    ->where('commodity_id', $commodity->id)
+                    ->where('tahun', $tahun)
+                    ->where('triwulan_id', $triwulanId)
+                    ->first();
+
+                // Ambil data WIP CBR dari tabel commodity_wip_cbr (untuk luas_tanam dan biaya_perawatan)
+                $wipCbr = DB::table('commodity_wip_cbr')
+                    ->where('commodity_id', $commodity->id)
+                    ->where('tahun', $tahun)
+                    ->where('triwulan_id', $triwulanId)
+                    ->first();
+
+                // Ambil data IHP dari tabel commodity_ihp
+                $ihp = DB::table('commodity_ihp')
+                    ->where('commodity_id', $commodity->id)
+                    ->where('tahun', $tahun)
+                    ->where('triwulan_id', $triwulanId)
+                    ->first();
+
+                // Ambil data relasi
+                $indikator = $commodity->indikator_id
+                    ? Indicator::find($commodity->indikator_id)
+                    : null;
+
+                $satuanProduksi = $commodity->satuan_produksi_id
+                    ? UnitProduksi::find($commodity->satuan_produksi_id)
+                    : null;
+
+                $satuanHarga = $commodity->satuan_harga_id
+                    ? UnitHarga::find($commodity->satuan_harga_id)
+                    : null;
+
+                $satuanLuas = $commodity->satuan_luas_tanam_id
+                    ? UnitLuas::find($commodity->satuan_luas_tanam_id)
+                    : null;
+
+                $satuanBiayaPerawatan = $commodity->satuan_biaya_perawatan_id
+                    ? UnitPerawatan::find($commodity->satuan_biaya_perawatan_id)
+                    : null;
+
+                // Build hierarchy path untuk commodity ini
+                $hierarchyPath = $this->buildHierarchyPath($commodity, $commodities);
+
+                // Tambahkan ke data array dengan data tambahan
+                $data[] = [
+                    'commodity' => $commodity,
+                    'indikator' => $indikator,
+                    'satuan_produksi' => $satuanProduksi,
+                    'satuan_harga' => $satuanHarga,
+                    'satuan_luas_tanam' => $satuanLuas,
+                    'satuan_biaya_perawatan' => $satuanBiayaPerawatan,
+                    'price_production' => $priceProduction,
+                    'rasio' => $rasio,
+                    'wip_cbr' => $wipCbr,
+                    'ihp' => $ihp,
+                    'hierarchy' => $hierarchyPath,
+                ];
+            }
+
+            // Generate HTML dari view
+            $html = view('download.pdf-template', [
+                'kategori' => $kategori,
+                'tahun' => $tahun,
+                'triwulan' => $triwulan,
+                'data' => $data,
+                'visibleColumns' => $visibleColumns,
+            ])->render();
+
+            // Konfigurasi mPDF
+            $mpdf = new Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'orientation' => 'L',
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_top' => 15,
+                'margin_bottom' => 15,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'default_font_size' => 8,
+                'default_font' => 'dejavusans'
+            ]);
+
+            // Set PDF properties
+            $mpdf->SetTitle('Data PDRB ' . $triwulan->triwulan . ' - ' . $tahun);
+            $mpdf->SetAuthor('PDRB System');
+
+            // Write HTML ke PDF (limit sudah ditingkatkan di awal method)
+            $mpdf->WriteHTML($html);
+
+            // Generate filename
+            $filename = 'PDRB_' . str_replace(' ', '_', $kategori->nama) . '_TW' . $triwulan->triwulan . '_' . $tahun . '.pdf';
+
+            // Output PDF
+            return $mpdf->Output($filename, 'D');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        // Generate PDF
-        $pdf = Pdf::loadView('download.pdf-template', [
-            'kategori' => $kategori,
-            'tahun' => $tahun,
-            'triwulan' => $triwulan,
-            'data' => $data,
-        ]);
-
-        // Set paper size dan orientation
-        $pdf->setPaper('a4', 'landscape');
-
-        // Download PDF
-        $filename = 'PDRB_' . str_replace(' ', '_', $kategori->nama) . '_TW' . $triwulan->triwulan . '_' . $tahun . '.pdf';
-        return $pdf->download($filename);
     }
 
-    /**
-     * Rekursif untuk mendapatkan semua child ID dari suatu kategori
-     */
     private function getAllChildIds($parentId)
     {
         $ids = [$parentId];
@@ -130,10 +277,6 @@ class DownloadController extends Controller
         return $ids;
     }
 
-    /**
-     * Build hierarchy path untuk commodity
-     * Return array dengan level1, level2, level3, level4, level5
-     */
     private function buildHierarchyPath($commodity, $allCommodities)
     {
         $path = [
@@ -144,13 +287,11 @@ class DownloadController extends Controller
             'level5' => null,
         ];
 
-        // Map commodities by ID untuk lookup cepat
         $commoditiesMap = [];
         foreach ($allCommodities as $c) {
             $commoditiesMap[$c->id] = $c;
         }
 
-        // Traverse ke atas untuk build path
         $current = $commodity;
         $levelKey = 'level' . $current->level;
         $path[$levelKey] = $current;

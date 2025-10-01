@@ -106,7 +106,8 @@
     <script defer src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script defer src="{{ asset('assets/js/dataTable.js') }}"></script>
-
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <body class="antialiased">
@@ -151,9 +152,8 @@
     <!-- Sweet Alert -->
     <script src="{{ asset('/assets/js/plugin/sweetalert/sweetalert.min.js') }}"></script>
 
-    <!-- Kaiadmin JS -->
-    <script src="{{ asset('/assets/js/kaiadmin.min.js') }}"></script>
-
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @yield('script')
     @stack('scripts')
