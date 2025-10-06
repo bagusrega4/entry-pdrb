@@ -61,6 +61,10 @@
             font-size: 9pt;
             color: #c41e3a;
         }
+
+        .page-break {
+            page-break-after: always;
+        }
     </style>
 </head>
 
@@ -106,8 +110,11 @@
         </thead>
         <tbody>
             @php
+            // Filter hanya komoditas yang merupakan leaf (tidak punya children)
             $leafData = array_filter($data, function($item) use ($data) {
                 $commodity = $item['commodity'];
+                
+                // Cek apakah commodity ini punya children di array data
                 $hasChildren = false;
                 foreach($data as $checkItem) {
                     if ($checkItem['commodity']->parent_id == $commodity->id) {
@@ -115,44 +122,68 @@
                         break;
                     }
                 }
+                
+                // Return true jika tidak punya children (adalah leaf node)
                 return !$hasChildren;
             });
+
+            // PENTING: Jika tidak ada leaf data, tampilkan semua data level terakhir
+            if (empty($leafData)) {
+                // Cari level tertinggi dalam data
+                $maxLevel = 0;
+                foreach($data as $item) {
+                    if ($item['commodity']->level > $maxLevel) {
+                        $maxLevel = $item['commodity']->level;
+                    }
+                }
+                
+                // Filter data dengan level tertinggi
+                $leafData = array_filter($data, function($item) use ($maxLevel) {
+                    return $item['commodity']->level == $maxLevel;
+                });
+            }
 
             $grouped = [];
             foreach($leafData as $item) {
                 $h = $item['hierarchy'];
                 $commodity = $item['commodity'];
                 
-                $level1Id = $h['level1']->id ?? 0;
-                $level2Id = $h['level2']->id ?? 0;
-                $level3Id = $h['level3']->id ?? 0;
-                $level4Id = $h['level4']->id ?? 0;
+                $level1Id = isset($h['level1']) && $h['level1'] ? $h['level1']->id : 0;
+                $level2Id = isset($h['level2']) && $h['level2'] ? $h['level2']->id : 0;
+                $level3Id = isset($h['level3']) && $h['level3'] ? $h['level3']->id : 0;
+                $level4Id = isset($h['level4']) && $h['level4'] ? $h['level4']->id : 0;
 
                 if (!isset($grouped[$level1Id])) {
                     $grouped[$level1Id] = [
-                        'level1' => $h['level1'],
+                        'level1' => $h['level1'] ?? null,
                         'level2s' => []
                     ];
                 }
 
                 if (!isset($grouped[$level1Id]['level2s'][$level2Id])) {
                     $grouped[$level1Id]['level2s'][$level2Id] = [
-                        'level2' => $h['level2'],
+                        'level2' => $h['level2'] ?? null,
                         'level3s' => []
                     ];
                 }
 
                 if (!isset($grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id])) {
                     $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id] = [
-                        'level3' => $h['level3'],
+                        'level3' => $h['level3'] ?? null,
                         'level4s' => [],
                         'direct_items' => []
                     ];
                 }
 
-                if ($commodity->level == 4) {
+                // Handle berbagai level commodity
+                if ($commodity->level <= 3) {
+                    // Komoditas level 1, 2, atau 3 langsung tanpa sub kategori lebih lanjut
                     $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['direct_items'][] = $item;
-                } elseif ($commodity->level == 5 && $h['level4']) {
+                } elseif ($commodity->level == 4) {
+                    // Komoditas level 4
+                    $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['direct_items'][] = $item;
+                } elseif ($commodity->level == 5 && isset($h['level4']) && $h['level4']) {
+                    // Komoditas level 5 dengan parent level 4
                     if (!isset($grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['level4s'][$level4Id])) {
                         $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['level4s'][$level4Id] = [
                             'level4' => $h['level4'],
@@ -160,82 +191,89 @@
                         ];
                     }
                     $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['level4s'][$level4Id]['items'][] = $item;
+                } else {
+                    // Fallback: masukkan sebagai direct_items
+                    $grouped[$level1Id]['level2s'][$level2Id]['level3s'][$level3Id]['direct_items'][] = $item;
                 }
             }
 
             // Helper function untuk format angka tanpa trailing zeros
-            function formatNumber($value, $decimals = 2) {
-                if ($value === null || $value === '') {
-                    return '-';
+            if (!function_exists('formatNumber')) {
+                function formatNumber($value, $decimals = 2) {
+                    if ($value === null || $value === '') {
+                        return '-';
+                    }
+                    $formatted = number_format($value, $decimals, ',', '.');
+                    $formatted = rtrim($formatted, '0');
+                    $formatted = rtrim($formatted, ',');
+                    return $formatted;
                 }
-                $formatted = number_format($value, $decimals, ',', '.');
-                $formatted = rtrim($formatted, '0');
-                $formatted = rtrim($formatted, ',');
-                return $formatted;
             }
 
-            function renderColumnValue($columnKey, $item, $level1 = null, $level2 = null, $level3 = null, $level4 = null) {
-                $commodity = $item['commodity'];
-                $priceProduction = $item['price_production'];
-                $rasio = $item['rasio'] ?? null;
-                $wipCbr = $item['wip_cbr'] ?? null;
-                $ihp = $item['ihp'] ?? null;
-                
-                switch($columnKey) {
-                    case 'kategori':
-                        return $level1 ? $level1->kode . '<br>' . $level1->nama : '-';
-                    case 'sub_kategori_1':
-                        return $level2 ? $level2->kode . '<br>' . $level2->nama : '-';
-                    case 'sub_kategori_2':
-                        return $level3 ? $level3->kode . '<br>' . $level3->nama : '-';
-                    case 'sub_kategori_3':
-                        return $level4 ? $level4->kode . '<br>' . $level4->nama : '-';
-                    case 'nama_komoditas':
-                        return $commodity->nama;
-                    case 'indikator':
-                        return $item['indikator']->indikator ?? '-';
-                    case 'satuan_produksi':
-                        return $item['satuan_produksi']->satuan_produksi ?? '-';
-                    case 'satuan_harga':
-                        return $item['satuan_harga']->satuan_harga ?? '-';
-                    case 'satuan_luas':
-                        return $item['satuan_luas_tanam']->satuan_luas_tanam ?? '-';
-                    case 'satuan_biaya_perawatan':
-                        return $item['satuan_biaya_perawatan']->satuan_biaya_perawatan ?? '-';
-                    case 'produksi':
-                        return $priceProduction && isset($priceProduction->produksi)
-                            ? formatNumber($priceProduction->produksi, 2)
-                            : '-';
-                    case 'harga':
-                        return $priceProduction && isset($priceProduction->harga)
-                            ? formatNumber($priceProduction->harga, 2)
-                            : '-';
-                    case 'rasio_output_ikutan':
-                        return $rasio && isset($rasio->rasio_output_ikutan)
-                            ? formatNumber($rasio->rasio_output_ikutan, 2)
-                            : '-';
-                    case 'rasio_wip_cbr':
-                        return $rasio && isset($rasio->rasio_wip_cbr)
-                            ? formatNumber($rasio->rasio_wip_cbr, 2)
-                            : '-';
-                    case 'rasio_biaya_antara':
-                        return $rasio && isset($rasio->rasio_biaya_antara)
-                            ? formatNumber($rasio->rasio_biaya_antara, 2)
-                            : '-';
-                    case 'ihp':
-                        return $ihp && isset($ihp->ihp)
-                            ? formatNumber($ihp->ihp, 2)
-                            : '-';
-                    case 'luas_tanam':
-                        return $wipCbr && isset($wipCbr->luas_tanam_akhir_tahun)
-                            ? formatNumber($wipCbr->luas_tanam_akhir_tahun, 2)
-                            : '-';
-                    case 'biaya_perawatan':
-                        return $wipCbr && isset($wipCbr->biaya_perawatan)
-                            ? formatNumber($wipCbr->biaya_perawatan, 2)
-                            : '-';
-                    default:
-                        return '-';
+            if (!function_exists('renderColumnValue')) {
+                function renderColumnValue($columnKey, $item, $level1 = null, $level2 = null, $level3 = null, $level4 = null) {
+                    $commodity = $item['commodity'];
+                    $priceProduction = $item['price_production'];
+                    $rasio = $item['rasio'] ?? null;
+                    $wipCbr = $item['wip_cbr'] ?? null;
+                    $ihp = $item['ihp'] ?? null;
+                    
+                    switch($columnKey) {
+                        case 'kategori':
+                            return $level1 ? $level1->kode . '<br>' . $level1->nama : '-';
+                        case 'sub_kategori_1':
+                            return $level2 ? $level2->kode . '<br>' . $level2->nama : '-';
+                        case 'sub_kategori_2':
+                            return $level3 ? $level3->kode . '<br>' . $level3->nama : '-';
+                        case 'sub_kategori_3':
+                            return $level4 ? $level4->kode . '<br>' . $level4->nama : '-';
+                        case 'nama_komoditas':
+                            return $commodity->nama;
+                        case 'indikator':
+                            return isset($item['indikator']) && $item['indikator'] ? $item['indikator']->indikator : '-';
+                        case 'satuan_produksi':
+                            return isset($item['satuan_produksi']) && $item['satuan_produksi'] ? $item['satuan_produksi']->satuan_produksi : '-';
+                        case 'satuan_harga':
+                            return isset($item['satuan_harga']) && $item['satuan_harga'] ? $item['satuan_harga']->satuan_harga : '-';
+                        case 'satuan_luas':
+                            return isset($item['satuan_luas_tanam']) && $item['satuan_luas_tanam'] ? $item['satuan_luas_tanam']->satuan_luas_tanam : '-';
+                        case 'satuan_biaya_perawatan':
+                            return isset($item['satuan_biaya_perawatan']) && $item['satuan_biaya_perawatan'] ? $item['satuan_biaya_perawatan']->satuan_biaya_perawatan : '-';
+                        case 'produksi':
+                            return $priceProduction && isset($priceProduction->produksi)
+                                ? formatNumber($priceProduction->produksi, 2)
+                                : '-';
+                        case 'harga':
+                            return $priceProduction && isset($priceProduction->harga)
+                                ? formatNumber($priceProduction->harga, 2)
+                                : '-';
+                        case 'rasio_output_ikutan':
+                            return $rasio && isset($rasio->rasio_output_ikutan)
+                                ? formatNumber($rasio->rasio_output_ikutan, 2)
+                                : '-';
+                        case 'rasio_wip_cbr':
+                            return $rasio && isset($rasio->rasio_wip_cbr)
+                                ? formatNumber($rasio->rasio_wip_cbr, 2)
+                                : '-';
+                        case 'rasio_biaya_antara':
+                            return $rasio && isset($rasio->rasio_biaya_antara)
+                                ? formatNumber($rasio->rasio_biaya_antara, 2)
+                                : '-';
+                        case 'ihp':
+                            return $ihp && isset($ihp->ihp)
+                                ? formatNumber($ihp->ihp, 2)
+                                : '-';
+                        case 'luas_tanam':
+                            return $wipCbr && isset($wipCbr->luas_tanam_akhir_tahun)
+                                ? formatNumber($wipCbr->luas_tanam_akhir_tahun, 2)
+                                : '-';
+                        case 'biaya_perawatan':
+                            return $wipCbr && isset($wipCbr->biaya_perawatan)
+                                ? formatNumber($wipCbr->biaya_perawatan, 2)
+                                : '-';
+                        default:
+                            return '-';
+                    }
                 }
             }
 
@@ -258,8 +296,7 @@
                             @foreach($level3Data['direct_items'] as $itemIndex => $item)
                                 @php
                                 $isFirstInGroup = ($itemIndex === 0);
-                                $remainingInGroup = count($level3Data['direct_items']) - $itemIndex;
-                                $rowspanCount = $remainingInGroup;
+                                $rowspanCount = count($level3Data['direct_items']);
                                 @endphp
 
                                 <tr>
@@ -290,8 +327,7 @@
                             @foreach($items as $itemIndex => $item)
                                 @php
                                 $isFirstInGroup = ($itemIndex === 0);
-                                $remainingInGroup = count($items) - $itemIndex;
-                                $rowspanCount = $remainingInGroup;
+                                $rowspanCount = count($items);
                                 @endphp
 
                                 <tr>
@@ -317,7 +353,7 @@
 
             @if(count($leafData) === 0)
                 <tr>
-                    <td colspan="{{ count($visibleColumns) }}">
+                    <td colspan="{{ count($visibleColumns) }}" style="text-align: center;">
                         Tidak ada data untuk kategori, tahun, dan triwulan yang dipilih
                     </td>
                 </tr>

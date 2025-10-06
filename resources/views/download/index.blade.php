@@ -24,15 +24,23 @@
                                 <label for="kategori_id">Pilih Kategori <span class="text-danger">*</span></label>
                                 <select name="kategori_id" id="kategori_id" class="form-control @error('kategori_id') is-invalid @enderror" required>
                                     <option value="">-- Pilih Kategori --</option>
-                                    @foreach($kategoris as $kategori)
-                                        <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
-                                            {{ $kategori->kode }} - {{ $kategori->nama }}
-                                        </option>
-                                    @endforeach
+                                    <option value="all" {{ old('kategori_id') == 'all' ? 'selected' : '' }} style="font-weight: bold; background-color: #f0f0f0;">
+                                        📋 SEMUA KATEGORI
+                                    </option>
+                                    <optgroup label="Kategori Individual">
+                                        @foreach($kategoris as $kategori)
+                                            <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                                                {{ $kategori->kode }} - {{ $kategori->nama }}
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
                                 </select>
                                 @error('kategori_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <small class="form-text text-muted mt-1">
+                                    <i class="fa fa-info-circle"></i> Pilih "SEMUA KATEGORI" untuk mendownload seluruh kategori dalam satu PDF (setiap kategori di halaman terpisah)
+                                </small>
                             </div>
 
                             <div class="form-group mb-3">
@@ -56,7 +64,7 @@
                                     <option value="">-- Pilih Triwulan --</option>
                                     @foreach($triwulans as $triwulan)
                                         <option value="{{ $triwulan->id }}" {{ old('triwulan_id') == $triwulan->id ? 'selected' : '' }}>
-                                            Triwulan {{ $triwulan->triwulan }}
+                                            {{ $triwulan->triwulan }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -97,6 +105,8 @@
                         <hr class="bg-white">
                         <small>
                             <strong>Fitur Baru:</strong><br>
+                            • Download semua kategori sekaligus<br>
+                            • Setiap kategori di halaman terpisah<br>
                             • Konfigurasi kolom yang muncul di PDF<br>
                             • Klik "Konfigurasi Kolom" untuk mengatur<br>
                             • Kolom kategori & komoditas wajib muncul<br>
@@ -107,7 +117,8 @@
                             • Header: Badan Pusat Statistik<br>
                             • Judul: Data PDRB Triwulan<br>
                             • Tabel data sesuai kategori yang dipilih<br>
-                            • Orientasi: Landscape (A4)
+                            • Orientasi: Landscape (A4)<br>
+                            • PDF multi-halaman untuk semua kategori
                         </small>
                     </div>
                 </div>
@@ -182,38 +193,45 @@
 
 @section('script')
 <script>
-    // Restore form values dari localStorage saat halaman load
+    // Variables untuk menyimpan form values
+    let formValues = {
+        kategori_id: '',
+        tahun: '',
+        triwulan_id: ''
+    };
+
+    // Restore form values saat halaman load
     document.addEventListener('DOMContentLoaded', function() {
-        const savedKategori = localStorage.getItem('download_kategori_id');
-        const savedTahun = localStorage.getItem('download_tahun');
-        const savedTriwulan = localStorage.getItem('download_triwulan_id');
+        const savedKategori = sessionStorage.getItem('download_kategori_id');
+        const savedTahun = sessionStorage.getItem('download_tahun');
+        const savedTriwulan = sessionStorage.getItem('download_triwulan_id');
 
         if (savedKategori) {
             document.getElementById('kategori_id').value = savedKategori;
+            formValues.kategori_id = savedKategori;
         }
         if (savedTahun) {
             document.getElementById('tahun').value = savedTahun;
+            formValues.tahun = savedTahun;
         }
         if (savedTriwulan) {
             document.getElementById('triwulan_id').value = savedTriwulan;
+            formValues.triwulan_id = savedTriwulan;
         }
-
-        // Clear localStorage setelah restore (agar tidak persistent)
-        // Komentar baris ini jika ingin nilai tetap tersimpan
-        // localStorage.removeItem('download_kategori_id');
-        // localStorage.removeItem('download_tahun');
-        // localStorage.removeItem('download_triwulan_id');
     });
 
-    // Auto-save form values ke localStorage saat berubah
+    // Auto-save form values ke sessionStorage saat berubah
     document.getElementById('kategori_id').addEventListener('change', function() {
-        localStorage.setItem('download_kategori_id', this.value);
+        sessionStorage.setItem('download_kategori_id', this.value);
+        formValues.kategori_id = this.value;
     });
     document.getElementById('tahun').addEventListener('change', function() {
-        localStorage.setItem('download_tahun', this.value);
+        sessionStorage.setItem('download_tahun', this.value);
+        formValues.tahun = this.value;
     });
     document.getElementById('triwulan_id').addEventListener('change', function() {
-        localStorage.setItem('download_triwulan_id', this.value);
+        sessionStorage.setItem('download_triwulan_id', this.value);
+        formValues.triwulan_id = this.value;
     });
 
     // Show SweetAlert for session messages
@@ -264,13 +282,30 @@
         }
         
         // Get selected option text
-        const kategoriText = kategori.options[kategori.selectedIndex].text;
+        const kategoriText = kategori.value === 'all' 
+            ? 'SEMUA KATEGORI' 
+            : kategori.options[kategori.selectedIndex].text;
         const triwulanText = triwulan.options[triwulan.selectedIndex].text;
         
-        // Confirmation before download
-        Swal.fire({
-            title: 'Konfirmasi Download',
-            html: `
+        // Special handling untuk "Semua Kategori"
+        let confirmationMessage = '';
+        if (kategori.value === 'all') {
+            confirmationMessage = `
+                <div style="text-align: left;">
+                    <div class="alert alert-warning" style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 10px; border-radius: 5px;">
+                        <strong>⚠️ Perhatian:</strong><br>
+                        Anda akan mendownload <strong>SEMUA KATEGORI</strong> sekaligus.
+                        Setiap kategori akan berada di halaman terpisah dalam satu file PDF.
+                    </div>
+                    <hr>
+                    <p><strong>Tahun:</strong> ${tahun}</p>
+                    <p><strong>Triwulan:</strong> ${triwulanText}</p>
+                </div>
+                <hr>
+                <p>Proses ini mungkin memakan waktu lebih lama. Lanjutkan?</p>
+            `;
+        } else {
+            confirmationMessage = `
                 <div style="text-align: left;">
                     <p><strong>Kategori:</strong> ${kategoriText}</p>
                     <p><strong>Tahun:</strong> ${tahun}</p>
@@ -278,7 +313,13 @@
                 </div>
                 <hr>
                 <p>Apakah Anda yakin ingin mendownload PDF dengan data di atas?</p>
-            `,
+            `;
+        }
+        
+        // Confirmation before download
+        Swal.fire({
+            title: 'Konfirmasi Download',
+            html: confirmationMessage,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -287,10 +328,18 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Adjust loading message based on selection
+                const loadingTitle = kategori.value === 'all' 
+                    ? 'Generating PDF Semua Kategori...'
+                    : 'Generating PDF...';
+                const loadingHtml = kategori.value === 'all'
+                    ? 'Mohon tunggu, PDF sedang dibuat<br><small>Proses ini mungkin memakan waktu beberapa menit untuk semua kategori</small>'
+                    : 'Mohon tunggu, PDF sedang dibuat<br><small>Proses ini mungkin memakan waktu beberapa detik</small>';
+                
                 // Show loading
                 Swal.fire({
-                    title: 'Generating PDF...',
-                    html: 'Mohon tunggu, PDF sedang dibuat<br><small>Proses ini mungkin memakan waktu beberapa detik</small>',
+                    title: loadingTitle,
+                    html: loadingHtml,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     didOpen: () => {
@@ -304,7 +353,8 @@
                 // Submit form
                 e.target.submit();
                 
-                // Auto close loading after 10 seconds
+                // Auto close loading after longer time for all categories
+                const timeout = kategori.value === 'all' ? 30000 : 10000;
                 setTimeout(function() {
                     Swal.close();
                     btn.innerHTML = '<i class="fa fa-download"></i> Download PDF';
@@ -318,7 +368,7 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
-                }, 10000);
+                }, timeout);
             }
         });
     });
@@ -420,10 +470,10 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Clear localStorage
-                localStorage.removeItem('download_kategori_id');
-                localStorage.removeItem('download_tahun');
-                localStorage.removeItem('download_triwulan_id');
+                // Clear sessionStorage
+                sessionStorage.removeItem('download_kategori_id');
+                sessionStorage.removeItem('download_tahun');
+                sessionStorage.removeItem('download_triwulan_id');
                 window.location.reload();
             }
         });
