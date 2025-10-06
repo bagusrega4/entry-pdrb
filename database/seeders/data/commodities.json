@@ -1132,7 +1132,7 @@
                 "satuan_biaya_perawatan_id": 4 
               },
               { "nama": "Jambu Mete", 
-                "indikator_id": 22, 
+                "indikator_id": 24, 
                 "satuan_harga_id": 1, 
                 "satuan_produksi_id": 1, 
                 "satuan_luas_tanam_id": 2, 
@@ -2218,8 +2218,8 @@
               {
                 "nama": "Ikan Hias",
                 "indikator_id": 38,
-                "satuan_harga_id": 9,
-                "satuan_produksi_id": 9, 
+                "satuan_harga_id": 6,
+                "satuan_produksi_id": 6, 
                 "satuan_luas_tanam_id": 3, 
                 "satuan_biaya_perawatan_id": 7
               }
@@ -2334,40 +2334,40 @@
                   {
                     "nama": "Bandeng ( 1 - 5 cm )",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Bandeng ( 5 cm )",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Ikan Tambak Lainnya",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Udang Windu",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Udang Putih",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   }
@@ -2380,32 +2380,32 @@
                   {
                     "nama": "Ikan Mas ( 1 - 5 cm )",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Ikan Mas ( 5 cm )",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Nila",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Ikan Tawar Lainnya",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   }
@@ -2418,30 +2418,1021 @@
                   {
                     "nama": "Ikan Mas",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Ikan Gabus",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   },
                   {
                     "nama": "Ikan Keramba Lainnya",
                     "indikator_id": 38,
-                    "satuan_harga_id": 10,
-                    "satuan_produksi_id": 10, 
+                    "satuan_harga_id": 9,
+                    "satuan_produksi_id": 9, 
                     "satuan_luas_tanam_id": 6, 
                     "satuan_biaya_perawatan_id": 7
                   }
                 ]
               }
             ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 2,
+    "nama": "PERTAMBANGAN & PENGGALIAN",
+    "children": [
+      {
+        "kode": "2.1",
+        "nama": "Pertambangan Minyak, Gas & Panas Bumi"
+      },
+      {
+        "kode": "2.2",
+        "nama": "Pertambangan Batubara & Lignit"
+      },
+      {
+        "kode": "2.3",
+        "nama": "Pertambangan Bijih Logam"
+      },
+      {
+        "kode": "2.4",
+        "nama": "Pertambangan dan Penggalian Lainnya",
+        "children": [
+          {
+            "kode": "2.4.a",
+            "nama": "Galian C (Edi)",
+            "indikator_id": 39,
+            "satuan_harga_id": 10,
+            "satuan_produksi_id": 10,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "2.4.b",
+            "nama": "Galian Desa Puncu",
+            "indikator_id": 39,
+            "satuan_harga_id": 10,
+            "satuan_produksi_id": 10,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 3,
+    "nama": "INDUSTRI PENGOLAHAN",
+    "children": [
+      {
+        "kode": "3.1",
+        "nama": "Industri Batubara dan Pengilangan Migas",
+        "children":[
+          {
+            "kode": "3.1.a",
+            "nama": "Industri Batu Bara"
+          },
+          {
+            "kode": "3.1.b",
+            "nama": "Industri Pengilangan Migas"
+          }
+        ]
+      },
+      {
+        "kode": "3.2",
+        "nama": "Industri Makanan dan Minuman",
+        "children":[
+          {
+            "kode": "3.2.a",
+            "nama": "Tahu (Ato)",
+            "indikator_id": 40,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.2.b",
+            "nama": "Rumah Jenang (Arifin)",
+            "indikator_id": 41,
+            "satuan_harga_id": 12,
+            "satuan_produksi_id": 12,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.3",
+        "nama": "Pertambangan Bijih Logam",
+        "children":[
+          {
+            "kode": "3.3.a",
+            "nama": "PT. Semanggi Mas",
+            "indikator_id": 42,
+            "satuan_harga_id": 13,
+            "satuan_produksi_id": 13,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.3.b",
+            "nama": "PT. Top Ten Tobaco",
+            "indikator_id": 42,
+            "satuan_harga_id": 14,
+            "satuan_produksi_id": 14,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.4",
+        "nama": "Industri Tekstil dan Pakaian Jadi",
+        "children": [
+          {
+            "kode": "3.4.a",
+            "nama": "Konveksi (Ihma Yuliani)",
+            "indikator_id": 43,
+            "satuan_harga_id": 15,
+            "satuan_produksi_id": 15,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.4.b",
+            "nama": "Penjahit Maslukah",
+            "indikator_id": 44,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.5",
+        "nama": "Industri Kulit, Barang dari Kulit dan Alas Kaki ",
+        "children": [
+          {
+            "kode": "3.5.a",
+            "nama": "Klinik alas kaki <Norman>",
+            "indikator_id": 45,
+            "satuan_harga_id": 16,
+            "satuan_produksi_id": 16,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.5.b",
+            "nama": "CV. Sidomulyo",
+            "indikator_id": 46,
+            "satuan_harga_id": 17,
+            "satuan_produksi_id": 17,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.6",
+        "nama": "Industri Kayu, Barang dari Kayu dan Gabus dan Barang Anyaman dari Bambu, Rotan dan Sejenisnya",
+        "children": [
+          {
+            "kode": "3.6.a",
+            "nama": "Kusen Bekti",
+            "indikator_id": 47,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.6.b",
+            "nama": "PT. SMS",
+            "indikator_id": 48,
+            "satuan_harga_id": 8,
+            "satuan_produksi_id": 8,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.7",
+        "nama": "Industri Kertas dan Barang dari Kertas, Percetakan dan Reproduksi Media Rekaman",
+        "children": [
+          {
+            "kode": "3.7.a",
+            "nama": "PT. Surya Pamenang",
+            "indikator_id": 49,
+            "satuan_harga_id": 1,
+            "satuan_produksi_id": 1,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.7.b",
+            "nama": "PT. Surya Zig Zag",
+            "indikator_id": 50,
+            "satuan_harga_id": 1,
+            "satuan_produksi_id": 1,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.8",
+        "nama": "Industri Kertas dan Barang dari Kertas, Percetakan dan Reproduksi Media Rekaman",
+        "children": [
+          {
+            "kode": "3.8.a",
+            "nama": "Niki Sari",
+            "indikator_id": 51,
+            "satuan_harga_id": 19,
+            "satuan_produksi_id": 19,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.8.b",
+            "nama": "Kayla Herbal",
+            "indikator_id": 51,
+            "satuan_harga_id": 12,
+            "satuan_produksi_id": 12,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.9",
+        "nama": "Industri Karet, Barang dari Karet dan Plastik",
+        "children": [
+          {
+            "kode": "3.9.a",
+            "nama": "Tas Anyaman Plastik (Ali Alatas)",
+            "indikator_id": 52,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.9.b",
+            "nama": "PT. Tirta Alam Plast",
+            "indikator_id": 53,
+            "satuan_harga_id": 5,
+            "satuan_produksi_id": 5,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.10",
+        "nama": "Industri Barang Galian bukan Logam",
+        "children": [
+          {
+            "kode": "3.10.a",
+            "nama": "Gypsum (Ali)",
+            "indikator_id": 54,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.10.b",
+            "nama": "Batako (Supangat)",
+            "indikator_id": 55,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.11",
+        "nama": "Industri Logam Dasar"
+      },
+      {
+        "kode": "3.12",
+        "nama": "Industri Barang dari Logam, Komputer, Barang Elektronik, Optik dan Peralatan Listrik",
+        "children":[
+          {
+            "kode": "3.12.a",
+            "nama": "Las (Fauzan)",
+            "indikator_id": 56,
+            "satuan_harga_id": 20,
+            "satuan_produksi_id": 20,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.12.b",
+            "nama": "Bima Karya",
+            "indikator_id": 57,
+            "satuan_harga_id": 20,
+            "satuan_produksi_id": 20,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.13",
+        "nama": "Industri Mesin dan Perlengkapan YTDL",
+        "children":[
+          {
+            "kode": "3.13.a",
+            "nama": "CV. Sumber Makmur Mekanik",
+            "indikator_id": 58,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.13.b",
+            "nama": "CV. Sumber Makmur Mekanik",
+            "indikator_id": 59,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.14",
+        "nama": "Industri Alat Angkutan",
+        "children":[
+          {
+            "kode": "3.14.a",
+            "nama": "Berkah jaya mandiri",
+            "indikator_id": 60,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.14.b",
+            "nama": "Priyono Gerobak",
+            "indikator_id": 60,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.15",
+        "nama": "Industri Furnitur",
+        "children":[
+          {
+            "kode": "3.15.a",
+            "nama": "Thalita Mebel",
+            "indikator_id": 61,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.15.b",
+            "nama": "Alumunium (Ugik)",
+            "indikator_id": 62,
+            "satuan_harga_id": 18,
+            "satuan_produksi_id": 18,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "3.16",
+        "nama": "Industri pengolahan lainnya, jasa reparasi dan pemasangan mesin dan peralatan",
+        "children":[
+          {
+            "kode": "3.16.a",
+            "nama": "Gitar akustik <supriyanto>",
+            "indikator_id": 63,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "3.16.b",
+            "nama": "Pembuatan odong-odong",
+            "indikator_id": 64,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 4,
+    "nama": "PENGADAAN LISTRIK & GAS",
+    "children": [
+      {
+        "kode": "4.1",
+        "nama": "Ketenagalistrikan",
+        "children":[
+          {
+            "kode": "4.1.a",
+            "nama": "PLN",
+            "indikator_id": 65,
+            "satuan_harga_id": 21,
+            "satuan_produksi_id": 21,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "4.2",
+        "nama": "Industri Makanan dan Minuman",
+        "children":[
+          {
+            "kode": "4.2.a",
+            "nama": "Ice tube kristal",
+            "indikator_id": 66,
+            "satuan_harga_id": 5,
+            "satuan_produksi_id": 5,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 5,
+    "nama": "PENGADAAN AIR, PENGELOLAAN SAMPAH, LIMBAH & DAUR ULANG",
+    "children": [
+      {
+        "kode": "5.1",
+        "nama": "Pengadaan Air",
+        "children":[
+          {
+            "kode": "5.1.a",
+            "nama": "PDAM",
+            "indikator_id": 67,
+            "satuan_harga_id": 8,
+            "satuan_produksi_id": 8,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "5.2",
+        "nama": "Pengelolaan Sampah/Limbah & Daur Ulang",
+        "children":[
+          {
+            "kode": "5.2.b",
+            "nama": "UD 52",
+            "indikator_id": 68,
+            "satuan_harga_id": 5,
+            "satuan_produksi_id": 5,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 6,
+    "nama": "KONTRUKSI",
+    "children": [
+      {
+        "kode": "6.1",
+        "nama": "Kontruksi",
+        "children":[
+          {
+            "kode": "6.1.a",
+            "nama": "Dinas PU",
+            "indikator_id": 69,
+            "satuan_harga_id": 22,
+            "satuan_produksi_id": 22,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "6.1.b",
+            "nama": "DPMPTSP",
+            "indikator_id": 70,
+            "satuan_harga_id": 23,
+            "satuan_produksi_id": 23,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 7,
+    "nama": "PERDAGANGAN BESAR & ECERAN; REPARASI MOBIL & SEPEDA MOTOR",
+    "children": [
+      {
+        "kode": "7.1",
+        "nama": "Perdagangan Mobil, Sepeda Motor & Reparasinya",
+        "children":[
+          {
+            "kode": "7.1.a",
+            "nama": "UD Erriks Mobil",
+            "indikator_id": 71,
+            "satuan_harga_id": 24,
+            "satuan_produksi_id": 24,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "7.1.b",
+            "nama": "Toko Sidem Motor",
+            "indikator_id": 72,
+            "satuan_harga_id": 24,
+            "satuan_produksi_id": 24,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "7.2",
+        "nama": "Perdagangan Besar & Eceran, Bukan Mobil & Sepeda Motor",
+        "children":[
+          {
+            "kode": "7.2.a",
+            "nama": "Sukses Bersama",
+            "indikator_id": 73,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "7.2.b",
+            "nama": "Toko Amanah",
+            "indikator_id": 73,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 8,
+    "nama": "TRANSPORTASI & PERGUDANGAN",
+    "children": [
+      {
+        "kode": "8.1",
+        "nama": "Angkutan Rel",
+        "children":[
+          {
+            "kode": "8.1.a",
+            "nama": "KAI",
+            "indikator_id": 74,
+            "satuan_harga_id": 26,
+            "satuan_produksi_id": 26,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "8.2",
+        "nama": "Angkutan Darat",
+        "children":[
+          {
+            "kode": "8.2.a",
+            "nama": "Terminal Pare",
+            "indikator_id": 75,
+            "satuan_harga_id": 26,
+            "satuan_produksi_id": 26,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "8.2.b",
+            "nama": "Jasa Angkut Trek",
+            "indikator_id": 76,
+            "satuan_harga_id": 27,
+            "satuan_produksi_id": 27,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "8.3",
+        "nama": "Angkutan Laut"
+      },
+      {
+        "kode": "8.4",
+        "nama": "Angkutan Sungai Danau & Penyeberangan",
+        "children":[
+          {
+            "kode": "8.4.a",
+            "nama": "Tambangan (Embun Brantas)",
+            "indikator_id": 77,
+            "satuan_harga_id": 26,
+            "satuan_produksi_id": 26,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "8.4.b",
+            "nama": "Tambangan Ds. Maesan",
+            "indikator_id": 76,
+            "satuan_harga_id": 26,
+            "satuan_produksi_id": 26,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "8.5",
+        "nama": "Angkutan Udara",
+        "children":[
+          {
+            "kode": "8.5.a",
+            "nama": "Bandara DHX",
+            "indikator_id": 74,
+            "satuan_harga_id": 26,
+            "satuan_produksi_id": 26,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "8.6",
+        "nama": "Perdagangan & Jasa Penunjang Angkutan, Pos & Kurir",
+        "children":[
+          {
+            "kode": "8.6.a",
+            "nama": "Teba Expres",
+            "indikator_id": 78,
+            "satuan_harga_id": 28,
+            "satuan_produksi_id": 28,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "8.6.b",
+            "nama": "POS Cb. Ngasem",
+            "indikator_id": 78,
+            "satuan_harga_id": 28,
+            "satuan_produksi_id": 28,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 9,
+    "nama": "PENYEDIAAN AKOMODASI & MAKAN MINUM",
+    "children": [
+      {
+        "kode": "9.1",
+        "nama": "Penyediaan Akomodasi",
+        "children":[
+          {
+            "kode": "9.1.a",
+            "nama": "Bukit Daun",
+            "indikator_id": 79,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "9.1.b",
+            "nama": "Kos Fadelan",
+            "indikator_id": 80,
+            "satuan_harga_id": 11,
+            "satuan_produksi_id": 11,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "9.2",
+        "nama": "Penyediaan Makan Minum",
+        "children":[
+          {
+            "kode": "9.2.a",
+            "nama": "Rumah Makan Dua-Dua Pare",
+            "indikator_id": 81,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "9.2.b",
+            "nama": "Pari Resto",
+            "indikator_id": 81,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 10,
+    "nama": "INFORMASI & KOMUNIKASI",
+    "children": [
+      {
+        "kode": "10.1",
+        "nama": "Infomasi & Komunikasi",
+        "children":[
+          {
+            "kode": "10.1.a",
+            "nama": "Dwi Jaya",
+            "indikator_id": 82,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "10.1.b",
+            "nama": "Radio Kharisma",
+            "indikator_id": 83,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 11,
+    "nama": "JASA KEUANGAN & ASURANSI",
+    "children": [
+      {
+        "kode": "11.1",
+        "nama": "Jasa Perantara Keuangan",
+        "children":[
+          {
+            "kode": "11.1.a",
+            "nama": "BI",
+            "indikator_id": 84,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "11.2",
+        "nama": "Asuransi & Dana Pensiun",
+        "children":[
+          {
+            "kode": "11.2.a",
+            "nama": "OJK",
+            "indikator_id": 85,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "11.3",
+        "nama": "Jasa Keuangan Lainnya",
+        "children":[
+          {
+            "kode": "11.3.a",
+            "nama": "OJK",
+            "indikator_id": 86,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      },
+      {
+        "kode": "11.4",
+        "nama": "Jasa Penunjang Keuangan",
+        "children":[
+          {
+            "kode": "11.4.a",
+            "nama": "Danabi Golden Valasindo",
+            "indikator_id": 87,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 12,
+    "nama": "REAL ESTATE",
+    "children": [
+      {
+        "kode": "12.1",
+        "nama": "Real Estate",
+        "children":[
+          {
+            "kode": "12.1.a",
+            "nama": "SKKRT",
+            "indikator_id": 88,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "12.1.b",
+            "nama": "Sekar Pamenang",
+            "indikator_id": 89,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 13,
+    "nama": "JASA PERUSAHAAN",
+    "children": [
+      {
+        "kode": "13.1",
+        "nama": "Real Estate",
+        "children":[
+          {
+            "kode": "13.1.a",
+            "nama": "Bilal Tour",
+            "indikator_id": 90,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "13.1.b",
+            "nama": "Imphotograph <Imam>",
+            "indikator_id": 91,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 14,
+    "nama": "ADMINISTRASI PEMERINTAHAN, PERTAHANAN & JAMINAN SOSIAL WAJIB",
+    "children": [
+      {
+        "kode": "14.1",
+        "nama": "Administrasi Pemerintahan, Pertahanan & Jaminan Sosial Wajib",
+        "children":[
+          {
+            "kode": "14.1.a",
+            "nama": "BPKAD",
+            "indikator_id": 92,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 15,
+    "nama": "JASA PENDIDIKAN",
+    "children": [
+      {
+        "kode": "15.1",
+        "nama": "Jasa Pendidikan",
+        "children":[
+          {
+            "kode": "15.1.a",
+            "nama": "BPKAD",
+            "indikator_id": 93,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "15.1.b",
+            "nama": "SMA Plemahan",
+            "indikator_id": 94,
+            "satuan_harga_id": 29,
+            "satuan_produksi_id": 29,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 16,
+    "nama": "JASA KESEHATAN & KEGIATAN SOSIAL",
+    "children": [
+      {
+        "kode": "16.1",
+        "nama": "Jasa Kesehatan & Kegiatan Sosial",
+        "children":[
+          {
+            "kode": "16.1.a",
+            "nama": "BPKAD",
+            "indikator_id": 95,
+            "satuan_harga_id": 25,
+            "satuan_produksi_id": 25,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "16.1.b",
+            "nama": "PKU Muhammadiyah",
+            "indikator_id": 96,
+            "satuan_harga_id": 30,
+            "satuan_produksi_id": 30,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "kode": 17,
+    "nama": "JASA LAINNYA",
+    "children": [
+      {
+        "kode": "17.1",
+        "nama": "Jasa Lainnya",
+        "children":[
+          {
+            "kode": "17.1.a",
+            "nama": "Gunung Kelud",
+            "indikator_id": 97,
+            "satuan_harga_id": 31,
+            "satuan_produksi_id": 31,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
+          },
+          {
+            "kode": "17.1.b",
+            "nama": "R'Loundry",
+            "indikator_id": 98,
+            "satuan_harga_id": 5,
+            "satuan_produksi_id": 5,
+            "satuan_luas_tanam_id": null,
+            "satuan_biaya_perawatan_id": null
           }
         ]
       }

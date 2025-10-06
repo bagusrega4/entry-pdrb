@@ -157,7 +157,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    // Setup CSRF token for all AJAX requests
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -170,7 +169,6 @@
             allYears = [],
             selectedYears = [];
 
-        // --- parsing yang robust: menerima format ID/EN ---
         function parseNumberID(formatted) {
             if (formatted === null || formatted === undefined || formatted === '') return null;
             let s = String(formatted).trim().replace(',', '.');
@@ -188,38 +186,21 @@
             }).format(num);
         }
 
-        // ambil semua indikator dan unit yang diperlukan
-        function fetchIndicatorsAndUnits() {
-            return $.when(
-                $.get('/rasio/indicators').done(data => indikatorOptions = data || []),
-                $.get('/rasio/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/rasio/unit-produksi').done(data => unitProduksiOptions = data || []),
-                $.get('/rasio/unit-luas').done(data => unitLuasOptions = data || []),
-                $.get('/rasio/unit-perawatan').done(data => unitPerawatanOptions = data || [])
-            ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
-        }
-
-        $('#level1').on('change', function() {
-            currentRootId = $(this).val();
-            if (currentRootId) {
-                $.when(
-                    $.get('/rasio/indicators'),
-                    $.get('/rasio/unit-harga'),
-                    $.get('/rasio/unit-produksi'),
-                    $.get('/rasio/unit-luas'),
-                    $.get('/rasio/unit-perawatan')
-                ).then(() => loadSubtree(currentRootId));
-            } else {
-                $('#table-container').hide();
-            }
-        });
-
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+
+        $('#level1').on('change', function() {
+            currentRootId = $(this).val();
+            if (currentRootId) {
+                loadSubtree(currentRootId);
+            } else {
+                $('#table-container').hide();
+            }
+        });
 
         function loadSubtree(rootId) {
             const previouslySelectedYears = [...selectedYears];
@@ -282,23 +263,6 @@
                 $theadRow.append(`<th colspan="3" class="text-center">${label}</th>`);
             });
 
-            // Tambahkan sub-header untuk 3 kolom rasio
-            const $subheadRow = $('<tr></tr>');
-            $subheadRow.html(`
-                <th rowspan="2"></th>
-                <th rowspan="2"></th>
-                <th rowspan="2"></th>
-            `);
-            
-            selectedYears.forEach(y => {
-                $subheadRow.append(`
-                    <th class="text-center bg-light">Output Ikutan</th>
-                    <th class="text-center bg-light">WIP/CBR</th>
-                    <th class="text-center bg-light">Biaya Antara</th>
-                `);
-            });
-
-            // Hapus header lama dan tambahkan yang baru dengan sub-header
             $('#rasioTable thead').empty().append($theadRow);
 
             const $tbody = $('#rasioTable tbody').empty();
@@ -309,6 +273,10 @@
                     escapeHtml(it.kode + ' - ' + it.nama) :
                     escapeHtml(it.nama);
 
+                // Tentukan apakah baris ini adalah leaf node
+                const itemLevel = (it.kode.match(/\./g) || []).length;
+                const isLeafNode = (it.is_leaf === true || it.is_leaf === 1) && itemLevel > 1;
+
                 let row = `<tr data-id="${it.id}">
                     <td class="${tdClass}">${displayName}</td>
                     <td class="${tdClass}">${it.indicator_name ?? ''}</td>
@@ -318,31 +286,39 @@
                     const triId = y.triwulan_id ?? 0;
                     const key = `${y.year}-${triId}`;
 
-                    // Ambil data dari response API
                     const rasioData = it.rasio?.[key] || {};
                     const outputVal = rasioData.rasio_output_ikutan ?? '';
                     const wipVal = rasioData.rasio_wip_cbr ?? '';
                     const antaraVal = rasioData.rasio_biaya_antara ?? '';
 
-                    row += `
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-output-ikutan text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${outputVal}"
-                                value="${formatNumberID(outputVal)}" placeholder="Output Ikutan">
-                        </td>
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-wip-cbr text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${wipVal}"
-                                value="${formatNumberID(wipVal)}" placeholder="WIP/CBR">
-                        </td>
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control rasio-biaya-antara text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${antaraVal}"
-                                value="${formatNumberID(antaraVal)}" placeholder="Biaya Antara">
-                        </td>`;
+                    // Hanya tampilkan input field jika ini adalah leaf node
+                    if (isLeafNode) {
+                        row += `
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control rasio-output-ikutan text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${outputVal}"
+                                    value="${formatNumberID(outputVal)}" placeholder="Output Ikutan">
+                            </td>
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control rasio-wip-cbr text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${wipVal}"
+                                    value="${formatNumberID(wipVal)}" placeholder="WIP/CBR">
+                            </td>
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control rasio-biaya-antara text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${antaraVal}"
+                                    value="${formatNumberID(antaraVal)}" placeholder="Biaya Antara">
+                            </td>`;
+                    } else {
+                        // Untuk parent/non-leaf nodes, tampilkan nilai saja tanpa input
+                        row += `
+                            <td class="${tdClass}">${formatNumberID(outputVal)}</td>
+                            <td class="${tdClass}">${formatNumberID(wipVal)}</td>
+                            <td class="${tdClass}">${formatNumberID(antaraVal)}</td>`;
+                    }
                 });
 
                 row += '</tr>';
@@ -397,49 +373,29 @@
                             Swal.showValidationMessage('Tahun dan Triwulan wajib diisi!');
                             return false;
                         }
-                        return {
-                            newYear,
-                            triwulanId,
-                            triwulanName
-                        };
+                        return { newYear, triwulanId, triwulanName };
                     }
                 }).then(result => {
                     if (result.isConfirmed) {
-                        const {
-                            newYear,
-                            triwulanId,
-                            triwulanName
-                        } = result.value;
+                        const { newYear, triwulanId, triwulanName } = result.value;
 
-                        // Cek apakah kombinasi tahun+triwulan sudah ada
                         if (allYears.some(y => y.year === newYear && y.triwulan_id === triwulanId)) {
                             Swal.fire('Gagal', 'Tahun & triwulan sudah ada!', 'error');
                             return;
                         }
 
-                        const newYearObj = {
-                            year: newYear,
-                            triwulan_id: triwulanId,
-                            triwulan_name: triwulanName
-                        };
-
-                        // Tambahkan ke allYears
+                        const newYearObj = { year: newYear, triwulan_id: triwulanId, triwulan_name: triwulanName };
                         allYears.push(newYearObj);
-
-                        // Tambahkan ke selectedYears untuk langsung dipilih
                         selectedYears.push(newYearObj);
 
-                        // Update dropdown dengan option yang baru
                         const optionValue = `${newYear}-${triwulanId}`;
                         const optionLabel = `${newYear} - ${triwulanName}`;
                         $('#yearFilter').append(`<option value="${optionValue}">${optionLabel}</option>`);
 
-                        // Set nilai yang dipilih (termasuk yang sudah ada sebelumnya + yang baru)
                         const currentSelected = $('#yearFilter').val() || [];
                         currentSelected.push(optionValue);
                         $('#yearFilter').val(currentSelected).trigger('change');
 
-                        // Rebuild tabel dengan kolom baru
                         buildTable();
                         Swal.fire('Berhasil', 'Tahun berhasil ditambahkan!', 'success');
                     }
@@ -464,7 +420,6 @@
 
                 const inputData = {};
                 
-                // Kumpulkan data per tahun-triwulan
                 $(this).find('input.rasio-output-ikutan, input.rasio-wip-cbr, input.rasio-biaya-antara').each(function() {
                     const year = $(this).data('year');
                     const triwulanId = $(this).data('triwulan');
@@ -488,7 +443,6 @@
                     }
                 });
 
-                // Tambahkan ke payload jika ada data yang tidak kosong
                 Object.values(inputData).forEach(data => {
                     if (data.rasio_output_ikutan !== null && data.rasio_output_ikutan !== undefined && data.rasio_output_ikutan !== '' ||
                         data.rasio_wip_cbr !== null && data.rasio_wip_cbr !== undefined && data.rasio_wip_cbr !== '' ||
@@ -503,13 +457,10 @@
                 return;
             }
 
-            console.log('Payload yang akan dikirim:', payload);
-
             $.post('/rasio/bulk-store', {
                 data: JSON.stringify(payload)
             }).done(() => {
                 Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
-                // Reload data dengan mempertahankan selectedYears
                 if (currentRootId) {
                     loadSubtree(currentRootId);
                 }
@@ -546,31 +497,11 @@
                 if ($(this).val() !== '__new__') return;
 
                 const typeMap = {
-                    '#newIndikator': {
-                        title: 'Indikator',
-                        endpoint: '/rasio/indicators',
-                        field: 'indikator'
-                    },
-                    '#newSatuanHarga': {
-                        title: 'Satuan Harga',
-                        endpoint: '/rasio/unit-harga',
-                        field: 'satuan_harga'
-                    },
-                    '#newSatuanProduksi': {
-                        title: 'Satuan Produksi',
-                        endpoint: '/rasio/unit-produksi',
-                        field: 'satuan_produksi'
-                    },
-                    '#newSatuanLuasTanam': {
-                        title: 'Satuan Luas Tanam',
-                        endpoint: '/rasio/unit-luas',
-                        field: 'satuan_luas_tanam'
-                    },
-                    '#newSatuanBiayaPerawatan': {
-                        title: 'Satuan Biaya Perawatan',
-                        endpoint: '/rasio/unit-perawatan',
-                        field: 'satuan_biaya_perawatan'
-                    }
+                    '#newIndikator': { title: 'Indikator', endpoint: '/rasio/indicators', field: 'indikator' },
+                    '#newSatuanHarga': { title: 'Satuan Harga', endpoint: '/rasio/unit-harga', field: 'satuan_harga' },
+                    '#newSatuanProduksi': { title: 'Satuan Produksi', endpoint: '/rasio/unit-produksi', field: 'satuan_produksi' },
+                    '#newSatuanLuasTanam': { title: 'Satuan Luas Tanam', endpoint: '/rasio/unit-luas', field: 'satuan_luas_tanam' },
+                    '#newSatuanBiayaPerawatan': { title: 'Satuan Biaya Perawatan', endpoint: '/rasio/unit-perawatan', field: 'satuan_biaya_perawatan' }
                 };
 
                 const config = typeMap[selector];
@@ -588,9 +519,7 @@
                         return;
                     }
 
-                    const postData = {
-                        [config.field]: res.value
-                    };
+                    const postData = { [config.field]: res.value };
                     $.post(config.endpoint, postData).done(data => {
                         const newOpt = new Option(data[config.field], data.id, true, true);
                         $(selector).append(newOpt).trigger('change');
@@ -627,7 +556,6 @@
             $.post('/rasio/commodities', data).done(() => {
                 $('#commodityModal').modal('hide');
                 Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
-                // Reload data dengan mempertahankan selectedYears
                 if (currentRootId) {
                     loadSubtree(currentRootId);
                 }

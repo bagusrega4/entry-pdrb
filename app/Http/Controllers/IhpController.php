@@ -128,7 +128,9 @@ class IhpController extends Controller
             ];
         }
 
-        $isParent = $commodity->children->count() > 0;
+        $hasChildren = $commodity->children->count() > 0;
+        $isParent = $commodity->level == 2 || $hasChildren;
+        $isLeaf = !$hasChildren;
 
         $rows[] = [
             'id' => $commodity->id,
@@ -136,7 +138,7 @@ class IhpController extends Controller
             'nama' => $commodity->nama,
             'full_name' => $name,
             'is_parent' => $isParent,
-            'is_leaf' => !$isParent,
+            'is_leaf' => $isLeaf,
             'ihp' => $ihpData, // Data IHP yang sudah dikelompokkan
 
             // indikator & satuan tetap ambil dari commodities

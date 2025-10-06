@@ -130,7 +130,9 @@ class RasioController extends Controller
             ];
         }
 
-        $isParent = $commodity->children->count() > 0;
+        $hasChildren = $commodity->children->count() > 0;
+        $isParent = $commodity->level == 2 || $hasChildren;
+        $isLeaf = !$hasChildren;
 
         $rows[] = [
             'id' => $commodity->id,
@@ -138,7 +140,7 @@ class RasioController extends Controller
             'nama' => $commodity->nama,
             'full_name' => $name,
             'is_parent' => $isParent,
-            'is_leaf' => !$isParent,
+            'is_leaf' => $isLeaf,
             'rasio' => $rasioData, // Data rasio yang sudah dikelompokkan
 
             // indikator & satuan tetap ambil dari commodities

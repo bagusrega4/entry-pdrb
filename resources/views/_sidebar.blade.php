@@ -6,7 +6,7 @@
                 <span
                     style="font-family: 'Poppins', sans-serif; font-size:20px; letter-spacing:1px;"
                     class="fw-bold text-uppercase text-white">
-                    ENTRY PDRB
+                    DAERBI
                 </span>
             </a>
             <div class="nav-toggle">

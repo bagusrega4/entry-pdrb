@@ -159,7 +159,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    // Setup CSRF token for all AJAX requests
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -172,7 +171,6 @@
             allYears = [],
             selectedYears = [];
 
-        // --- parsing yang robust: menerima format ID/EN ---
         function parseNumberID(formatted) {
             if (formatted === null || formatted === undefined || formatted === '') return null;
             let s = String(formatted).trim().replace(',', '.');
@@ -190,38 +188,21 @@
             }).format(num);
         }
 
-        // ambil semua indikator dan unit yang diperlukan
-        function fetchIndicatorsAndUnits() {
-            return $.when(
-                $.get('/ihp/indicators').done(data => indikatorOptions = data || []),
-                $.get('/ihp/unit-harga').done(data => unitHargaOptions = data || []),
-                $.get('/ihp/unit-produksi').done(data => unitProduksiOptions = data || []),
-                $.get('/ihp/unit-luas').done(data => unitLuasOptions = data || []),
-                $.get('/ihp/unit-perawatan').done(data => unitPerawatanOptions = data || [])
-            ).fail(() => Swal.fire('Error', 'Gagal mengambil indikator / satuan', 'error'));
-        }
-
-        $('#level1').on('change', function() {
-            currentRootId = $(this).val();
-            if (currentRootId) {
-                $.when(
-                    $.get('/ihp/indicators'),
-                    $.get('/ihp/unit-harga'),
-                    $.get('/ihp/unit-produksi'),
-                    $.get('/ihp/unit-luas'),
-                    $.get('/ihp/unit-perawatan')
-                ).then(() => loadSubtree(currentRootId));
-            } else {
-                $('#table-container').hide();
-            }
-        });
-
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+
+        $('#level1').on('change', function() {
+            currentRootId = $(this).val();
+            if (currentRootId) {
+                loadSubtree(currentRootId);
+            } else {
+                $('#table-container').hide();
+            }
+        });
 
         function loadSubtree(rootId) {
             const previouslySelectedYears = [...selectedYears];
@@ -293,6 +274,10 @@
                     escapeHtml(it.kode + ' - ' + it.nama) :
                     escapeHtml(it.nama);
 
+                // Tentukan apakah baris ini adalah leaf node
+                const itemLevel = (it.kode.match(/\./g) || []).length;
+                const isLeafNode = (it.is_leaf === true || it.is_leaf === 1) && itemLevel > 1;
+
                 let row = `<tr data-id="${it.id}">
                     <td class="${tdClass}">${displayName}</td>
                     <td class="${tdClass}">${it.indicator_name ?? ''}</td>
@@ -303,17 +288,23 @@
                     const triId = y.triwulan_id ?? 0;
                     const key = `${y.year}-${triId}`;
 
-                    // Ambil data dari response API
                     const ihpData = it.ihp?.[key] || {};
                     const ihpVal = ihpData.ihp ?? '';
 
-                    row += `
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control ihp text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${ihpVal}"
-                                value="${formatNumberID(ihpVal)}" placeholder="Input IHP">
-                        </td>`;
+                    // Hanya tampilkan input field jika ini adalah leaf node
+                    if (isLeafNode) {
+                        row += `
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control ihp text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${ihpVal}"
+                                    value="${formatNumberID(ihpVal)}" placeholder="Input IHP">
+                            </td>`;
+                    } else {
+                        // Untuk parent/non-leaf nodes, tampilkan nilai saja tanpa input
+                        row += `
+                            <td class="${tdClass}">${formatNumberID(ihpVal)}</td>`;
+                    }
                 });
 
                 row += '</tr>';
@@ -368,49 +359,29 @@
                             Swal.showValidationMessage('Tahun dan Triwulan wajib diisi!');
                             return false;
                         }
-                        return {
-                            newYear,
-                            triwulanId,
-                            triwulanName
-                        };
+                        return { newYear, triwulanId, triwulanName };
                     }
                 }).then(result => {
                     if (result.isConfirmed) {
-                        const {
-                            newYear,
-                            triwulanId,
-                            triwulanName
-                        } = result.value;
+                        const { newYear, triwulanId, triwulanName } = result.value;
 
-                        // Cek apakah kombinasi tahun+triwulan sudah ada
                         if (allYears.some(y => y.year === newYear && y.triwulan_id === triwulanId)) {
                             Swal.fire('Gagal', 'Tahun & triwulan sudah ada!', 'error');
                             return;
                         }
 
-                        const newYearObj = {
-                            year: newYear,
-                            triwulan_id: triwulanId,
-                            triwulan_name: triwulanName
-                        };
-
-                        // Tambahkan ke allYears
+                        const newYearObj = { year: newYear, triwulan_id: triwulanId, triwulan_name: triwulanName };
                         allYears.push(newYearObj);
-
-                        // Tambahkan ke selectedYears untuk langsung dipilih
                         selectedYears.push(newYearObj);
 
-                        // Update dropdown dengan option yang baru
                         const optionValue = `${newYear}-${triwulanId}`;
                         const optionLabel = `${newYear} - ${triwulanName}`;
                         $('#yearFilter').append(`<option value="${optionValue}">${optionLabel}</option>`);
 
-                        // Set nilai yang dipilih (termasuk yang sudah ada sebelumnya + yang baru)
                         const currentSelected = $('#yearFilter').val() || [];
                         currentSelected.push(optionValue);
                         $('#yearFilter').val(currentSelected).trigger('change');
 
-                        // Rebuild tabel dengan kolom baru
                         buildTable();
                         Swal.fire('Berhasil', 'Tahun berhasil ditambahkan!', 'success');
                     }
@@ -454,13 +425,10 @@
                 return;
             }
 
-            console.log('Payload yang akan dikirim:', payload);
-
             $.post('/ihp/bulk-store', {
                 data: JSON.stringify(payload)
             }).done(() => {
                 Swal.fire('Sukses', 'Data berhasil disimpan', 'success');
-                // Reload data dengan mempertahankan selectedYears
                 if (currentRootId) {
                     loadSubtree(currentRootId);
                 }
@@ -497,31 +465,11 @@
                 if ($(this).val() !== '__new__') return;
 
                 const typeMap = {
-                    '#newIndikator': {
-                        title: 'Indikator',
-                        endpoint: '/ihp/indicators',
-                        field: 'indikator'
-                    },
-                    '#newSatuanHarga': {
-                        title: 'Satuan Harga',
-                        endpoint: '/ihp/unit-harga',
-                        field: 'satuan_harga'
-                    },
-                    '#newSatuanProduksi': {
-                        title: 'Satuan Produksi',
-                        endpoint: '/ihp/unit-produksi',
-                        field: 'satuan_produksi'
-                    },
-                    '#newSatuanLuasTanam': {
-                        title: 'Satuan Luas Tanam',
-                        endpoint: '/ihp/unit-luas',
-                        field: 'satuan_luas_tanam'
-                    },
-                    '#newSatuanBiayaPerawatan': {
-                        title: 'Satuan Biaya Perawatan',
-                        endpoint: '/ihp/unit-perawatan',
-                        field: 'satuan_biaya_perawatan'
-                    }
+                    '#newIndikator': { title: 'Indikator', endpoint: '/ihp/indicators', field: 'indikator' },
+                    '#newSatuanHarga': { title: 'Satuan Harga', endpoint: '/ihp/unit-harga', field: 'satuan_harga' },
+                    '#newSatuanProduksi': { title: 'Satuan Produksi', endpoint: '/ihp/unit-produksi', field: 'satuan_produksi' },
+                    '#newSatuanLuasTanam': { title: 'Satuan Luas Tanam', endpoint: '/ihp/unit-luas', field: 'satuan_luas_tanam' },
+                    '#newSatuanBiayaPerawatan': { title: 'Satuan Biaya Perawatan', endpoint: '/ihp/unit-perawatan', field: 'satuan_biaya_perawatan' }
                 };
 
                 const config = typeMap[selector];
@@ -539,9 +487,7 @@
                         return;
                     }
 
-                    const postData = {
-                        [config.field]: res.value
-                    };
+                    const postData = { [config.field]: res.value };
                     $.post(config.endpoint, postData).done(data => {
                         const newOpt = new Option(data[config.field], data.id, true, true);
                         $(selector).append(newOpt).trigger('change');
@@ -578,7 +524,6 @@
             $.post('/ihp/commodities', data).done(() => {
                 $('#commodityModal').modal('hide');
                 Swal.fire('Sukses', 'Komoditas berhasil ditambahkan', 'success');
-                // Reload data dengan mempertahankan selectedYears
                 if (currentRootId) {
                     loadSubtree(currentRootId);
                 }

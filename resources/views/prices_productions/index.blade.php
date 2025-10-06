@@ -369,6 +369,10 @@
                     escapeHtml(it.kode + ' - ' + it.nama) :
                     escapeHtml(it.nama);
 
+                // Tentukan apakah baris ini adalah leaf node (child terakhir)
+                const itemLevel = (it.kode.match(/\./g) || []).length;
+                const isLeafNode = (it.is_leaf === true || it.is_leaf === 1) && itemLevel > 1;
+
                 let row = `<tr data-id="${it.id}">
                     <td class="${tdClass}">${displayName}</td>
                     <td class="${tdClass}">${it.indicator_name ?? ''}</td>
@@ -387,19 +391,27 @@
                     const hargaVal = priceEntry?.harga ?? priceEntry ?? '';
                     const produksiVal = prodEntry?.produksi ?? prodEntry ?? '';
 
-                    row += `
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control harga text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${hargaVal}"
-                                value="${formatNumberID(hargaVal, true)}" placeholder="Harga">
-                        </td>
-                        <td class="${tdClass}">
-                            <input type="text" class="form-control produksi text-end"
-                                data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
-                                data-raw="${produksiVal}"
-                                value="${formatNumberID(produksiVal)}" placeholder="Produksi">
-                        </td>`;
+                    // Hanya tampilkan input field jika ini adalah leaf node
+                    if (isLeafNode) {
+                        row += `
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control harga text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${hargaVal}"
+                                    value="${formatNumberID(hargaVal, true)}" placeholder="Harga">
+                            </td>
+                            <td class="${tdClass}">
+                                <input type="text" class="form-control produksi text-end"
+                                    data-year="${y.year}" data-triwulan="${triId}" data-id="${it.id}"
+                                    data-raw="${produksiVal}"
+                                    value="${formatNumberID(produksiVal)}" placeholder="Produksi">
+                            </td>`;
+                    } else {
+                        // Untuk parent/non-leaf nodes, tampilkan nilai saja tanpa input
+                        row += `
+                            <td class="${tdClass}">${formatNumberID(hargaVal, true)}</td>
+                            <td class="${tdClass}">${formatNumberID(produksiVal)}</td>`;
+                    }
                 });
 
                 row += '</tr>';
@@ -522,7 +534,7 @@
 
                 const inputData = {};
                 
-                // Kumpulkan data per tahun-triwulan
+                // Kumpulkan data per tahun-triwulan (hanya dari input field yang ada)
                 $(this).find('input.harga, input.produksi').each(function() {
                     const year = $(this).data('year');
                     const triwulanId = $(this).data('triwulan');
