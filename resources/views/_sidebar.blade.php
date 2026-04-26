@@ -1,6 +1,5 @@
 <aside class="app-sidebar" id="appSidebar">
 
-    <!-- Logo + Toggle -->
     <div class="sidebar-logo">
         <a href="{{ route('simulasi.index') }}" class="brand">
             <img src="{{ asset('assets/img/logo_bps.png') }}" alt="Logo" class="brand-logo">
@@ -16,7 +15,6 @@
         </button>
     </div>
 
-    <!-- Scrollable nav area -->
     <div class="sidebar-scroll">
         <nav class="sidebar-nav">
 
@@ -34,9 +32,10 @@
                 <span class="nav-label">Dashboard</span>
             </a>
 
+            @if(Auth::user()->id_role == 2)
+
             <p class="nav-section-label" style="margin-top:18px">Menu Penunjang</p>
 
-            <!-- Collapsible: Data Pendukung PDRB -->
             @php
                 $isInputMenu = request()->routeIs('prices_productions.*')
                     || request()->routeIs('rasio.*')
@@ -104,19 +103,18 @@
                 <span class="nav-label">Download Laporan</span>
             </a>
 
-            @if(Auth::user()->id_role == 2)
             <a href="{{ route('manage.user.index') }}"
                class="nav-item {{ request()->routeIs('manage.user.*') ? 'active' : '' }}">
                 <i class="fas fa-users-cog nav-icon"></i>
                 <span class="nav-label">Kelola Pengguna</span>
             </a>
+
             @endif
 
         </nav>
     </div>
 </aside>
 
-<!-- Overlay (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
@@ -157,7 +155,6 @@
     overflow: hidden;
 }
 
-/* Collapsed state */
 .app-sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
 }
@@ -201,14 +198,12 @@
     margin-right: 8px;
 }
 
-/* Saat collapsed: sembunyikan logo image juga bersama brand */
 .app-sidebar.collapsed .brand-text {
     opacity: 0;
     width: 0;
     pointer-events: none;
 }
 
-/* Toggle button */
 .sidebar-toggle {
     flex-shrink: 0;
     width: 30px;
@@ -230,7 +225,6 @@
     color: var(--accent);
 }
 
-/* When collapsed, center the entire logo row & toggle */
 .app-sidebar.collapsed .sidebar-logo {
     justify-content: center;
     padding: 0;
@@ -317,7 +311,6 @@
     white-space: nowrap;
 }
 
-/* Hover */
 .nav-item:hover {
     background: var(--accent-light);
 }
@@ -326,7 +319,6 @@
     color: var(--accent);
 }
 
-/* Active */
 .nav-item.active {
     background: var(--accent-light);
 }
@@ -349,13 +341,11 @@
     font-weight: 600;
 }
 
-/* Hide labels when collapsed */
 .app-sidebar.collapsed .nav-label,
 .app-sidebar.collapsed .nav-caret {
     display: none;
 }
 
-/* Center icons when collapsed */
 .app-sidebar.collapsed .sidebar-scroll {
     display: flex;
     flex-direction: column;
@@ -406,7 +396,6 @@
     color: var(--accent);
 }
 
-/* Submenu */
 .nav-submenu {
     display: none;
     flex-direction: column;
@@ -464,7 +453,6 @@
     background: var(--accent);
 }
 
-/* Hide submenu when collapsed */
 .app-sidebar.collapsed .nav-submenu {
     display: none !important;
 }
@@ -472,14 +460,12 @@
     display: none;
 }
 
-/* Fix nav-group width & centering when collapsed */
 .app-sidebar.collapsed .nav-group {
     position: relative;
     width: var(--sidebar-collapsed-width);
     align-items: center;
 }
 
-/* Submenu popup ke kanan saat hover collapsed */
 .app-sidebar.collapsed .nav-group:hover .nav-submenu {
     display: flex !important;
     position: fixed;
@@ -551,13 +537,11 @@ body.sidebar-collapsed .main-panel {
     const overlay  = document.getElementById('sidebarOverlay');
     const STORAGE_KEY = 'si_prabu_sidebar_collapsed';
 
-    /* Restore state */
     if (localStorage.getItem(STORAGE_KEY) === '1') {
         sidebar.classList.add('collapsed');
         document.body.classList.add('sidebar-collapsed');
     }
 
-    /* Toggle collapsed */
     toggle.addEventListener('click', function () {
         const isMobile = window.innerWidth <= 768;
 
@@ -571,13 +555,11 @@ body.sidebar-collapsed .main-panel {
         }
     });
 
-    /* Close on overlay click (mobile) */
     overlay.addEventListener('click', function () {
         sidebar.classList.remove('mobile-open');
         overlay.classList.remove('active');
     });
 
-    /* Collapsible submenu */
     document.querySelectorAll('.nav-group-toggle').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const group    = btn.closest('.nav-group');
@@ -586,7 +568,6 @@ body.sidebar-collapsed .main-panel {
         });
     });
 
-    /* Posisi popup submenu saat collapsed */
     document.querySelectorAll('.nav-group').forEach(function (group) {
         group.addEventListener('mouseenter', function () {
             if (!sidebar.classList.contains('collapsed')) return;
