@@ -34,7 +34,7 @@
 
             @if(Auth::user()->id_role == 2)
 
-            <p class="nav-section-label" style="margin-top:18px">Menu Penunjang</p>
+            <p class="nav-section-label" style="margin-top:18px">Menu Admin</p>
 
             @php
                 $isInputMenu = request()->routeIs('prices_productions.*')
