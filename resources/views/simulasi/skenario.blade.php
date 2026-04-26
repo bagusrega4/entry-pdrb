@@ -19,7 +19,6 @@
     .card-head-title { font-size:14px; font-weight:500; color:#111827; }
     .card-body { padding:20px; }
 
-    /* Side by side grid */
     .compare-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -101,7 +100,6 @@
     }
     .btn-back:hover { background:#f3f4f6; text-decoration:none; color:#111827; }
 
-    /* Metodologi Note */
     .metodologi-note {
         display:flex; align-items:flex-start; gap:8px; padding:9px 13px;
         background:#fefce8; border:0.5px solid #fde68a; border-radius:8px;
@@ -109,7 +107,6 @@
     }
     .metodologi-note svg { flex-shrink:0; margin-top:2px; }
 
-    /* Result Cards (4 metric mini-cards each) */
     .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
     @media (max-width: 900px) { .result-grid { grid-template-columns:1fr; } }
 
@@ -126,7 +123,6 @@
     .rc-a .result-card-head { background:#fff7ed; color:#c2410c; border-bottom:0.5px solid #fed7aa; }
     .rc-b .result-card-head { background:#eff6ff; color:#1d4ed8; border-bottom:0.5px solid #bfdbfe; }
 
-    /* 4 cols for mini cards (Stimulus | ΔX | ΔNTB | Multiplier) */
     .metric-cards-row { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:12px 14px; }
     @media (max-width:640px) { .metric-cards-row { grid-template-columns:repeat(2,1fr); } }
 
@@ -154,7 +150,6 @@
     .metric-mini-value.teal   { color:#0d9488; }
     .metric-mini-sub { font-size:9px; color:#9ca3af; margin-top:2px; }
 
-    /* Multiplier Strips per skenario */
     .mult-strip {
         display:flex; align-items:center; gap:8px;
         padding:7px 14px; font-size:11.5px; font-weight:500; flex-wrap:wrap;
@@ -164,7 +159,6 @@
     .mult-strip-b { background:#eff6ff; border-color:#bfdbfe; color:#1e40af; }
     .mult-strip strong { font-weight:700; }
 
-    /* Diff summary (now 4 items) */
     .diff-card {
         border:0.5px solid #e5e7eb; border-radius:10px; padding:0;
         margin-bottom:16px; background:#fff;
@@ -185,7 +179,6 @@
     .diff-val.neutral { color:#374151; }
     .diff-sub { font-size:10px; color:#9ca3af; margin-top:3px; }
 
-    /* Comparison table */
     .cmp-table { width:100%; border-collapse:collapse; font-size:12.5px; min-width:760px; }
     .cmp-table thead th {
         font-size:10.5px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px;
@@ -210,7 +203,6 @@
     .diff-minus { color:#dc2626; font-weight:600; font-family:monospace; font-size:11.5px; }
     .diff-zero  { color:#9ca3af; font-size:11.5px; }
 
-    /* Charts */
     .chart-box { position:relative; width:100%; }
     .two-col-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
     @media (max-width:900px) { .two-col-grid { grid-template-columns:1fr; gap:16px; } }
@@ -220,7 +212,6 @@
     .empty-state h6 { font-size:14px; font-weight:600; color:#374151; margin-bottom:4px; }
     .empty-state p { font-size:13px; margin:0; }
 
-    /* Section headers */
     .result-section-title {
         font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px;
         color:#9ca3af; margin:20px 0 10px; display:flex; align-items:center; gap:8px;
@@ -246,13 +237,11 @@
         </a>
     </div>
 
-    <!-- Form Skenario -->
     <form action="{{ route('simulasi.proses-skenario') }}" method="POST" id="formSkenario">
         @csrf
 
         <div class="compare-grid" style="margin-bottom:16px;">
 
-            <!-- Skenario A -->
             <div class="sce-panel sce-a">
                 <div class="sce-panel-head">
                     <span>Skenario A</span>
@@ -310,7 +299,6 @@
                 </div>
             </div>
 
-            <!-- Skenario B -->
             <div class="sce-panel sce-b">
                 <div class="sce-panel-head">
                     <span>Skenario B</span>
@@ -392,9 +380,23 @@
 
     </form>
 
-    <!-- HASIL KOMPARASI -->
     @if($hasil_a && $hasil_b && $summary_a && $summary_b)
     @php
+        function fmtRp($val) {
+            if (floor((float)$val) == (float)$val) {
+                return number_format((float)$val, 0, ',', '.');
+            }
+            return rtrim(rtrim(number_format((float)$val, 3, ',', '.'), '0'), ',');
+        }
+
+        function fmtDiff($val) {
+            $abs = abs((float)$val);
+            if (floor($abs) == $abs) {
+                return number_format($abs, 0, ',', '.');
+            }
+            return rtrim(rtrim(number_format($abs, 3, ',', '.'), '0'), ',');
+        }
+
         $ntbA = $summary_a['tambahan_ntb']    ?? 0;
         $ntbB = $summary_b['tambahan_ntb']    ?? 0;
         $mNtbA = $summary_a['multiplier_ntb'] ?? 0;
@@ -409,7 +411,6 @@
         $diffMNtb       = $mNtbB - $mNtbA;
     @endphp
 
-    <!-- Metodologi Note -->
     <div class="metodologi-note">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>
@@ -418,12 +419,10 @@
         </div>
     </div>
 
-    <!-- Ringkasan per Skenario -->
     <div class="result-section-title">Ringkasan per Skenario</div>
 
     <div class="result-grid">
 
-        <!-- Card Skenario A -->
         <div class="result-card rc-a">
             <div class="result-card-head">
                 <span>{{ $summary_a['label'] }}</span>
@@ -432,17 +431,17 @@
             <div class="metric-cards-row">
                 <div class="metric-mini-card mc-orange">
                     <div class="metric-mini-label">Total Stimulus</div>
-                    <div class="metric-mini-value orange">{{ number_format($summary_a['total_stimulus'], 3, ',', '.') }}</div>
+                    <div class="metric-mini-value orange">{{ fmtRp($summary_a['total_stimulus']) }}</div>
                     <div class="metric-mini-sub">Miliar Rp</div>
                 </div>
                 <div class="metric-mini-card mc-green">
                     <div class="metric-mini-label">ΔX Output</div>
-                    <div class="metric-mini-value up">+{{ number_format($summary_a['tambahan_output'], 3, ',', '.') }}</div>
+                    <div class="metric-mini-value up">+{{ fmtRp($summary_a['tambahan_output']) }}</div>
                     <div class="metric-mini-sub">Miliar Rp</div>
                 </div>
                 <div class="metric-mini-card mc-teal">
                     <div class="metric-mini-label">ΔNTB</div>
-                    <div class="metric-mini-value teal">+{{ number_format($ntbA, 3, ',', '.') }}</div>
+                    <div class="metric-mini-value teal">+{{ fmtRp($ntbA) }}</div>
                     <div class="metric-mini-sub">Miliar Rp · dasar PDRB</div>
                 </div>
                 <div class="metric-mini-card mc-blue">
@@ -453,7 +452,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Multiplier strip -->
             <div class="mult-strip mult-strip-a">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
                 Output Multiplier: <strong>{{ number_format($mOutA, 4) }}×</strong>
@@ -463,7 +461,6 @@
             </div>
         </div>
 
-        <!-- Card Skenario B -->
         <div class="result-card rc-b">
             <div class="result-card-head">
                 <span>{{ $summary_b['label'] }}</span>
@@ -472,17 +469,17 @@
             <div class="metric-cards-row">
                 <div class="metric-mini-card mc-orange">
                     <div class="metric-mini-label">Total Stimulus</div>
-                    <div class="metric-mini-value" style="color:#1d4ed8;">{{ number_format($summary_b['total_stimulus'], 3, ',', '.') }}</div>
+                    <div class="metric-mini-value" style="color:#1d4ed8;">{{ fmtRp($summary_b['total_stimulus']) }}</div>
                     <div class="metric-mini-sub">Miliar Rp</div>
                 </div>
                 <div class="metric-mini-card mc-green">
                     <div class="metric-mini-label">ΔX Output</div>
-                    <div class="metric-mini-value up">+{{ number_format($summary_b['tambahan_output'], 3, ',', '.') }}</div>
+                    <div class="metric-mini-value up">+{{ fmtRp($summary_b['tambahan_output']) }}</div>
                     <div class="metric-mini-sub">Miliar Rp</div>
                 </div>
                 <div class="metric-mini-card mc-teal">
                     <div class="metric-mini-label">ΔNTB</div>
-                    <div class="metric-mini-value teal">+{{ number_format($ntbB, 3, ',', '.') }}</div>
+                    <div class="metric-mini-value teal">+{{ fmtRp($ntbB) }}</div>
                     <div class="metric-mini-sub">Miliar Rp · dasar PDRB</div>
                 </div>
                 <div class="metric-mini-card mc-blue">
@@ -493,7 +490,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Multiplier strip -->
             <div class="mult-strip mult-strip-b">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
                 Output Multiplier: <strong>{{ number_format($mOutB, 4) }}×</strong>
@@ -505,27 +501,26 @@
 
     </div>
 
-    <!-- Selisih (B − A) -->
     <div class="result-section-title">Selisih (B − A)</div>
     <div class="diff-card">
         <div class="diff-item">
             <div class="diff-label">Δ Total Stimulus</div>
             <div class="diff-val {{ $diffStimulus >= 0 ? 'pos' : 'neg' }}">
-                {{ $diffStimulus >= 0 ? '+' : '' }}{{ number_format($diffStimulus, 3, ',', '.') }}
+                {{ $diffStimulus >= 0 ? '+' : '-' }}{{ fmtDiff($diffStimulus) }}
             </div>
             <div class="diff-sub">Miliar Rp</div>
         </div>
         <div class="diff-item">
             <div class="diff-label">Δ ΔX Output</div>
             <div class="diff-val {{ $diffTambahan >= 0 ? 'pos' : 'neg' }}">
-                {{ $diffTambahan >= 0 ? '+' : '' }}{{ number_format($diffTambahan, 3, ',', '.') }}
+                {{ $diffTambahan >= 0 ? '+' : '-' }}{{ fmtDiff($diffTambahan) }}
             </div>
             <div class="diff-sub">Miliar Rp</div>
         </div>
         <div class="diff-item" style="background:#f0fdfa;">
             <div class="diff-label" style="color:#0d9488;">Δ ΔNTB</div>
             <div class="diff-val {{ $diffNtb >= 0 ? 'pos' : 'neg' }}">
-                {{ $diffNtb >= 0 ? '+' : '' }}{{ number_format($diffNtb, 3, ',', '.') }}
+                {{ $diffNtb >= 0 ? '+' : '-' }}{{ fmtDiff($diffNtb) }}
             </div>
             <div class="diff-sub">Miliar Rp · dampak PDRB</div>
         </div>
@@ -538,7 +533,6 @@
         </div>
     </div>
 
-    <!-- Tabel Detail per Sektor -->
     <div class="result-section-title">Tabel Detail per Sektor</div>
     <div class="card" style="margin-bottom:16px;">
         <div class="card-head">
@@ -575,26 +569,26 @@
                     @endphp
                     <tr>
                         <td>{{ $row['nama'] }}</td>
-                        <td class="td-mono">{{ number_format($dxA, 3, ',', '.') }}</td>
-                        <td class="td-mono td-ntb-a">{{ number_format($ntbRowA, 3, ',', '.') }}</td>
-                        <td class="td-mono">{{ $rb ? number_format($dxB, 3, ',', '.') : '—' }}</td>
-                        <td class="td-mono td-ntb-b">{{ $rb ? number_format($ntbRowB, 3, ',', '.') : '—' }}</td>
+                        <td class="td-mono">{{ fmtRp($dxA) }}</td>
+                        <td class="td-mono td-ntb-a">{{ fmtRp($ntbRowA) }}</td>
+                        <td class="td-mono">{{ $rb ? fmtRp($dxB) : '—' }}</td>
+                        <td class="td-mono td-ntb-b">{{ $rb ? fmtRp($ntbRowB) : '—' }}</td>
                         <td>
                             @if(abs($diffDx) < 0.001)
                                 <span class="diff-zero">≈ 0</span>
                             @elseif($diffDx > 0)
-                                <span class="diff-plus">+{{ number_format($diffDx, 3, ',', '.') }}</span>
+                                <span class="diff-plus">+{{ fmtDiff($diffDx) }}</span>
                             @else
-                                <span class="diff-minus">{{ number_format($diffDx, 3, ',', '.') }}</span>
+                                <span class="diff-minus">-{{ fmtDiff($diffDx) }}</span>
                             @endif
                         </td>
                         <td>
                             @if(abs($diffNtbR) < 0.001)
                                 <span class="diff-zero">≈ 0</span>
                             @elseif($diffNtbR > 0)
-                                <span class="diff-plus" style="color:#0d9488;">+{{ number_format($diffNtbR, 3, ',', '.') }}</span>
+                                <span class="diff-plus" style="color:#0d9488;">+{{ fmtDiff($diffNtbR) }}</span>
                             @else
-                                <span class="diff-minus">{{ number_format($diffNtbR, 3, ',', '.') }}</span>
+                                <span class="diff-minus">-{{ fmtDiff($diffNtbR) }}</span>
                             @endif
                         </td>
                     </tr>
@@ -602,7 +596,6 @@
                 </tbody>
             </table>
         </div>
-        <!-- Legenda -->
         <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:9px 14px; background:#f9fafb; border-top:0.5px solid #e5e7eb; font-size:11px; color:#6b7280;">
             <div style="display:flex; align-items:center; gap:5px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>
@@ -615,7 +608,6 @@
         </div>
     </div>
 
-    <!-- Visualisasi -->
     <div class="result-section-title">Visualisasi Perbandingan</div>
     <div class="card" style="margin-bottom:0;">
         <div class="card-head">
@@ -791,7 +783,6 @@ function mkGroupedBar(canvasId, dataA, dataB, labelA, labelB, colorA, colorB) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Chart ΔX Output
     mkGroupedBar(
         'chartCompare',
         HASIL_A.map(r => parseFloat((r.tambahan_output || 0).toFixed(3))),
@@ -801,7 +792,6 @@ document.addEventListener('DOMContentLoaded', function () {
         'rgba(59,130,246,0.75)'
     );
 
-    // Chart ΔNTB
     mkGroupedBar(
         'chartCompareNtb',
         HASIL_A.map(r => parseFloat((r.tambahan_ntb || 0).toFixed(3))),

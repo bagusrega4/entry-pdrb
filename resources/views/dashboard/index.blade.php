@@ -464,13 +464,13 @@ body { background: #f7f6f3; }
     <div class="metric-grid" style="margin-bottom:12px;">
         <div class="metric-card orange">
             <div class="metric-label">PDRB ADHB</div>
-            <div class="metric-value">{{ number_format($total_adhb, 3, ',', '.') }}</div>
-            <div class="metric-sub">Miliar Rupiah · Harga Berlaku</div>
+            <div class="metric-value">Rp {{ number_format($total_adhb, 3, ',', '.') }} M</div>
+            <div class="metric-sub">Harga Berlaku</div>
         </div>
         <div class="metric-card green">
             <div class="metric-label">PDRB ADHK</div>
-            <div class="metric-value">{{ number_format($total_adhk, 3, ',', '.') }}</div>
-            <div class="metric-sub">Miliar Rupiah · Harga Konstan</div>
+            <div class="metric-value">Rp {{ number_format($total_adhk, 3, ',', '.') }} M</div>
+            <div class="metric-sub">Harga Konstan</div>
         </div>
         <div class="metric-card {{ $growth_qoq_total >= 0 ? 'blue' : 'red' }}">
             <div class="metric-label">Pertumbuhan QoQ</div>
