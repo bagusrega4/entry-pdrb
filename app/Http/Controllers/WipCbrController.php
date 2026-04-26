@@ -14,6 +14,9 @@ use App\Models\UnitProduksi;
 use App\Models\Triwulan;
 use App\Models\UnitPerawatan;
 use App\Models\UnitLuas;
+use App\Exports\WipCbrExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\WipCbrImport;
 
 class WipCbrController extends Controller
 {
@@ -369,5 +372,75 @@ class WipCbrController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Data berhasil disimpan']);
+    }
+
+    private function collectLeaf($commodity)
+    {
+        $result = collect();
+
+        if ($commodity->children->count() == 0) {
+            $result->push($commodity);
+        } else {
+            foreach ($commodity->children as $child) {
+                $result = $result->merge($this->collectLeaf($child));
+            }
+        }
+
+        return $result;
+    }
+
+    public function downloadTemplate(Request $request)
+    {
+        $commodities = Commodity::with([
+            'indicator',
+            'unitLuas',
+            'unitPerawatan'
+        ])->get();
+    
+        $roots = Commodity::whereNull('parent_id')->get();
+
+        return Excel::download(
+            new WipCbrExport($roots),
+            'template_wip_cbr.xlsx'
+        );
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+    
+        $path = $request->file('file')->getRealPath();
+        $import = new WipCbrImport($path);
+    
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors'  => collect($e->failures())
+                    ->map(fn($f) => "Baris {$f->row()}: " . implode(', ', $f->errors()))
+                    ->toArray(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat import: ' . $e->getMessage(),
+            ], 500);
+        }
+    
+        $response = [
+            'success'  => true,
+            'imported' => $import->imported,
+            'skipped'  => $import->skipped,
+        ];
+    
+        if (!empty($import->errors)) {
+            $response['warnings'] = $import->errors;
+        }
+    
+        return response()->json($response);
     }
 }

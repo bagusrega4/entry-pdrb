@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\DashboardAdminController;
-use App\Http\Controllers\DashboardOperatorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PriceProductionController;
 use App\Http\Controllers\ManageUserController;
@@ -11,17 +9,21 @@ use App\Http\Controllers\RasioController;
 use App\Http\Controllers\IhpController;
 use App\Http\Controllers\WipCbrController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\IOController;
+use App\Http\Controllers\PdrbController;
+use App\Http\Controllers\FinalisasiPdrbController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardExportController;
+use App\Http\Controllers\SimulasiController;
 
-// -------------------------------------------------------------------
-// Halaman Home
-// -------------------------------------------------------------------
+
+// Home
 Route::get('/', function () {
     return view('auth.login');
 })->name('login');
 
-// -------------------------------------------------------------------
 // Auth & Verifikasi
-// -------------------------------------------------------------------
 require __DIR__ . '/auth.php';
 
 Route::get('/check-auth', function () {
@@ -32,26 +34,15 @@ Route::get('/check-auth', function () {
     }
 })->name('check-auth');
 
-// -------------------------------------------------------------------
-// Halaman error jika unauthorized
-// -------------------------------------------------------------------
+// error unauthorized
 Route::get('/notfound', function () {
     return view('error.unauthorized');
 })->name('error.unauthorized');
 
-// -------------------------------------------------------------------
 // Lolos 'auth' dan 'verified'
-// -------------------------------------------------------------------
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware('role:1,2')->group(function () {
-
-        // Dashboard
-        Route::get('/dashboardAdmin', [DashboardAdminController::class, 'index'])
-            ->name('dashboard.admin');
-
-        Route::get('/dashboardOperator', [DashboardOperatorController::class, 'index'])
-            ->name('dashboard.operator');
 
         // Profile
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -73,7 +64,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/commodities/{parent}/next-code', [PriceProductionController::class, 'generateNextCode'])
                 ->name('prices_productions.next_code');
 
-            // indikator & satuan
             Route::get('/indicators', [PriceProductionController::class, 'getIndicators'])
                 ->name('prices_productions.indicators');
             Route::post('/indicators', [PriceProductionController::class, 'storeIndicator'])
@@ -98,7 +88,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/unit-perawatan', [WipCbrController::class, 'storeUnitPerawatan'])
                 ->name('prices_productions.store_unit_perawatan');
 
-            // Triwulan
             Route::get('/triwulans', [PriceProductionController::class, 'getTriwulans'])
                 ->name('prices_productions.triwulans');
 
@@ -116,6 +105,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [PriceProductionController::class, 'getAllCommodities'])
                 ->name('prices_productions.all_commodities');
+
+            // download template excel
+            Route::get('/template', [PriceProductionController::class, 'downloadTemplate'])
+                ->name('prices_productions.template');
+
+            // import excel
+            Route::post('/import', [PriceProductionController::class, 'importExcel'])
+                ->name('prices_productions.import');
         });
 
         // Input Rasio
@@ -174,6 +171,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [RasioController::class, 'getAllCommodities'])
                 ->name('rasio.all_commodities');
+
+            // download template excel
+            Route::get('/template', [RasioController::class, 'downloadTemplate'])
+                ->name('rasio.template');
+
+            // import excel
+            Route::post('/import', [RasioController::class, 'importExcel'])
+                ->name('rasio.import');
         });
 
         // Input IHP
@@ -232,6 +237,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/commodities/all', [IhpController::class, 'getAllCommodities'])
                 ->name('ihp.all_commodities');
+
+            // download template excel
+            Route::get('/template', [IhpController::class, 'downloadTemplate'])
+                ->name('ihp.template');
+
+            // import excel
+            Route::post('/import', [IhpController::class, 'importExcel'])
+                ->name('ihp.import');
         });
 
         // Input WIP/CBR
@@ -295,6 +308,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->name('wip-cbr.bulk');
             Route::post('/bulk-store', [WipCbrController::class, 'bulkStore'])
                 ->name('wip-cbr.bulk_store');
+
+            // download template excel
+            Route::get('/template', [WipCbrController::class, 'downloadTemplate'])
+                ->name('wip-cbr.template');
+
+            // import excel
+            Route::post('/import', [WipCbrController::class, 'importExcel'])
+                ->name('wip-cbr.import');
         });
 
         // Manage User
@@ -310,13 +331,107 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Download
-        Route::prefix('download')->group(function () {
+        Route::prefix('download')->name('download.')->group(function () {
             Route::get('/', [DownloadController::class, 'index'])
-                ->name('download.index');
+                ->name('index');
             Route::post('/generate-pdf', [DownloadController::class, 'generatePdf'])
-                ->name('download.generate-pdf');
+                ->name('generate-pdf');
             Route::post('/update-column-config', [DownloadController::class, 'updateColumnConfig'])
-                ->name('download.update-column-config');
+                ->name('update-column-config');
+            Route::get('/preview', [DownloadController::class, 'preview'])
+                ->name('preview');
         });
+
+        // Manajemen Dokumen Pendukung
+        Route::name('documents.')->prefix('documents')->group(function () {
+            Route::get('/', [DocumentController::class, 'index'])->name('index');
+            Route::post('/upload', [DocumentController::class, 'store'])->name('store');
+            Route::get('/download/{id}', [DocumentController::class, 'download'])->name('download');
+            Route::delete('/{id}', [DocumentController::class, 'destroy'])->name('destroy');
+            Route::put('/{id}', [DocumentController::class, 'update'])->name('update');
+            Route::get('/view/{id}/{filename?}', [DocumentController::class, 'show'])
+                ->name('view');
+        });
+
+        // Kelola Tabel IO
+        Route::prefix('io')->name('io.')->group(function () {
+            Route::get('/', [IOController::class, 'index'])->name('index');
+
+            Route::get('/create', [IOController::class, 'create'])->name('create');
+            Route::post('/store', [IOController::class, 'store'])->name('store');
+
+            Route::get('/{id}/edit', [IOController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [IOController::class, 'update'])->name('update');
+
+            Route::delete('/{id}', [IOController::class, 'destroy'])->name('destroy');
+
+            Route::get('/{id}/matrix-a', [IOController::class, 'matrixA'])->name('matrixA');
+            Route::get('/{id}/leontief', [IOController::class, 'leontief'])->name('leontief');
+            Route::get('/{id}/simulasi', [IOController::class, 'simulasi'])->name('simulasi');
+
+            Route::get('/{id}/input', [IOController::class, 'input'])->name('input');
+            Route::post('/{id}/store-matrix', [IOController::class, 'storeMatrix'])->name('storeMatrix');
+        });
+
+        // Pembentukan PDRB
+        Route::prefix('pdrb')->name('pdrb.')->group(function () {
+            Route::get('/', [PdrbController::class, 'index'])->name('index');
+            Route::post('/hitung', [PdrbController::class, 'hitung'])->name('hitung');
+            Route::get('/hasil', [PdrbController::class, 'hasil'])->name('hasil');
+            Route::delete('/reset', [PdrbController::class, 'reset'])->name('reset');
+        });
+
+        // Finalisasi PDRB
+        Route::prefix('finalisasi')->name('finalisasi.')->group(function () {
+            Route::get('/', [FinalisasiPdrbController::class, 'index'])
+                ->name('index');
+            Route::post('/proses', [FinalisasiPdrbController::class, 'finalisasi'])
+                ->name('proses');
+            Route::post('/batal', [FinalisasiPdrbController::class, 'batal'])
+                ->name('batal');
+            Route::get('/detail/{tahun}', [FinalisasiPdrbController::class, 'detail'])
+                ->name('detail');
+            Route::get('/detail-versi', [FinalisasiPdrbController::class, 'detailVersi'])
+                ->name('detail-versi');
+        });
+
+        // Dashboard
+        Route::prefix('dashboard')->name('dashboard.')->group(function () {
+            Route::get('/', [DashboardController::class, 'index'])
+                ->name('index');
+            Route::get('/export-pdf', [DashboardExportController::class, 'exportPdf'])
+                ->name('export-pdf');
+        });
+    });
+
+    // Simulasi
+    Route::prefix('simulasi')->name('simulasi.')->group(function () {
+
+        // Halaman utama & proses
+        Route::get('/',         [SimulasiController::class, 'index'])->name('index');
+        Route::post('/proses',  [SimulasiController::class, 'proses'])->name('proses');
+        Route::get('/reset',    [SimulasiController::class, 'reset'])->name('reset');
+
+        // Skenario Komparasi
+        Route::get('/skenario',              [SimulasiController::class, 'skenario'])->name('skenario');
+        Route::post('/skenario/proses',      [SimulasiController::class, 'prosesSkenario'])->name('proses-skenario');
+        Route::get('/skenario/reset',        [SimulasiController::class, 'resetSkenario'])->name('reset-skenario');
+
+        // Riwayat
+        Route::get('/riwayat',          [SimulasiController::class, 'riwayat'])->name('riwayat');
+        Route::post('/simpan',          [SimulasiController::class, 'simpan'])->name('simpan');
+        Route::get('/riwayat/{id}',     [SimulasiController::class, 'lihatRiwayat'])->name('lihat-riwayat');
+        Route::delete('/hapus/{id}',    [SimulasiController::class, 'hapus'])->name('hapus');
+
+        // Export
+        Route::get('/export/excel', [SimulasiController::class, 'exportExcel'])->name('export.excel');
+        Route::get('/export/pdf',   [SimulasiController::class, 'exportPdf'])->name('export.pdf');
+
+        Route::get('/chart/data',   [SimulasiController::class, 'chartData'])->name('chart.data');
+        Route::get('/sektor/list',  [SimulasiController::class, 'listSektor'])->name('sektor.list');
+        Route::get('/sektor/{id}',  [SimulasiController::class, 'detailSektor'])->name('sektor.detail');
+
+        Route::get('/riwayat/{id}/export/excel', [SimulasiController::class, 'exportExcelRiwayat'])->name('riwayat.export.excel');
+        Route::get('/riwayat/{id}/export/pdf',   [SimulasiController::class, 'exportPdfRiwayat'])->name('riwayat.export.pdf');
     });
 });

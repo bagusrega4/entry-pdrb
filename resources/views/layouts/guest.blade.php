@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Sistem Bukti Dukung Administrasi BPS Provinsi DKI Jakarta') }}</title>
+    <title>{{ config('app.name', 'SI-PRABU') }}</title>
     <link rel="icon" href="{{ asset('/assets/img/logo.png') }}" type="image/x-icon" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">

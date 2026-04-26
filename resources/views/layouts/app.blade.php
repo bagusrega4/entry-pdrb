@@ -13,7 +13,6 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
     <style>
         .modal-body {
             padding: 15px;
@@ -39,12 +38,10 @@
 
         .notif-success {
             background-color: #28a745;
-            /* Green for success */
         }
 
         .notif-danger {
             background-color: #dc3545;
-            /* Red for danger */
         }
 
         .notification-text strong {
@@ -61,7 +58,43 @@
         .inner-page {
             margin-top: 70px;
         }
+
+        .main-panel {
+            margin-left: var(--sidebar-width, 240px) !important;
+            width: auto !important;
+            min-height: 100vh;
+            transition: margin-left 0.22s cubic-bezier(.4,0,.2,1) !important;
+            float: none !important;
+        }
+
+        body.sidebar-collapsed .main-panel {
+            margin-left: var(--sidebar-collapsed-width, 60px) !important;
+        }
+
+        .wrapper {
+            display: block !important;
+            overflow: visible !important;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .page {
+            zoom: 0.82;
+        }
+
+        @media (max-width: 768px) {
+            .main-panel {
+                margin-left: 0 !important;
+            }
+            .page {
+                zoom: 1;
+            }
+        }
     </style>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('/assets/img/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('/assets/img/favicon-32x32.png') }}">
@@ -106,6 +139,7 @@
     <script defer src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script defer src="{{ asset('assets/js/dataTable.js') }}"></script>
+
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
@@ -127,8 +161,8 @@
             @yield('modal-delete')
             @yield('css')
         </div>
-
     </div>
+
     <!-- Core JS Files -->
     <script src="{{ asset('/assets/js/core/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('/assets/js/core/popper.min.js') }}"></script>
