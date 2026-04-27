@@ -16,7 +16,10 @@ class SimulasiController extends Controller
             ->whereNull('parent_id')->orderBy('id')->get();
 
         $riwayat_singkat = DB::table('simulasi_riwayat')
-            ->orderByDesc('created_at')->take(5)->get();
+            ->where('created_by', auth()->id())
+            ->orderByDesc('created_at')
+            ->take(5)
+            ->get();
 
         [$pdrbAdhb, $pdrbAdhk, $pdrbPeriode] = $this->getPdrbReferensi();
         $pdrbInfo = $pdrbPeriode ? [
@@ -223,6 +226,7 @@ class SimulasiController extends Controller
     public function riwayat()
     {
         $riwayat = DB::table('simulasi_riwayat')
+            ->where('created_by', auth()->id())  // tambah ini
             ->orderByDesc('created_at')->get()
             ->map(function ($r) {
                 $r->summary = json_decode($r->summary, true);
@@ -257,14 +261,26 @@ class SimulasiController extends Controller
 
     public function hapus($id)
     {
+        $row = DB::table('simulasi_riwayat')
+            ->where('id', $id)
+            ->where('created_by', auth()->id())
+            ->first();
+
+        if (!$row) return back()->with('error', 'Riwayat tidak ditemukan atau Anda tidak memiliki akses.');
+
         DB::table('simulasi_riwayat')->where('id', $id)->delete();
         return back()->with('success', 'Riwayat berhasil dihapus.');
     }
 
     public function lihatRiwayat($id)
     {
-        $row = DB::table('simulasi_riwayat')->where('id', $id)->first();
-        if (!$row) return redirect()->route('simulasi.riwayat')->with('error', 'Riwayat tidak ditemukan.');
+        $row = DB::table('simulasi_riwayat')
+            ->where('id', $id)
+            ->where('created_by', auth()->id())
+            ->first();
+
+        if (!$row) return redirect()->route('simulasi.riwayat')
+            ->with('error', 'Riwayat tidak ditemukan atau Anda tidak memiliki akses.');
 
         $summary     = json_decode($row->summary, true);
         $hasil       = json_decode($row->hasil, true);
@@ -352,7 +368,10 @@ class SimulasiController extends Controller
     // Export Riwayat
     public function exportExcelRiwayat($id)
     {
-        $row = DB::table('simulasi_riwayat')->where('id', $id)->first();
+        $row = DB::table('simulasi_riwayat')
+            ->where('id', $id)
+            ->where('created_by', auth()->id())
+            ->first();
         if (!$row) return back()->with('error', 'Riwayat tidak ditemukan.');
 
         $summary = json_decode($row->summary, true);
@@ -425,7 +444,10 @@ class SimulasiController extends Controller
 
     public function exportPdfRiwayat($id)
     {
-        $row = DB::table('simulasi_riwayat')->where('id', $id)->first();
+        $row = DB::table('simulasi_riwayat')
+            ->where('id', $id)
+            ->where('created_by', auth()->id())
+            ->first();
         if (!$row) return back()->with('error', 'Riwayat tidak ditemukan.');
 
         $summary      = json_decode($row->summary, true);
