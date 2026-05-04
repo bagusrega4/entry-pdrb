@@ -102,13 +102,13 @@ class WipCbrController extends Controller
 
         // Gabungkan semua tahun dari semua tabel dan ambil yang unik
         $allYears = $ihpYears->union($pricesYears)->union($rasioYears)->union($wipCbrYears)
-            ->orderBy('year')
-            ->orderBy('triwulan_id')
+            ->orderByDesc('year')
+            ->orderByDesc('triwulan_id')
             ->get()
             ->unique(function ($item) {
                 return $item->year . '-' . $item->triwulan_id;
             })
-            ->values(); // Reset index setelah unique
+            ->values();
 
         return response()->json([
             'commodities' => $flatten,

@@ -13,7 +13,7 @@
         font-family: 'Figtree', sans-serif;
     }
 
-    /* ── Card ── */
+    /* Card */
     .card {
         background: #fff;
         border: 0.5px solid #e5e7eb;
@@ -37,7 +37,7 @@
     .card-head-title { font-size: 14px; font-weight: 500; color: #111827; }
     .card-body { padding: 20px; }
 
-    /* ── Filter row ── */
+    /* Filter row */
     .filter-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
     .filter-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 200px; }
     .filter-label { font-size: 12px; font-weight: 500; color: #374151; }
@@ -60,7 +60,7 @@
         box-shadow: 0 0 0 3px rgba(249,115,22,0.08);
     }
 
-    /* ── Buttons ── */
+    /* Buttons */
     .btn-base {
         display: inline-flex;
         align-items: center;
@@ -90,7 +90,7 @@
     .btn-save { background: #f97316; color: #fff; border-color: #ea580c; font-size: 13px; height: 38px; padding: 0 18px; }
     .btn-save:hover { background: #ea580c; }
 
-    /* ── Year filter (select2 area) ── */
+    /* Year filter (select2 area) */
     .year-filter-wrap {
         display: flex;
         align-items: center;
@@ -104,7 +104,7 @@
         white-space: nowrap;
     }
 
-    /* ── Table ── */
+    /* Table */
     .table-wrap { overflow-x: auto; }
 
     #hargaTable {
@@ -142,7 +142,7 @@
     #hargaTable tbody td.td-name.fw-bold { color: #111827; background: #f9fafb; }
     #hargaTable tbody td.bg-light { background: #f9fafb !important; }
 
-    /* ── Table inputs ── */
+    /* Table inputs */
     #hargaTable input.form-control {
         height: 32px;
         padding: 0 8px;
@@ -164,7 +164,7 @@
     }
     #hargaTable input.form-control::placeholder { color: #d1d5db; }
 
-    /* ── Year column header ── */
+    /* Year column header */
     .year-col-head {
         background: #fff7ed !important;
         color: #c2410c !important;
@@ -176,7 +176,7 @@
         font-size: 10px !important;
     }
 
-    /* ── Empty state ── */
+    /* Empty state */
     .empty-state {
         padding: 56px 20px;
         text-align: center;
@@ -186,7 +186,7 @@
     .empty-state h6 { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px; }
     .empty-state p  { font-size: 13px; margin: 0; }
 
-    /* ── Modal ── */
+    /* Modal */
     .modal-content {
         border-radius: 12px !important;
         border: 0.5px solid #e5e7eb !important;
@@ -625,11 +625,13 @@
                 }));
 
                 const $yearFilter = $('#yearFilter').empty();
-                allYears.forEach(y => {
-                    const val = `${y.year}-${y.triwulan_id ?? 0}`;
-                    const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
-                    $yearFilter.append(`<option value="${val}">${label}</option>`);
-                });
+                [...allYears]
+                    .sort((a, b) => b.year !== a.year ? b.year - a.year : b.triwulan_id - a.triwulan_id)
+                    .forEach(y => {
+                        const val = `${y.year}-${y.triwulan_id ?? 0}`;
+                        const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
+                        $yearFilter.append(`<option value="${val}">${label}</option>`);
+                    });
 
                 $yearFilter.select2({ placeholder: "Pilih Periode", allowClear: true, width: '100%', multiple: true });
 

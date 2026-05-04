@@ -602,11 +602,13 @@
                 }));
 
                 const $yearFilter = $('#yearFilter').empty();
-                allYears.forEach(y => {
-                    const val = `${y.year}-${y.triwulan_id ?? 0}`;
-                    const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
-                    $yearFilter.append(`<option value="${val}">${label}</option>`);
-                });
+                [...allYears]
+                    .sort((a, b) => b.year !== a.year ? b.year - a.year : b.triwulan_id - a.triwulan_id)
+                    .forEach(y => {
+                        const val = `${y.year}-${y.triwulan_id ?? 0}`;
+                        const label = y.triwulan_name ? `${y.year} - ${y.triwulan_name}` : y.year;
+                        $yearFilter.append(`<option value="${val}">${label}</option>`);
+                    });
 
                 $yearFilter.select2({ placeholder: "Pilih Periode", allowClear: true, width: '100%', multiple: true });
 
