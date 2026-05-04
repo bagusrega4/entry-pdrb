@@ -16,7 +16,6 @@ class SimulasiController extends Controller
             ->whereNull('parent_id')->orderBy('id')->get();
 
         $riwayat_singkat = DB::table('simulasi_riwayat')
-            ->where('created_by', auth()->id())
             ->orderByDesc('created_at')
             ->take(5)
             ->get();
@@ -233,7 +232,6 @@ class SimulasiController extends Controller
     public function riwayat()
     {
         $riwayat = DB::table('simulasi_riwayat')
-            ->where('created_by', auth()->id())  // tambah ini
             ->orderByDesc('created_at')->get()
             ->map(function ($r) {
                 $r->summary = json_decode($r->summary, true);
@@ -283,7 +281,6 @@ class SimulasiController extends Controller
     {
         $row = DB::table('simulasi_riwayat')
             ->where('id', $id)
-            ->where('created_by', auth()->id())
             ->first();
 
         if (!$row) return redirect()->route('simulasi.riwayat')
@@ -377,7 +374,6 @@ class SimulasiController extends Controller
     {
         $row = DB::table('simulasi_riwayat')
             ->where('id', $id)
-            ->where('created_by', auth()->id())
             ->first();
         if (!$row) return back()->with('error', 'Riwayat tidak ditemukan.');
 
@@ -453,7 +449,6 @@ class SimulasiController extends Controller
     {
         $row = DB::table('simulasi_riwayat')
             ->where('id', $id)
-            ->where('created_by', auth()->id())
             ->first();
         if (!$row) return back()->with('error', 'Riwayat tidak ditemukan.');
 
