@@ -53,7 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/skenario',         [SimulasiController::class, 'skenario'])->name('skenario');
         Route::post('/skenario/proses', [SimulasiController::class, 'prosesSkenario'])->name('proses-skenario');
         Route::get('/skenario/reset',   [SimulasiController::class, 'resetSkenario'])->name('reset-skenario');
-
+        Route::get('/skenario/export/pdf', [SimulasiController::class, 'exportPdfSkenario'])->name('skenario.export.pdf');
+        
         Route::get('/riwayat',          [SimulasiController::class, 'riwayat'])->name('riwayat');
         Route::post('/simpan',          [SimulasiController::class, 'simpan'])->name('simpan');
         Route::get('/riwayat/{id}',     [SimulasiController::class, 'lihatRiwayat'])->name('lihat-riwayat');

@@ -43,6 +43,13 @@ class SimulasiController extends Controller
             'nilai'      => 'required|array',
         ]);
 
+        [$pdrbAdhb, $pdrbAdhk, $pdrbPeriode] = $this->getPdrbReferensi();
+        if (!$pdrbPeriode || $pdrbAdhb == 0) {
+            return back()
+                ->withInput()
+                ->with('error_pdrb', 'Belum ada data PDRB yang telah difinalisasi. Silakan finalisasi PDRB terlebih dahulu sebelum menjalankan simulasi.');
+        }
+
         $datasetId = $request->dataset_id;
         $dataset   = DB::table('io_datasets')->where('id', $datasetId)->first();
         if (!$dataset) return back()->with('error', 'Dataset IO tidak ditemukan.');
@@ -462,6 +469,20 @@ class SimulasiController extends Controller
         return view('simulasi.export-pdf', compact('hasil', 'summary', 'linkage_data'));
     }
 
+    public function exportPdfSkenario()
+    {
+        $hasil_a   = session('skenario_a');
+        $hasil_b   = session('skenario_b');
+        $summary_a = session('skenario_a_summary');
+        $summary_b = session('skenario_b_summary');
+
+        if (!$hasil_a || !$hasil_b || !$summary_a || !$summary_b) {
+            return back()->with('error', 'Tidak ada data komparasi untuk diekspor.');
+        }
+
+        return view('simulasi.export-pdf-skenario', compact('hasil_a', 'hasil_b', 'summary_a', 'summary_b'));
+    }
+
     // CHART DATA & HELPERS
     public function chartData()
     {
@@ -707,6 +728,18 @@ class SimulasiController extends Controller
             $totalTambahanNtb    += $tambahanNtb;
         }
 
+        $sektorInjeksi = [];
+        foreach ($sektors as $k => $s) {
+            $s = (int) $s;
+            if ($s >= 1 && $s <= $n) {
+                $sektorInjeksi[] = [
+                    'sektor' => $s,
+                    'nama'   => $namaSektor[$s - 1] ?? 'Sektor ' . $s,
+                    'nilai'  => (float) $nilais[$k],
+                ];
+            }
+        }
+
         return [
             'hasil'   => $hasil,
             'summary' => [
@@ -714,13 +747,13 @@ class SimulasiController extends Controller
                 'dataset'            => $dataset->nama_dataset,
                 'tahun'              => $dataset->tahun,
                 'total_stimulus'     => $totalStimulus,
+                'sektor_injeksi'     => $sektorInjeksi,   // ← TAMBAHAN
                 'tambahan_output'    => $totalTambahanOutput,
                 'tambahan_ntb'       => $totalTambahanNtb,
                 'multiplier_output'  => $totalStimulus > 0
                     ? round($totalTambahanOutput / $totalStimulus, 4) : 0,
                 'multiplier_ntb'     => $totalStimulus > 0
                     ? round($totalTambahanNtb / $totalStimulus, 4) : 0,
-                // backward compat
                 'multiplier'         => $totalStimulus > 0
                     ? round($totalTambahanOutput / $totalStimulus, 4) : 0,
             ],

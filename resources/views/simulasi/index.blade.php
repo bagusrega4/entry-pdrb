@@ -775,8 +775,19 @@
 @if(session('success'))
 Swal.fire({icon:'success',title:'Berhasil',text:'{{ session("success") }}',timer:2200,showConfirmButton:false});
 @endif
+
 @if(session('error'))
 Swal.fire({icon:'error',title:'Gagal',text:'{{ session("error") }}',confirmButtonColor:'#f97316'});
+@endif
+
+@if(session('error_pdrb'))
+Swal.fire({
+    icon: 'warning',
+    title: 'PDRB Belum Difinalisasi',
+    text: '{{ session("error_pdrb") }}',
+    confirmButtonColor: '#f97316',
+    confirmButtonText: 'Mengerti',
+});
 @endif
 
 let sektorCount = {{ count(session('simulasi_input.sektor', [null])) }};

@@ -358,7 +358,11 @@
 
         </div>
 
+        {{-- ============================================================
+             BARIS TOMBOL: Bandingkan | Export PDF + Reset (kanan)
+        ============================================================ --}}
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
+
             <button type="submit" class="btn-hitung">
                 <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
@@ -366,16 +370,34 @@
                 </svg>
                 Bandingkan Skenario
             </button>
-            @if(session('skenario_a') || session('skenario_b'))
-            <button type="button" id="btnResetSkenario"
-               style="display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 16px; font-size:13px; font-weight:500; color:#991b1b; background:#fef2f2; border:0.5px solid #fca5a5; border-radius:8px; cursor:pointer; font-family:'Figtree',sans-serif; transition:background 0.12s;">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <polyline points="1 4 1 10 7 10"/>
-                    <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
-                </svg>
-                Reset Komparasi
-            </button>
-            @endif
+
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                {{-- Tombol Export PDF — hanya tampil jika ada hasil --}}
+                @if($hasil_a && $hasil_b && $summary_a && $summary_b)
+                <a href="{{ route('simulasi.skenario.export.pdf') }}" target="_blank"
+                   class="btn-back"
+                   style="color:#991b1b; background:#fef2f2; border-color:#fca5a5;">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Export PDF
+                </a>
+                @endif
+
+                {{-- Tombol Reset --}}
+                @if(session('skenario_a') || session('skenario_b'))
+                <button type="button" id="btnResetSkenario"
+                   style="display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 16px; font-size:13px; font-weight:500; color:#991b1b; background:#fef2f2; border:0.5px solid #fca5a5; border-radius:8px; cursor:pointer; font-family:'Figtree',sans-serif; transition:background 0.12s;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+                    </svg>
+                    Reset Komparasi
+                </button>
+                @endif
+            </div>
+
         </div>
 
     </form>
@@ -636,6 +658,7 @@
     </div>
 
     @else
+
     <div class="card" style="margin-bottom:0;">
         <div class="empty-state">
             <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
@@ -645,6 +668,7 @@
             <p>Isi kedua skenario di atas lalu klik <strong>Bandingkan Skenario</strong>.</p>
         </div>
     </div>
+
     @endif
 
 </div>

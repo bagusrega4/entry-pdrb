@@ -227,11 +227,11 @@
                         class="form-input"
                         value="{{ old('jumlah_sektor', 17) }}"
                         min="1"
-                        max="50"
+                        max="17"
                         required
                         style="max-width: 200px;"
                     >
-                    <span class="form-hint">Default 17 sektor — bisa diubah sesuai kebutuhan (maks. 50)</span>
+                    <span class="form-hint">Default 17 sektor — bisa diubah sesuai kebutuhan (maks. 17)</span>
                 </div>
 
                 <div class="info-box">
