@@ -357,10 +357,6 @@
             </div>
 
         </div>
-
-        {{-- ============================================================
-             BARIS TOMBOL: Bandingkan | Export PDF + Reset (kanan)
-        ============================================================ --}}
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
 
             <button type="submit" class="btn-hitung">
@@ -684,6 +680,16 @@ Swal.fire({ icon:'success', title:'Berhasil', text:'{{ session("success") }}', t
 @endif
 @if(session('error'))
 Swal.fire({ icon:'error', title:'Gagal', text:'{{ session("error") }}', confirmButtonColor:'#f97316' });
+@endif
+
+@if(session('error_pdrb'))
+Swal.fire({
+    icon: 'warning',
+    title: 'PDRB Belum Difinalisasi',
+    text: '{{ session("error_pdrb") }}',
+    confirmButtonColor: '#f97316',
+    confirmButtonText: 'Mengerti',
+});
 @endif
 
 const sektorData = @json($sektors->values()->map(fn($s, $i) => ['id' => $i+1, 'nama' => $s->nama]));

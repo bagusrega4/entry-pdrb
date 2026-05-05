@@ -206,6 +206,13 @@ class SimulasiController extends Controller
             'dataset_id_b' => 'required', 'sektor_b' => 'required|array', 'nilai_b' => 'required|array',
         ]);
 
+        [$pdrbAdhb, $pdrbAdhk, $pdrbPeriode] = $this->getPdrbReferensi();
+        if (!$pdrbPeriode || $pdrbAdhb == 0) {
+            return back()
+                ->withInput()
+                ->with('error_pdrb', 'Belum ada data PDRB yang telah difinalisasi. Silakan finalisasi PDRB terlebih dahulu sebelum menjalankan komparasi.');
+        }
+
         $hasilA = $this->hitungSkenario($request->dataset_id_a, $request->sektor_a, $request->nilai_a, $request->label_a ?? 'Skenario A');
         $hasilB = $this->hitungSkenario($request->dataset_id_b, $request->sektor_b, $request->nilai_b, $request->label_b ?? 'Skenario B');
 
