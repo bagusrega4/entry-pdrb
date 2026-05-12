@@ -18,7 +18,7 @@
         min-height: 100vh;
     }
 
-    /* ── Left panel ── */
+    /* Left panel */
     .login-left {
         flex: 1;
         background: #fff;
@@ -53,7 +53,7 @@
         color: #fff;
         flex-shrink: 0;
     }
-    .login-brand-logo{
+    .login-brand-logo {
         width: 38px;
         height: 38px;
         object-fit: contain;
@@ -155,7 +155,7 @@
         margin-top: 5px;
     }
 
-    /* Submit */
+    /* Tombol Login */
     .btn-login {
         width: 100%;
         height: 42px;
@@ -176,15 +176,64 @@
         box-shadow: 0 4px 14px rgba(249,115,22,0.3);
     }
 
+    /* TOMBOL REGISTER */
+    .btn-register {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        height: 42px;
+        background: transparent;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: 'Figtree', sans-serif;
+        color: #374151;
+        cursor: pointer;
+        margin-top: 10px;
+        text-decoration: none;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+        letter-spacing: 0.2px;
+    }
+    .btn-register:hover {
+        border-color: #f97316;
+        color: #f97316;
+        background: rgba(249,115,22,0.04);
+    }
+    .btn-register i { font-size: 14px; }
+
+    /* Divider */
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 18px 0 0;
+    }
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #f3f4f6;
+    }
+    .divider span {
+        font-size: 11px;
+        color: #d1d5db;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
     /* Footer note */
     .login-footer-note {
-        margin-top: 32px;
+        margin-top: 28px;
         font-size: 11.5px;
         color: #d1d5db;
         text-align: center;
     }
 
-    /* ── Right panel ── */
+    /* Right panel */
     .login-right {
         width: 440px;
         flex-shrink: 0;
@@ -198,7 +247,6 @@
         overflow: hidden;
     }
 
-    /* Decorative circles */
     .login-right::before {
         content: '';
         position: absolute;
@@ -263,7 +311,6 @@
         max-width: 300px;
     }
 
-    /* Stats */
     .right-stats {
         display: flex;
         flex-direction: column;
@@ -298,7 +345,6 @@
         font-weight: 500;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .login-right { display: none; }
         .login-left { padding: 40px 24px; }
@@ -361,6 +407,15 @@
 
                 <button type="submit" class="btn-login">Masuk</button>
             </form>
+
+            <!-- Divider -->
+            <div class="divider"><span>atau</span></div>
+
+            <!-- Tombol Daftar Akun -->
+            <a href="{{ route('register') }}" class="btn-register">
+                <i class="bi bi-person-plus"></i>
+                Daftar Akun Baru
+            </a>
 
             <div class="login-footer-note">
                 © {{ date('Y') }} SI-PRABU · BPS Kabupaten Kediri

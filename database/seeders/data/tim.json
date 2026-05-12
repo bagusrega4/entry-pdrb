@@ -7,5 +7,6 @@
     { "id": 6, "tim": "Statistik Produksi" },
     { "id": 7, "tim": "Nerwilis" },
     { "id": 8, "tim": "SAKIP, ZI, EPSS" },
-    { "id": 9, "tim": "Pimpinan" }
+    { "id": 9, "tim": "Pimpinan" },
+    { "id": 10, "tim": "Non-BPS" }
 ]

@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('pegawai', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 150);
-            $table->string('nip_lama', 20)->unique();
-            $table->string('nip_baru', 20)->unique();
-            $table->string('jabatan', 100);
-            $table->string('golongan_akhir', 20);
+            $table->string('nip_lama', 50)->nullable();
+            $table->string('nip_baru', 50)->nullable();
+            $table->string('jabatan', 255)->nullable();
+            $table->string('golongan_akhir', 10)->nullable();
             $table->date('tamat_gol')->nullable();
             $table->string('pendidikan', 100)->nullable();
             $table->date('tanggal_lulus')->nullable();

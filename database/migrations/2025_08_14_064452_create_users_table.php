@@ -13,18 +13,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('nip_lama', 20)->unique();
+            $table->string('nip_lama', 20)->nullable();
             $table->string('username')->unique();
             $table->string('password');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
 
             // Relasi ke tabel role
             $table->unsignedBigInteger('id_role');
             $table->foreign('id_role')->references('id')->on('role');
 
             // Relasi ke tabel tim (nullable jika belum punya tim)
-            $table->unsignedBigInteger('tim_id')->nullable(); // ✅ Bisa null
+            $table->unsignedBigInteger('tim_id')->nullable();
             $table->foreign('tim_id')->references('id')->on('tims');
 
             $table->rememberToken();
