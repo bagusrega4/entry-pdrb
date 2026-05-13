@@ -177,8 +177,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::name('manage.user.')->prefix('manage/user')->group(function () {
             Route::get('/', [ManageUserController::class, 'index'])->name('index');
-            Route::get('/create', [ManageUserController::class, 'create'])->name('create');
-            Route::post('/store', [ManageUserController::class, 'store'])->name('store');
             Route::put('/{id}/update-role', [ManageUserController::class, 'updateRoleUser'])->name('updateRole');
             Route::put('/{id}/update-tim', [ManageUserController::class, 'updateTimUser'])->name('updateTim');
             Route::get('/edit/{id}', [ManageUserController::class, 'edit'])->name('edit');

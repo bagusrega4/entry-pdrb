@@ -23,63 +23,6 @@ class ManageUserController extends Controller
         return view('manage.user.index', compact('users', 'roles', 'timList'));
     }
 
-    public function create()
-    {
-        $roles = Role::all();
-        $jabatans = Pegawai::select('jabatan')->distinct()->orderBy('jabatan')->pluck('jabatan');
-        $golongans = Pegawai::select('golongan_akhir')->distinct()->orderBy('golongan_akhir')->pluck('golongan_akhir');
-        return view('manage.user.create', compact('roles', 'jabatans', 'golongans'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama'            => 'required|string|max:255',
-            'nip_lama'        => 'required|string|max:255|unique:users,nip_lama',
-            'nip_baru'        => 'required|string|max:255|unique:pegawai,nip_baru',
-            'jabatan'         => 'required',
-            'golongan_akhir'  => 'required',
-            'tamat_gol'  => 'required|date',
-            'pendidikan'      => 'required|string|max:255',
-            'tanggal_lulus'   => 'required|date',
-            'jenis_kelamin' => 'required|in:LK,PR',
-            'username'        => 'required|string|max:255|unique:users,username',
-            'password'        => 'required|string|min:6',
-            'email'           => 'required|string|email|max:255|unique:users,email',
-            'id_role'         => 'required|exists:role,id',
-        ]);
-
-        Pegawai::create([
-            'nama'            => $request->nama,
-            'nip_lama'        => $request->nip_lama,
-            'nip_baru'        => $request->nip_baru,
-            'jabatan'         => $request->jabatan,
-            'golongan_akhir'  => $request->golongan_akhir,
-            'tamat_gol'       => $request->tamat_gol,
-            'pendidikan'      => $request->pendidikan,
-            'tanggal_lulus'   => $request->tanggal_lulus,
-            'jenis_kelamin'   => $request->jenis_kelamin,
-            'email'   => $request->email
-        ]);
-
-        // Default tim_id null
-        $timId = null;
-        if ($request->id_role == 3) {
-            $timId = 9;
-        }
-
-        User::create([
-            'nip_lama' => $request->nip_lama,
-            'username' => $request->username,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'id_role'  => $request->id_role,
-            'tim_id'   => $timId
-        ]);
-
-        return redirect()->route('manage.user.index')->with('success', 'User berhasil ditambahkan.');
-    }
-
     public function edit($id)
     {
         $user = User::findOrFail($id);
