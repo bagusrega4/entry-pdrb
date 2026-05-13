@@ -38,13 +38,17 @@ Route::get('/notfound', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Role 1 & 2: Dashboard
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.index');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/edit-profile', [ProfileController::class, 'setPhotoProfile'])->name('edit.profile');
+    Route::put('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
+
     Route::middleware('role:1,2')->prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('index');
         Route::get('/export-pdf', [DashboardExportController::class, 'exportPdf'])->name('export-pdf');
     });
 
-    // Role 1 & 2: Simulasi
     Route::middleware('role:1,2')->prefix('simulasi')->name('simulasi.')->group(function () {
         Route::get('/',         [SimulasiController::class, 'index'])->name('index');
         Route::post('/proses',  [SimulasiController::class, 'proses'])->name('proses');
@@ -73,13 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Role 2 only: semua fitur lainnya
     Route::middleware('role:2')->group(function () {
-
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::post('/edit-profile', [ProfileController::class, 'setPhotoProfile'])->name('edit.profile');
-        Route::put('/password/change', [ProfileController::class, 'changePassword'])->name('password.change');
-
+        
         Route::prefix('prices-productions')->group(function () {
             Route::get('/', [PriceProductionController::class, 'index'])->name('prices_productions.index');
             Route::get('/commodities/{commodity}/subtree', [PriceProductionController::class, 'getSubtree'])->name('prices_productions.subtree');
