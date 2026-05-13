@@ -17,7 +17,10 @@ class ManageUserController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $users = User::with('role')->get();
+        $users = User::with('role')
+            ->when(request('search'), fn($q, $s) => $q->where('username', 'like', "%$s%"))
+            ->paginate(10)
+            ->withQueryString();
         $roles = Role::all();
         $timList = Tim::orderBy('nama_tim')->get();
         return view('manage.user.index', compact('users', 'roles', 'timList'));

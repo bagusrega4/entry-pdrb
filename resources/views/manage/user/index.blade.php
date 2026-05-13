@@ -43,26 +43,6 @@
         color: #6b7280;
     }
 
-    /* Tombol tambah */
-    .btn-tambah {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 36px;
-        padding: 0 16px;
-        font-size: 13px;
-        font-weight: 500;
-        color: #fff;
-        background: #f97316; 
-        border: 0.5px solid #ea580c;
-        border-radius: 8px;
-        cursor: pointer;
-        font-family: 'Figtree', sans-serif;
-        text-decoration: none;
-        transition: background 0.12s;
-    }
-    .btn-tambah:hover { background: #ea580c; color: #fff; }
-
     /* Table */
     .table-wrap { overflow-x: auto; }
 
@@ -185,6 +165,60 @@
     .btn-icon-hapus { color: #991b1b; border-color: #fca5a5; background: #fef2f2; }
     .btn-icon-hapus:hover { background: #fee2e2; }
 
+    /* Pagination */
+    .pagination-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        border-top: 0.5px solid #e5e7eb;
+        background: #fafafa;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .pagination-info { font-size: 12px; color: #9ca3af; }
+    .pagination-btns { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: 12px;
+        font-weight: 500;
+        font-family: 'Figtree', sans-serif;
+        border-radius: 6px;
+        border: 0.5px solid #e5e7eb;
+        background: #fff;
+        color: #374151;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.12s;
+    }
+    .page-btn:hover { background: #f3f4f6; color: #111827; border-color: #d1d5db; }
+    .page-btn.active { background: #f97316; border-color: #ea580c; color: #fff; pointer-events: none; }
+    .page-btn.disabled { opacity: 0.35; pointer-events: none; cursor: default; }
+    .page-btn-dots {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 30px;
+        font-size: 12px;
+        color: #9ca3af;
+        font-family: 'Figtree', sans-serif;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 48px 20px;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 13px;
+    }
+    .empty-state svg { margin-bottom: 12px; opacity: 0.4; }
+
     /* Modal */
     .modal-overlay {
         display: none;
@@ -241,7 +275,7 @@
         font-size: 13px;
         font-weight: 500;
         color: #fff;
-        background: #f97316; 
+        background: #f97316;
         border: 0.5px solid #ea580c;
         border-radius: 8px;
         cursor: pointer;
@@ -282,20 +316,34 @@
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
                 <span class="card-head-title">Daftar Pengguna</span>
-                <span class="card-head-badge" id="userCount">{{ count($users) }} pengguna</span>
+                <span class="card-head-badge">{{ $users->total() }} pengguna</span>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
-                <div style="position:relative;">
-                    <svg style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:#9ca3af;" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <!-- Search (server-side) -->
+                <form method="GET" action="{{ route('manage.user.index') }}" style="position:relative; margin:0;">
+                    <svg style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:#9ca3af; pointer-events:none;" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
-                    <input type="text" id="searchInput" placeholder="Cari username..."
-                        style="height:36px; padding:0 10px 0 30px; font-size:13px; font-family:'Figtree',sans-serif;
-                            color:#374151; border:0.5px solid #d1d5db; border-radius:8px; outline:none;
-                            width:200px; transition:border-color 0.15s;"
+                    <input
+                        type="text"
+                        name="search"
+                        id="searchInput"
+                        placeholder="Cari username..."
+                        value="{{ request('search') }}"
+                        autocomplete="off"
+                        style="height:36px; padding:0 32px 0 30px; font-size:13px; font-family:'Figtree',sans-serif;
+                               color:#374151; border:0.5px solid #d1d5db; border-radius:8px; outline:none;
+                               width:200px; transition:border-color 0.15s;"
                         onfocus="this.style.borderColor='#f97316'"
                         onblur="this.style.borderColor='#d1d5db'">
-                </div>
+                    @if(request('search'))
+                    <a href="{{ route('manage.user.index') }}"
+                       style="position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#9ca3af; line-height:1; text-decoration:none;"
+                       title="Hapus pencarian">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </a>
+                    @endif
+                </form>
             </div>
         </div>
 
@@ -313,9 +361,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($users as $user)
+                    @forelse($users as $user)
                     <tr>
-                        <td class="td-no">{{ $loop->iteration }}</td>
+                        <td class="td-no">{{ $users->firstItem() + $loop->index }}</td>
                         <td class="td-left">{{ $user->username }}</td>
                         <td class="td-left" style="font-weight:400; color:#6b7280; font-family:monospace; font-size:12.5px;">{{ $user->nip_lama }}</td>
                         <td class="td-left" style="font-weight:400;">{{ $user->email }}</td>
@@ -389,10 +437,94 @@
                             </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <div>Tidak ada pengguna ditemukan{{ request('search') ? ' untuk "' . request('search') . '"' : '' }}.</div>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        @if($users->lastPage() > 1)
+        <div class="pagination-wrap">
+            <span class="pagination-info">
+                @if($users->total() > 0)
+                    Menampilkan {{ $users->firstItem() }}–{{ $users->lastItem() }} dari {{ $users->total() }} pengguna
+                @else
+                    Tidak ada data
+                @endif
+            </span>
+            <div class="pagination-btns">
+
+                {{-- Prev --}}
+                <a href="{{ $users->onFirstPage() ? '#' : $users->previousPageUrl() . (request('search') ? '&search=' . request('search') : '') }}"
+                   class="page-btn {{ $users->onFirstPage() ? 'disabled' : '' }}"
+                   title="Halaman sebelumnya">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                </a>
+
+                {{-- Nomor halaman dengan ellipsis --}}
+                @php
+                    $current  = $users->currentPage();
+                    $last     = $users->lastPage();
+                    $search   = request('search') ? '&search=' . request('search') : '';
+
+                    // Tentukan range halaman yang ditampilkan
+                    $window = 2; // halaman kiri & kanan dari current
+                    $pages  = [];
+
+                    for ($i = 1; $i <= $last; $i++) {
+                        if (
+                            $i == 1 ||
+                            $i == $last ||
+                            ($i >= $current - $window && $i <= $current + $window)
+                        ) {
+                            $pages[] = $i;
+                        }
+                    }
+                @endphp
+
+                @php $prev = null; @endphp
+                @foreach($pages as $page)
+                    @if($prev !== null && $page - $prev > 1)
+                        <span class="page-btn-dots">…</span>
+                    @endif
+                    <a href="{{ $users->url($page) }}{{ $search }}"
+                       class="page-btn {{ $current == $page ? 'active' : '' }}">
+                        {{ $page }}
+                    </a>
+                    @php $prev = $page; @endphp
+                @endforeach
+
+                {{-- Next --}}
+                <a href="{{ !$users->hasMorePages() ? '#' : $users->nextPageUrl() . (request('search') ? '&search=' . request('search') : '') }}"
+                   class="page-btn {{ !$users->hasMorePages() ? 'disabled' : '' }}"
+                   title="Halaman berikutnya">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+
+            </div>
+        </div>
+        @else
+        {{-- Tetap tampilkan info meski hanya 1 halaman --}}
+        @if($users->total() > 0)
+        <div class="pagination-wrap">
+            <span class="pagination-info">
+                Menampilkan {{ $users->firstItem() }}–{{ $users->lastItem() }} dari {{ $users->total() }} pengguna
+            </span>
+        </div>
+        @endif
+        @endif
+
     </div>
 
 </div>
@@ -504,6 +636,18 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function () {
         document.querySelectorAll('.dropdown-menu-custom').forEach(m => m.classList.remove('show'));
     });
+
+    // Search: submit form saat Enter atau setelah berhenti mengetik (debounce)
+    let searchTimer;
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                this.closest('form').submit();
+            }, 500);
+        });
+    }
 });
 
 const updateRoleRoute = "{{ route('manage.user.updateRole', ':id') }}";
@@ -544,22 +688,6 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', function (e) {
         if (e.target === this) this.classList.remove('show');
     });
-});
-
-// Search filter
-document.getElementById('searchInput').addEventListener('input', function () {
-    const keyword = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.user-table tbody tr');
-    let visible = 0;
-
-    rows.forEach(row => {
-        const username = row.querySelector('.td-left')?.textContent.toLowerCase() || '';
-        const match = username.includes(keyword);
-        row.style.display = match ? '' : 'none';
-        if (match) visible++;
-    });
-
-    document.getElementById('userCount').textContent = visible + ' pengguna';
 });
 </script>
 @endsection
