@@ -61,9 +61,6 @@ class SimulasiController extends Controller
         $L = $this->buildLeontief($z, $x, $n);
         if (!$L) return back()->with('error', 'Matrix (I-A) singular, tidak dapat diinvers.');
 
-        [$backward, $forward, $normBackward, $normForward, $klasifikasi] =
-            $this->hitungLinkage($L, $n);
-
         // Ambil rasio biaya antara per sektor
         $rasioPerSektor = $this->getRasioPerSektor($n, $dataset->tahun ?? null);
 
@@ -94,11 +91,6 @@ class SimulasiController extends Controller
                 'rasio_biaya_antara'  => $rasio,
                 'output_baru'         => $x[$i] + $tambahan,
                 'persen_dampak'       => $x[$i] > 0 ? ($tambahan / $x[$i]) * 100 : 0,
-                'backward'            => round($backward[$i], 4),
-                'forward'             => round($forward[$i], 4),
-                'norm_backward'       => round($normBackward[$i], 4),
-                'norm_forward'        => round($normForward[$i], 4),
-                'klasifikasi'         => $klasifikasi[$i],
             ];
 
             $totalTambahanOutput += $tambahan;
@@ -107,17 +99,6 @@ class SimulasiController extends Controller
 
         [$pdrbAdhb, $pdrbAdhk, $pdrbPeriode] = $this->getPdrbReferensi();
         $totalStimulus = array_sum(array_map('floatval', $request->nilai));
-
-        // Linkage data
-        $linkage_data = [];
-        for ($i = 1; $i <= $n; $i++) {
-            $linkage_data[] = [
-                'nama'        => $namaSektor[$i - 1] ?? 'Sektor ' . $i,
-                'backward'    => round($normBackward[$i], 4),
-                'forward'     => round($normForward[$i], 4),
-                'klasifikasi' => $klasifikasi[$i],
-            ];
-        }
 
         $sektorInjeksi = [];
         foreach ($request->sektor as $k => $s) {
@@ -138,7 +119,6 @@ class SimulasiController extends Controller
                 'nilai'      => $request->nilai,
             ],
             'hasil_simulasi'   => $hasil,
-            'linkage_data'     => $linkage_data,
             'summary_simulasi' => [
                 'dataset'              => $dataset->nama_dataset,
                 'tahun'                => $dataset->tahun,
@@ -293,17 +273,10 @@ class SimulasiController extends Controller
         if (!$row) return redirect()->route('simulasi.riwayat')
             ->with('error', 'Riwayat tidak ditemukan atau Anda tidak memiliki akses.');
 
-        $summary     = json_decode($row->summary, true);
-        $hasil       = json_decode($row->hasil, true);
+        $summary = json_decode($row->summary, true);
+        $hasil   = json_decode($row->hasil, true);
 
-        $linkageData = array_map(fn($r) => [
-            'nama'        => $r['nama'],
-            'backward'    => $r['norm_backward'] ?? 0,
-            'forward'     => $r['norm_forward']  ?? 0,
-            'klasifikasi' => $r['klasifikasi']   ?? 'Independen',
-        ], $hasil);
-
-        return view('simulasi.lihat-riwayat', compact('row', 'summary', 'hasil', 'linkageData'));
+        return view('simulasi.lihat-riwayat', compact('row', 'summary', 'hasil'));
     }
 
     // EXPORT index
@@ -339,7 +312,7 @@ class SimulasiController extends Controller
             'Output Multiplier (ΔX/ΔY):,'          . number_format($summary['multiplier_output'] ?? $summary['multiplier'], 4, '.', ''),
             'NTB Multiplier (ΔNTB/ΔY):,'           . number_format($summary['multiplier_ntb']    ?? 0, 4, '.', ''),
             '',
-            'No,Sektor,Output Awal (M Rp),Tambahan ΔX (M Rp),Tambahan ΔNTB (M Rp),Rasio BA,Output Baru (M Rp),% Dampak,BL (Norm),FL (Norm),Klasifikasi',
+            'No,Sektor,Output Awal (M Rp),Tambahan ΔX (M Rp),Tambahan ΔNTB (M Rp),Rasio BA,Output Baru (M Rp),% Dampak',
         ];
 
         foreach ($hasil as $i => $row) {
@@ -352,9 +325,6 @@ class SimulasiController extends Controller
                 number_format($row['rasio_biaya_antara'] ?? 0, 4, '.', ''),
                 number_format($row['output_baru'],            3, '.', ''),
                 number_format($row['persen_dampak'],          2, '.', ''),
-                number_format($row['norm_backward']    ?? 0,  4, '.', ''),
-                number_format($row['norm_forward']     ?? 0,  4, '.', ''),
-                $row['klasifikasi'] ?? '-',
             ]);
         }
 
@@ -369,11 +339,10 @@ class SimulasiController extends Controller
     {
         $hasil        = session('hasil_simulasi');
         $summary      = session('summary_simulasi');
-        $linkage_data = session('linkage_data', []);
 
         if (!$hasil || !$summary) return back()->with('error', 'Tidak ada data untuk diekspor.');
 
-        return view('simulasi.export-pdf', compact('hasil', 'summary', 'linkage_data'));
+        return view('simulasi.export-pdf', compact('hasil', 'summary'));
     }
 
     // Export Riwayat
@@ -426,7 +395,7 @@ class SimulasiController extends Controller
             'Output Multiplier (ΔX/ΔY):,'          . number_format($summary['multiplier_output'] ?? $summary['multiplier'] ?? 0, 4, '.', ''),
             'NTB Multiplier (ΔNTB/ΔY):,'           . number_format($summary['multiplier_ntb']    ?? 0, 4, '.', ''),
             '',
-            'No,Sektor,Output Awal (M Rp),Tambahan ΔX (M Rp),Tambahan ΔNTB (M Rp),Rasio BA,Output Baru (M Rp),% Dampak,BL (Norm),FL (Norm),Klasifikasi',
+            'No,Sektor,Output Awal (M Rp),Tambahan ΔX (M Rp),Tambahan ΔNTB (M Rp),Rasio BA,Output Baru (M Rp),% Dampak',
         ]);
 
         foreach ($hasil as $i => $r) {
@@ -439,9 +408,6 @@ class SimulasiController extends Controller
                 number_format($r['rasio_biaya_antara'] ?? 0,  4, '.', ''),
                 number_format($r['output_baru'],             3, '.', ''),
                 number_format($r['persen_dampak'],           2, '.', ''),
-                number_format($r['norm_backward']     ?? 0,  4, '.', ''),
-                number_format($r['norm_forward']      ?? 0,  4, '.', ''),
-                $r['klasifikasi'] ?? '-',
             ]);
         }
 
@@ -461,14 +427,8 @@ class SimulasiController extends Controller
 
         $summary      = json_decode($row->summary, true);
         $hasil        = json_decode($row->hasil,   true);
-        $linkage_data = array_map(fn($r) => [
-            'nama'        => $r['nama'],
-            'norm_backward' => $r['norm_backward'] ?? 0,
-            'norm_forward'  => $r['norm_forward']  ?? 0,
-            'klasifikasi'   => $r['klasifikasi']   ?? 'Independen',
-        ], $hasil);
 
-        return view('simulasi.export-pdf', compact('hasil', 'summary', 'linkage_data'));
+        return view('simulasi.export-pdf', compact('hasil', 'summary'));
     }
 
     public function exportPdfSkenario()
@@ -489,14 +449,13 @@ class SimulasiController extends Controller
     public function chartData()
     {
         return response()->json([
-            'hasil'        => session('hasil_simulasi', []),
-            'linkage_data' => session('linkage_data', []),
+            'hasil' => session('hasil_simulasi', []),
         ]);
     }
 
     public function reset()
     {
-        session()->forget(['hasil_simulasi', 'summary_simulasi', 'simulasi_input', 'linkage_data']);
+        session()->forget(['hasil_simulasi', 'summary_simulasi', 'simulasi_input']);
         return redirect()->route('simulasi.index')->with('success', 'Simulasi berhasil direset.');
     }
 
@@ -558,45 +517,6 @@ class SimulasiController extends Controller
             }
         }
         return $this->matrixInverse($B, $n);
-    }
-
-    private function hitungLinkage(array $L, int $n): array
-    {
-        $backward = [];
-        $forward  = [];
-        $sumAll   = 0;
-
-        for ($j = 1; $j <= $n; $j++) {
-            $s = 0;
-            for ($i = 1; $i <= $n; $i++) $s += $L[$i][$j];
-            $backward[$j] = $s;
-            $sumAll += $s;
-        }
-        for ($i = 1; $i <= $n; $i++) {
-            $s = 0;
-            for ($j = 1; $j <= $n; $j++) $s += $L[$i][$j];
-            $forward[$i] = $s;
-        }
-
-        $avg         = $sumAll / $n;
-        $normB       = [];
-        $normF       = [];
-        $klasifikasi = [];
-
-        for ($i = 1; $i <= $n; $i++) {
-            $nb = $backward[$i] / $avg;
-            $nf = $forward[$i]  / $avg;
-            $normB[$i]       = $nb;
-            $normF[$i]       = $nf;
-            $klasifikasi[$i] = match(true) {
-                $nb >= 1 && $nf >= 1 => 'Kunci',
-                $nb >= 1             => 'Hilir',
-                $nf >= 1             => 'Hulu',
-                default              => 'Independen',
-            };
-        }
-
-        return [$backward, $forward, $normB, $normF, $klasifikasi];
     }
 
     private function getRasioPerSektor(int $n, ?int $tahun = null): array
@@ -749,7 +669,7 @@ class SimulasiController extends Controller
                 'dataset'            => $dataset->nama_dataset,
                 'tahun'              => $dataset->tahun,
                 'total_stimulus'     => $totalStimulus,
-                'sektor_injeksi'     => $sektorInjeksi,   // ← TAMBAHAN
+                'sektor_injeksi'     => $sektorInjeksi,
                 'tambahan_output'    => $totalTambahanOutput,
                 'tambahan_ntb'       => $totalTambahanNtb,
                 'multiplier_output'  => $totalStimulus > 0

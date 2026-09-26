@@ -164,11 +164,6 @@
         .diff-plus  { color:#16a34a; font-weight:600; }
         .diff-minus { color:#dc2626; font-weight:600; }
         .diff-zero  { color:#9ca3af; }
-        .klas { display:inline-block; font-size:8.5px; font-weight:600; padding:1px 5px; border-radius:20px; }
-        .klas-kunci      { background:#fef9c3; color:#854d0e; }
-        .klas-hilir      { background:#eff6ff; color:#1d4ed8; }
-        .klas-hulu       { background:#f0fdf4; color:#166534; }
-        .klas-independen { background:#f3f4f6; color:#6b7280; }
 
         /* Footer */
         .doc-footer {
@@ -481,8 +476,6 @@
                 $ntbRowB  = $rb ? ($rb['tambahan_ntb'] ?? 0) : 0;
                 $diffDx   = $dxB - $dxA;
                 $diffNtbR = $ntbRowB - $ntbRowA;
-                $klasMap  = ['Kunci'=>'klas-kunci','Hilir'=>'klas-hilir','Hulu'=>'klas-hulu','Independen'=>'klas-independen'];
-                $kc       = $klasMap[$row['klasifikasi'] ?? 'Independen'] ?? 'klas-independen';
             @endphp
             <tr>
                 <td style="font-size:10px;">{{ $row['nama'] }}</td>

@@ -211,31 +211,8 @@
     .pct-mid  { color:#b45309; background:#fefce8; }
     .pct-high { color:#991b1b; background:#fef2f2; }
 
-    .klas-badge { display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:100px; }
-    .klas-kunci      { background:#fef9c3; color:#854d0e; border:0.5px solid #fde68a; }
-    .klas-hilir      { background:#eff6ff; color:#1d4ed8; border:0.5px solid #bfdbfe; }
-    .klas-hulu       { background:#f0fdf4; color:#166534; border:0.5px solid #86efac; }
-    .klas-independen { background:#f3f4f6; color:#6b7280; border:0.5px solid #d1d5db; }
-
-    /* Linkage bars */
-    .link-bar-wrap { display:flex; align-items:center; gap:6px; }
-    .link-bar-track { flex:1; height:6px; border-radius:3px; background:#f3f4f6; overflow:hidden; min-width:60px; }
-    .link-bar-fill { height:100%; border-radius:3px; transition:width 0.5s ease; }
-    .link-bar-fill.back { background:#f97316; }
-    .link-bar-fill.fwd  { background:#3b82f6; }
-    .link-val { font-size:11.5px; font-weight:600; color:#374151; min-width:36px; text-align:right; font-family:monospace; }
-
     /* Chart */
     .chart-box { position:relative; width:100%; }
-
-    /* Scatter quadrant */
-    .quadrant-legend { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:12px; }
-    .q-item { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:6px; font-size:11px; }
-    .q-kunci { background:#fef9c3; color:#854d0e; }
-    .q-hilir { background:#eff6ff; color:#1d4ed8; }
-    .q-hulu  { background:#f0fdf4; color:#166534; }
-    .q-independen { background:#f3f4f6; color:#6b7280; }
-    .q-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 
     /* Empty state */
     .empty-state { padding:56px 20px; text-align:center; color:#9ca3af; }
@@ -283,7 +260,6 @@
         .multiplier-strip .hint-text { display:none; }
         .btn-tambah-sektor { width:100%; justify-content:center; }
         .tabs-chart-grid { grid-template-columns:1fr !important; }
-        .tabs-linkage-grid { grid-template-columns:1fr !important; }
     }
     @media (max-width:420px) {
         .summary-grid-6 { grid-template-columns:1fr; }
@@ -454,7 +430,6 @@
             @php
                 $sum          = session('summary_simulasi');
                 $hasil        = session('hasil_simulasi');
-                $linkage      = session('linkage_data', []);
 
                 $mOutput      = $sum['multiplier_output'] ?? $sum['multiplier'] ?? 0;
                 $mNtb         = $sum['multiplier_ntb']    ?? 0;
@@ -588,16 +563,12 @@
                         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                         Grafik
                     </button>
-                    <button class="tab-btn" onclick="switchTab(event,'tab-linkage')">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        Analisis Linkage
-                    </button>
                 </div>
 
                 <!-- Tab: Tabel Dampak -->
                 <div id="tab-dampak" class="tab-panel active">
                     <div class="table-scroll">
-                        <table class="sim-table" style="min-width:580px;">
+                        <table class="sim-table" style="min-width:520px;">
                             <thead>
                                 <tr>
                                     <th style="width:36px;">No</th>
@@ -607,7 +578,6 @@
                                     <th class="th-ntb">ΔNTB<br><span style="font-weight:400;font-size:9px;text-transform:none;">(M Rp)</span></th>
                                     <th>Output Baru<br><span style="font-weight:400;font-size:9px;text-transform:none;">(M Rp)</span></th>
                                     <th>% Dampak</th>
-                                    <th>Klasifikasi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -615,8 +585,6 @@
                                 @php
                                     $pct      = $row['persen_dampak'];
                                     $pctClass = $pct < 1 ? 'pct-low' : ($pct < 5 ? 'pct-mid' : 'pct-high');
-                                    $klasMap  = ['Kunci'=>'klas-kunci','Hilir'=>'klas-hilir','Hulu'=>'klas-hulu','Independen'=>'klas-independen'];
-                                    $kc       = $klasMap[$row['klasifikasi'] ?? 'Independen'] ?? 'klas-independen';
                                 @endphp
                                 <tr>
                                     <td class="td-no">{{ $i + 1 }}</td>
@@ -626,7 +594,6 @@
                                     <td class="td-ntb"><span class="badge-ntb">+{{ number_format($row['tambahan_ntb'] ?? 0,3,',','.') }}</span></td>
                                     <td class="td-num">{{ number_format($row['output_baru'],3,',','.') }}</td>
                                     <td><span class="pct-badge {{ $pctClass }}">{{ number_format($pct,2) }}%</span></td>
-                                    <td><span class="klas-badge {{ $kc }}">{{ $row['klasifikasi'] ?? '-' }}</span></td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -654,68 +621,6 @@
                             <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:10px;">Tambahan NTB ΔNTB (M Rp)</div>
                             <div class="chart-box" style="height:{{ max(200, count($hasil)*28+60) }}px;">
                                 <canvas id="chartNtb"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab: Linkage -->
-                <div id="tab-linkage" class="tab-panel">
-                    <div class="tabs-linkage-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-                        <div>
-                            <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;">Peta Keterkaitan Antar Sektor</div>
-                            <div style="font-size:11px;color:#9ca3af;margin-bottom:10px;">Backward Linkage (X) vs Forward Linkage (Y), dinormalisasi</div>
-                            <div class="chart-box" style="height:280px;"><canvas id="chartScatter"></canvas></div>
-                            <div class="quadrant-legend">
-                                <div class="q-item q-kunci"><span class="q-dot" style="background:#f59e0b;"></span><strong>Kunci</strong> — BL≥1 & FL≥1</div>
-                                <div class="q-item q-hilir"><span class="q-dot" style="background:#3b82f6;"></span><strong>Hilir</strong> — BL≥1, FL&lt;1</div>
-                                <div class="q-item q-hulu"><span class="q-dot" style="background:#22c55e;"></span><strong>Hulu</strong> — BL&lt;1, FL≥1</div>
-                                <div class="q-item q-independen"><span class="q-dot" style="background:#9ca3af;"></span><strong>Independen</strong> — BL&lt;1 & FL&lt;1</div>
-                            </div>
-                        </div>
-                        <!-- Linkage table -->
-                        <div>
-                            <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:10px;">Detail Backward & Forward Linkage</div>
-                            <div class="table-scroll" style="max-height:360px;overflow-y:auto;">
-                                <table class="sim-table" style="min-width:280px;">
-                                    <thead>
-                                        <tr>
-                                            <th class="th-left">Sektor</th>
-                                            <th>Backward</th>
-                                            <th>Forward</th>
-                                            <th>Kelas</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $maxBack = max(array_column($hasil,'norm_backward') ?: [1]);
-                                            $maxFwd  = max(array_column($hasil,'norm_forward')  ?: [1]);
-                                        @endphp
-                                        @foreach($hasil as $row)
-                                        @php
-                                            $kc    = ($klasMap[$row['klasifikasi'] ?? 'Independen'] ?? 'klas-independen');
-                                            $pBack = $maxBack > 0 ? min(100, ($row['norm_backward'] ?? 0) / $maxBack * 100) : 0;
-                                            $pFwd  = $maxFwd  > 0 ? min(100, ($row['norm_forward']  ?? 0) / $maxFwd  * 100) : 0;
-                                        @endphp
-                                        <tr>
-                                            <td class="td-left" style="font-size:11.5px;">{{ $row['nama'] }}</td>
-                                            <td style="min-width:110px;">
-                                                <div class="link-bar-wrap">
-                                                    <div class="link-bar-track"><div class="link-bar-fill back" style="width:{{ $pBack }}%"></div></div>
-                                                    <span class="link-val">{{ number_format($row['norm_backward'] ?? 0,3) }}</span>
-                                                </div>
-                                            </td>
-                                            <td style="min-width:110px;">
-                                                <div class="link-bar-wrap">
-                                                    <div class="link-bar-track"><div class="link-bar-fill fwd" style="width:{{ $pFwd }}%"></div></div>
-                                                    <span class="link-val">{{ number_format($row['norm_forward'] ?? 0,3) }}</span>
-                                                </div>
-                                            </td>
-                                            <td><span class="klas-badge {{ $kc }}">{{ $row['klasifikasi'] ?? '-' }}</span></td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -800,13 +705,11 @@ function switchTab(e, id) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     e.currentTarget.classList.add('active');
     document.getElementById(id).classList.add('active');
-    if (id === 'tab-chart'   && !window._chartsBuilt)  { window._chartsBuilt  = true; buildCharts(); }
-    if (id === 'tab-linkage' && !window._scatterBuilt) { window._scatterBuilt = true; buildScatter(); }
+    if (id === 'tab-chart' && !window._chartsBuilt) { window._chartsBuilt = true; buildCharts(); }
 }
 
 @if(session('hasil_simulasi'))
-const HASIL_DATA   = @json(session('hasil_simulasi'));
-const LINKAGE_DATA = @json(session('linkage_data', []));
+const HASIL_DATA = @json(session('hasil_simulasi'));
 
 function mkBarChart(canvasId, data, label, color) {
     const labels = HASIL_DATA.map(r => r.nama.length > 22 ? r.nama.substr(0,20)+'…' : r.nama);
@@ -832,40 +735,6 @@ function buildCharts() {
     mkBarChart('chartNtb',
         HASIL_DATA.map(r => parseFloat((r.tambahan_ntb||0).toFixed(3))),
         'ΔNTB', 'rgba(20,184,166,0.75)');
-}
-
-function buildScatter() {
-    const colorMap = {
-        'Kunci'     :'rgba(245,158,11,0.85)',
-        'Hilir'     :'rgba(59,130,246,0.85)',
-        'Hulu'      :'rgba(34,197,94,0.85)',
-        'Independen':'rgba(156,163,175,0.75)'
-    };
-    const datasets = {};
-    LINKAGE_DATA.forEach(item => {
-        const k = item.klasifikasi;
-        if (!datasets[k]) datasets[k] = {
-            label:k, data:[],
-            backgroundColor:colorMap[k]||'rgba(156,163,175,0.75)',
-            pointRadius:7, pointHoverRadius:9
-        };
-        datasets[k].data.push({x:item.backward, y:item.forward, nama:item.nama});
-    });
-    new Chart(document.getElementById('chartScatter'), {
-        type:'scatter',
-        data:{ datasets:Object.values(datasets) },
-        options:{
-            responsive:true, maintainAspectRatio:false,
-            plugins:{
-                legend:{ position:'top', labels:{boxWidth:10,padding:10,font:{size:11}} },
-                tooltip:{ callbacks:{ label:ctx=>`${ctx.raw.nama} (BL:${ctx.raw.x.toFixed(3)}, FL:${ctx.raw.y.toFixed(3)})` } }
-            },
-            scales:{
-                x:{ title:{display:true,text:'Backward Linkage (Normalized)',font:{size:10}}, grid:{color:ctx=>ctx.tick.value===1?'#f97316':'#f3f4f6'} },
-                y:{ title:{display:true,text:'Forward Linkage (Normalized)', font:{size:10}}, grid:{color:ctx=>ctx.tick.value===1?'#f97316':'#f3f4f6'} }
-            }
-        }
-    });
 }
 @endif
 

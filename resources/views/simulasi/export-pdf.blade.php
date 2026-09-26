@@ -140,17 +140,6 @@
         .gr-neg  { color:#991b1b; font-weight:600; }
         .gr-teal { color:#0d9488; font-weight:600; }
 
-        /* Linkage table */
-        .link-bar { height:6px; border-radius:3px; display:inline-block; vertical-align:middle; margin-right:4px; }
-        .link-back { background:#f97316; }
-        .link-fwd  { background:#3b82f6; }
-
-        .klas { display:inline-block; font-size:9px; font-weight:600; padding:1px 6px; border-radius:20px; }
-        .klas-kunci      { background:#fef9c3; color:#854d0e; }
-        .klas-hilir      { background:#eff6ff; color:#1d4ed8; }
-        .klas-hulu       { background:#f0fdf4; color:#166534; }
-        .klas-independen { background:#f3f4f6; color:#6b7280; }
-
         /* Footer */
         .doc-footer {
             margin-top:24px; padding-top:12px; border-top:1px solid #e5e7eb;
@@ -179,8 +168,8 @@
 
             .multiplier-box, .summary-grid { page-break-inside:avoid; break-inside:avoid; }
 
-            .linkage-section table, .dampak-table { page-break-inside:auto; }
-            .linkage-section tr, .dampak-table tr { page-break-inside:avoid; }
+            .dampak-table { page-break-inside:auto; }
+            .dampak-table tr { page-break-inside:avoid; }
         }
     </style>
 </head>
@@ -332,77 +321,7 @@
 
     <div class="doc-footer">
         <span>Simulasi Input-Output — Model Leontief</span>
-        <span>Halaman 1 dari 3 &nbsp;·&nbsp; {{ now()->format('d/m/Y') }}</span>
-    </div>
-
-</div>
-
-<div class="page-section">
-
-    <div class="doc-header">
-        <div>
-            <div class="doc-title">Laporan Simulasi Input-Output</div>
-            <div class="doc-sub">Model Leontief — Peta Keterkaitan Antar Sektor</div>
-        </div>
-        <div class="doc-meta">
-            Dataset: <strong>{{ $summary['dataset'] }}</strong><br>
-            Tahun IO: <strong>{{ $summary['tahun'] }}</strong><br>
-            Dicetak: {{ now()->format('d M Y H:i') }}
-        </div>
-    </div>
-
-    <div class="section-title">Peta Keterkaitan (Linkage Analysis)</div>
-    <div class="linkage-section">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th style="text-align:left;">Sektor</th>
-                    <th>BL (Norm)</th>
-                    <th>FL (Norm)</th>
-                    <th>Klasifikasi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php
-                    $maxB = max(array_column($hasil, 'norm_backward') ?: [1]);
-                    $maxF = max(array_column($hasil, 'norm_forward')  ?: [1]);
-                @endphp
-                @foreach($hasil as $i => $row)
-                @php
-                    $klasMap = ['Kunci'=>'klas-kunci','Hilir'=>'klas-hilir','Hulu'=>'klas-hulu','Independen'=>'klas-independen'];
-                    $kc = $klasMap[$row['klasifikasi'] ?? 'Independen'] ?? 'klas-independen';
-                    $pB = $maxB > 0 ? min(60, ($row['norm_backward'] ?? 0) / $maxB * 60) : 0;
-                    $pF = $maxF > 0 ? min(60, ($row['norm_forward']  ?? 0) / $maxF * 60) : 0;
-                @endphp
-                <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td style="text-align:left; font-size:10px;">{{ $row['nama'] }}</td>
-                    <td>
-                        <span class="link-bar link-back" style="width:{{ $pB }}px;"></span>
-                        <span class="td-mono">{{ number_format($row['norm_backward'] ?? 0, 3) }}</span>
-                    </td>
-                    <td>
-                        <span class="link-bar link-fwd" style="width:{{ $pF }}px;"></span>
-                        <span class="td-mono">{{ number_format($row['norm_forward'] ?? 0, 3) }}</span>
-                    </td>
-                    <td><span class="klas {{ $kc }}">{{ $row['klasifikasi'] ?? '-' }}</span></td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
-            <span class="klas klas-kunci">🔑 Kunci (BL≥1, FL≥1)</span>
-            <span class="klas klas-hilir">⬇ Hilir (BL≥1, FL&lt;1)</span>
-            <span class="klas klas-hulu">⬆ Hulu (BL&lt;1, FL≥1)</span>
-            <span class="klas klas-independen">◎ Independen (BL&lt;1, FL&lt;1)</span>
-        </div>
-    </div>
-
-    <div class="doc-footer">
-        <span>Simulasi Input-Output — Model Leontief</span>
-        <span>Halaman 2 dari 3 &nbsp;·&nbsp; {{ now()->format('d/m/Y') }}</span>
+        <span>Halaman 1 dari 2 &nbsp;·&nbsp; {{ now()->format('d/m/Y') }}</span>
     </div>
 
 </div>
@@ -432,7 +351,6 @@
                 <th class="th-ntb">ΔNTB<br><span style="font-weight:400;font-size:8.5px;text-transform:none;">(M Rp)</span></th>
                 <th>Output Baru<br><span style="font-weight:400;font-size:8.5px;text-transform:none;">(M Rp)</span></th>
                 <th>% Dampak</th>
-                <th>Klasifikasi</th>
             </tr>
         </thead>
         <tbody>
@@ -440,8 +358,6 @@
             @php
                 $pct     = $row['persen_dampak'];
                 $ntbRow  = $row['tambahan_ntb']      ?? 0;
-                $klasMap = ['Kunci'=>'klas-kunci','Hilir'=>'klas-hilir','Hulu'=>'klas-hulu','Independen'=>'klas-independen'];
-                $kc      = $klasMap[$row['klasifikasi'] ?? 'Independen'] ?? 'klas-independen';
             @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
@@ -451,7 +367,6 @@
                 <td class="td-mono td-ntb gr-teal">+{{ number_format($ntbRow, 3, ',', '.') }}</td>
                 <td class="td-mono">{{ number_format($row['output_baru'], 3, ',', '.') }}</td>
                 <td class="{{ $pct >= 0 ? 'gr-pos' : 'gr-neg' }}">{{ number_format($pct, 2) }}%</td>
-                <td><span class="klas {{ $kc }}">{{ $row['klasifikasi'] ?? '-' }}</span></td>
             </tr>
             @endforeach
         </tbody>
@@ -467,7 +382,7 @@
 
     <div class="doc-footer">
         <span>Simulasi Input-Output — Model Leontief</span>
-        <span>Halaman 3 dari 3 &nbsp;·&nbsp; {{ now()->format('d/m/Y') }}</span>
+        <span>Halaman 2 dari 2 &nbsp;·&nbsp; {{ now()->format('d/m/Y') }}</span>
     </div>
 
 </div>
