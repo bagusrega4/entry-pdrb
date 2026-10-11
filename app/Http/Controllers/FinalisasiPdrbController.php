@@ -32,7 +32,6 @@ class FinalisasiPdrbController extends Controller
                 ->where('triwulan_id', $triwulan_id)
                 ->get();
 
-            // --- Data triwulan sebelumnya (untuk QoQ) ---
             $prevTriwulan = $triwulan_id - 1;
             $prevTahun    = $tahun;
             if ($triwulan_id == 1) {
@@ -45,7 +44,6 @@ class FinalisasiPdrbController extends Controller
                 ->get()
                 ->keyBy('sektor_id');
 
-            // --- Data tahun lalu, triwulan sama (untuk YoY) ---
             $yoyData = PdrbResult::where('tahun', $tahun - 1)
                 ->where('triwulan_id', $triwulan_id)
                 ->get()
@@ -83,8 +81,6 @@ class FinalisasiPdrbController extends Controller
             $isFinal = $versiTerakhir !== null;
         }
 
-        // --- Riwayat finalisasi: semua versi yang pernah dikunci ---
-        // Ambil satu baris per (tahun, triwulan_id, versi) dengan agregate PDRB-nya
         $riwayat = PdrbFinal::with(['triwulan', 'finalizer'])
             ->select(
                 'tahun',
@@ -92,6 +88,7 @@ class FinalisasiPdrbController extends Controller
                 'versi',
                 'status',
                 'finalized_by',
+                DB::raw('MAX(komentar) as komentar'),
                 DB::raw('MIN(created_at) as created_at'),
                 DB::raw('SUM(adhb) as total_adhb'),
                 DB::raw('SUM(adhk) as total_adhk'),
@@ -129,10 +126,16 @@ class FinalisasiPdrbController extends Controller
         $request->validate([
             'tahun'       => 'required|integer',
             'triwulan_id' => 'required|exists:triwulanan,id',
+            'komentar'    => 'required|string|min:5|max:1000',
+        ], [
+            'komentar.required' => 'Komentar finalisasi wajib diisi.',
+            'komentar.min'      => 'Komentar minimal 5 karakter.',
+            'komentar.max'      => 'Komentar maksimal 1000 karakter.',
         ]);
 
         $tahun       = $request->tahun;
         $triwulan_id = $request->triwulan_id;
+        $komentar    = trim($request->komentar);
 
         DB::beginTransaction();
 
@@ -148,6 +151,7 @@ class FinalisasiPdrbController extends Controller
                 ->get();
 
             if ($data->isEmpty()) {
+                DB::rollback();
                 return back()->with('error', 'Data PDRB belum tersedia!');
             }
 
@@ -164,6 +168,7 @@ class FinalisasiPdrbController extends Controller
                     'pertumbuhan'  => $item->pertumbuhan ?? null,
                     'versi'        => $newVersion,
                     'status'       => 'final',
+                    'komentar'     => $komentar,
                     'finalized_by' => auth()->id(),
                 ]);
             }
@@ -179,10 +184,6 @@ class FinalisasiPdrbController extends Controller
         }
     }
 
-    /**
-     * Tampilkan detail snapshot sektor untuk satu versi finalisasi tertentu.
-     * Dipanggil via AJAX dari modal riwayat.
-     */
     public function detailVersi(Request $request)
     {
         $request->validate([
@@ -191,19 +192,73 @@ class FinalisasiPdrbController extends Controller
             'versi'       => 'required|integer',
         ]);
 
-        $rows = PdrbFinal::with('sektor')
-            ->where('tahun', $request->tahun)
-            ->where('triwulan_id', $request->triwulan_id)
-            ->where('versi', $request->versi)
-            ->get()
-            ->map(fn ($r) => [
-                'sektor'      => $r->sektor->nama ?? '-',
-                'adhb'        => $r->adhb,
-                'adhk'        => $r->adhk,
-                'kontribusi'  => $r->kontribusi,
-                'pertumbuhan' => $r->pertumbuhan,
-            ]);
+        $tahun = (int) $request->tahun;
+        $tw    = (int) $request->triwulan_id;
 
-        return response()->json($rows);
+        $snapshot = PdrbFinal::with('sektor')
+            ->where('tahun', $tahun)
+            ->where('triwulan_id', $tw)
+            ->where('versi', $request->versi)
+            ->orderBy('sektor_id')
+            ->get();
+
+        // Periode pembanding
+        $prevTw    = $tw == 1 ? 4 : $tw - 1;
+        $prevTahun = $tw == 1 ? $tahun - 1 : $tahun;
+
+        $prev = $this->adhkPembanding($prevTahun, $prevTw);   // QoQ
+        $yoy  = $this->adhkPembanding($tahun - 1, $tw);       // YoY
+
+        $growth = fn ($now, $base) => ($base && $base > 0)
+            ? (($now - $base) / $base) * 100
+            : null;
+
+        $rows = $snapshot->map(function ($r) use ($prev, $yoy, $growth) {
+            $adhk = (float) $r->adhk;
+
+            return [
+                'sektor'     => $r->sektor->nama ?? '-',
+                'adhb'       => (float) $r->adhb,
+                'adhk'       => $adhk,
+                'kontribusi' => $r->kontribusi !== null ? (float) $r->kontribusi : null,
+                'qoq'        => $growth($adhk, $prev->get($r->sektor_id)),
+                'yoy'        => $growth($adhk, $yoy->get($r->sektor_id)),
+            ];
+        })->values();
+
+        $totalAdhb = $rows->sum('adhb');
+        $totalAdhk = $rows->sum('adhk');
+
+        return response()->json([
+            'rows'  => $rows,
+            'total' => [
+                'adhb' => $totalAdhb,
+                'adhk' => $totalAdhk,
+                'qoq'  => $growth($totalAdhk, $prev->sum()),
+                'yoy'  => $growth($totalAdhk, $yoy->sum()),
+            ],
+        ]);
+    }
+
+    private function adhkPembanding(int $tahun, int $triwulanId)
+    {
+        $versi = PdrbFinal::where('tahun', $tahun)
+            ->where('triwulan_id', $triwulanId)
+            ->max('versi');
+
+        if ($versi !== null) {
+            return PdrbFinal::where('tahun', $tahun)
+                ->where('triwulan_id', $triwulanId)
+                ->where('versi', $versi)
+                ->get()
+                ->keyBy('sektor_id')
+                ->map(fn ($r) => (float) $r->adhk);
+        }
+
+        return PdrbResult::where('tahun', $tahun)
+            ->where('triwulan_id', $triwulanId)
+            ->get()
+            ->keyBy('sektor_id')
+            ->map(fn ($r) => (float) $r->adhk);
     }
 }

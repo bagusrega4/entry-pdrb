@@ -240,6 +240,66 @@
         flex-wrap: wrap;
         gap: 8px;
     }
+    .riwayat-komentar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 0.5px solid #e5e7eb;
+    }
+    .riwayat-komentar.is-first {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-color: #bbf7d0;
+    }
+    .riwayat-komentar.is-rev {
+        background: linear-gradient(135deg, #fffbeb 0%, #fff7ed 100%);
+        border-color: #fde68a;
+    }
+    .riwayat-komentar.is-empty {
+        background: #f9fafb;
+        border: 1px dashed #d1d5db;
+    }
+
+    .riwayat-komentar-icon {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .is-first .riwayat-komentar-icon { background: #dcfce7; color: #166534; }
+    .is-rev   .riwayat-komentar-icon { background: #fef3c7; color: #b45309; }
+    .is-empty .riwayat-komentar-icon { background: #f3f4f6; color: #9ca3af; }
+
+    .riwayat-komentar-content { flex: 1; min-width: 0; }
+
+    .riwayat-komentar-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 3px;
+    }
+    .is-first .riwayat-komentar-label { color: #166534; }
+    .is-rev   .riwayat-komentar-label { color: #92400e; }
+    .is-empty .riwayat-komentar-label { color: #9ca3af; }
+
+    .riwayat-komentar-text {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #1f2937;
+        white-space: pre-line;
+        word-break: break-word;
+    }
+    .riwayat-komentar-empty {
+        font-size: 12px;
+        color: #9ca3af;
+        font-style: italic;
+    }
     .riwayat-stat {
         padding: 5px 10px;
         border: 0.5px solid #e5e7eb;
@@ -267,8 +327,8 @@
     .modal-backdrop {
         display: none;
         position: fixed; inset: 0;
-        background: rgba(0,0,0,0.35);
-        z-index: 999;
+        background: rgba(0,0,0,0.4);
+        z-index: 2000;
         align-items: center;
         justify-content: center;
     }
@@ -278,7 +338,7 @@
         background: #fff;
         border-radius: 14px;
         width: 92%;
-        max-width: 760px;
+        max-width: 980px;
         max-height: 85vh;
         display: flex;
         flex-direction: column;
@@ -302,10 +362,40 @@
     }
     .modal-close:hover { background: #f3f4f6; }
 
-    .modal-body { overflow-y: auto; padding: 0; flex: 1; }
+    .modal-body {
+        overflow: auto;
+        flex: 1;
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+    }
+    .modal-body .table-wrap { overflow: visible; }
 
     .modal-loading {
         padding: 48px 20px; text-align: center; color: #9ca3af; font-size: 13px;
+    }
+
+    .modal-body .fin-table { min-width: 760px; }
+    .modal-body .fin-table .td-left { min-width: 280px; }
+    .modal-body .fin-table tbody td { padding: 9px 14px; font-size: 12.5px; }
+    .modal-body .fin-table thead th {
+        position: sticky; top: 0; z-index: 2;
+        border-bottom: none;
+        box-shadow: 0 1px 0 #e5e7eb; 
+    }
+    .modal-body .fin-table tfoot td {
+        position: sticky; bottom: 0; z-index: 2;
+        border-top: none;
+        box-shadow: 0 -1.5px 0 #e5e7eb;
+    }
+    .fin-table thead th.th-right { text-align: right; }
+    .g-na { color: #9ca3af; }
+
+    .snapshot-note {
+        padding: 10px 20px;
+        font-size: 11.5px;
+        color: #6b7280;
+        background: #fffbeb;
+        border-bottom: 0.5px solid #fde68a;
     }
 
     /* modal inner table */
@@ -532,6 +622,7 @@
                 @csrf
                 <input type="hidden" name="tahun" value="{{ $tahun }}">
                 <input type="hidden" name="triwulan_id" value="{{ $triwulan_id }}">
+                <input type="hidden" name="komentar" id="input-komentar">
                 @if($isFinal)
                     <button type="button" id="btnFinalisasi" class="btn-revisi">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -636,7 +727,24 @@
                             {{ $rw->jumlah_sektor }} sektor dikunci
                         </span>
                     </div>
-
+                    @php $adaKomentar = !empty($rw->komentar); @endphp
+                    <div class="riwayat-komentar {{ !$adaKomentar ? 'is-empty' : ($isFirst ? 'is-first' : 'is-rev') }}">
+                        <div class="riwayat-komentar-icon">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <div class="riwayat-komentar-content">
+                            <span class="riwayat-komentar-label">
+                                {{ $isFirst ? 'Catatan Finalisasi' : 'Alasan Revisi' }}
+                            </span>
+                            @if($adaKomentar)
+                                <div class="riwayat-komentar-text">{{ $rw->komentar }}</div>
+                            @else
+                                <div class="riwayat-komentar-empty">Tidak ada komentar (versi sebelum fitur komentar).</div>
+                            @endif
+                        </div>
+                    </div>
                     <div class="riwayat-stats">
                         <div class="riwayat-stat">
                             <span class="riwayat-stat-label">PDRB ADHB</span>
@@ -700,12 +808,18 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
+    document.body.appendChild(document.getElementById('modalDetailVersi'));
+
     @if(session('success'))
     Swal.fire({ icon:'success', title:'Berhasil', text: @json(session('success')), timer:2200, showConfirmButton:false });
     @endif
 
     @if(session('error'))
     Swal.fire({ icon:'error', title:'Gagal', text: @json(session('error')), confirmButtonColor:'#2563eb', confirmButtonText:'OK' });
+    @endif
+
+    @if($errors->any())
+    Swal.fire({ icon:'error', title:'Gagal', text: @json($errors->first()), confirmButtonColor:'#2563eb' });
     @endif
 
     @if(isset($data) && $data->count() > 0)
@@ -717,13 +831,27 @@ document.addEventListener("DOMContentLoaded", function () {
             html: isFinal
                 ? 'Data PDRB periode <strong>{{ $tahun }} — {{ $triwulans->firstWhere('id', $triwulan_id)?->triwulan ?? '' }}</strong> akan dibuat versi baru.<br>Tindakan ini tidak dapat dibatalkan.'
                 : 'Data PDRB periode <strong>{{ $tahun }} — {{ $triwulans->firstWhere('id', $triwulan_id)?->triwulan ?? '' }}</strong> akan dikunci sebagai versi pertama.<br>Tindakan ini tidak dapat dibatalkan.',
+            input: 'textarea',
+            inputLabel: isFinal ? 'Alasan / catatan revisi (wajib)' : 'Komentar finalisasi (wajib)',
+            inputPlaceholder: isFinal
+                ? 'Contoh: Revisi karena pembaruan data produksi padi...'
+                : 'Contoh: Finalisasi awal setelah verifikasi seluruh sektor...',
+            inputAttributes: { maxlength: 1000 },
+            inputValidator: (value) => {
+                if (!value || value.trim().length < 5) {
+                    return 'Komentar wajib diisi (minimal 5 karakter).';
+                }
+            },
             showCancelButton: true,
             confirmButtonColor: isFinal ? '#ca8a04' : '#16a34a',
             cancelButtonColor: '#6b7280',
             confirmButtonText: isFinal ? 'Ya, Revisi!' : 'Ya, Finalisasi!',
             cancelButtonText: 'Batal'
         }).then((result) => {
-            if (result.isConfirmed) document.getElementById('form-finalisasi').submit();
+            if (result.isConfirmed) {
+                document.getElementById('input-komentar').value = result.value.trim();
+                document.getElementById('form-finalisasi').submit();
+            }
         });
     });
     @endif
@@ -732,69 +860,86 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Modal Detail Versi
 function bukaDetailVersi(tahun, triwulanId, versi, label) {
+    const body = document.getElementById('modalBody');
     document.getElementById('modalSubTitle').textContent = label;
-    document.getElementById('modalBody').innerHTML = '<div class="modal-loading">Memuat data…</div>';
+    body.innerHTML = '<div class="modal-loading">Memuat data…</div>';
     document.getElementById('modalDetailVersi').classList.add('open');
 
+    const fmtNum = v => Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const growth = v => {
+        if (v === null || v === undefined) return '<span class="g-na">—</span>';
+        const n = Number(v);
+        if (n > 0) return `<span class="growth-up">▲ +${n.toFixed(2)}%</span>`;
+        if (n < 0) return `<span class="growth-down">▼ ${n.toFixed(2)}%</span>`;
+        return '<span class="g-na">0.00%</span>';
+    };
+
+    const totalBadge = v => {
+        if (v === null || v === undefined) return '<span class="g-na">—</span>';
+        const n = Number(v);
+        return `<span class="total-badge ${n >= 0 ? 'total-badge-up' : 'total-badge-down'}">
+                    ${n >= 0 ? '▲ +' : '▼ '}${n.toFixed(2)}%
+                </span>`;
+    };
+
     fetch(`{{ route('finalisasi.detail-versi') }}?tahun=${tahun}&triwulan_id=${triwulanId}&versi=${versi}`)
-        .then(r => r.json())
-        .then(rows => {
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(({ rows, total }) => {
             if (!rows || rows.length === 0) {
-                document.getElementById('modalBody').innerHTML =
-                    '<div class="modal-loading">Tidak ada data untuk versi ini.</div>';
+                body.innerHTML = '<div class="modal-loading">Tidak ada data untuk versi ini.</div>';
                 return;
             }
 
-            let totalAdhb = rows.reduce((s, r) => s + (r.adhb || 0), 0);
-            let totalAdhk = rows.reduce((s, r) => s + (r.adhk || 0), 0);
-
-            let html = `<table class="modal-table">
+            let html = `
+            <div class="snapshot-note">
+                Data ini adalah snapshot yang dikunci pada versi ${versi}. QoQ dan YoY dihitung dari ADHK snapshot.
+            </div>
+            <div class="table-wrap">
+            <table class="fin-table">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th style="text-align:left;">Sektor</th>
-                        <th>ADHB (M Rp)</th>
-                        <th>ADHK (M Rp)</th>
+                        <th class="th-left">Sektor</th>
+                        <th class="th-right">ADHB <span style="font-weight:400;text-transform:none;font-size:10px;color:#9ca3af;">(Miliar Rp)</span></th>
+                        <th class="th-right">ADHK <span style="font-weight:400;text-transform:none;font-size:10px;color:#9ca3af;">(Miliar Rp)</span></th>
                         <th>Kontribusi</th>
-                        <th>Pertumbuhan</th>
+                        <th>QoQ</th>
+                        <th>YoY</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
             rows.forEach((r, i) => {
-                const pertLabel = r.pertumbuhan !== null
-                    ? (r.pertumbuhan >= 0
-                        ? `<span style="color:#166534;font-weight:700;">▲ +${parseFloat(r.pertumbuhan).toFixed(2)}%</span>`
-                        : `<span style="color:#991b1b;font-weight:700;">▼ ${parseFloat(r.pertumbuhan).toFixed(2)}%</span>`)
-                    : `<span style="color:#9ca3af;">—</span>`;
-
                 html += `<tr>
-                    <td>${i + 1}</td>
-                    <td>${r.sektor}</td>
-                    <td class="td-mono">${parseFloat(r.adhb).toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td class="td-mono">${parseFloat(r.adhk).toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td>${r.kontribusi !== null ? parseFloat(r.kontribusi).toFixed(2) + '%' : '—'}</td>
-                    <td>${pertLabel}</td>
+                    <td class="td-no">${i + 1}</td>
+                    <td class="td-left">${r.sektor}</td>
+                    <td class="td-num">${fmtNum(r.adhb)}</td>
+                    <td class="td-num">${fmtNum(r.adhk)}</td>
+                    <td>${r.kontribusi !== null ? fmtNum(r.kontribusi) + '%' : '<span class="g-na">—</span>'}</td>
+                    <td>${growth(r.qoq)}</td>
+                    <td>${growth(r.yoy)}</td>
                 </tr>`;
             });
 
             html += `</tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2">Total</td>
-                        <td class="td-mono">${totalAdhb.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td class="td-mono">${totalAdhk.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                        <td>100%</td>
-                        <td>—</td>
+                        <td colspan="2" class="td-left">Total PDRB</td>
+                        <td class="td-num">${fmtNum(total.adhb)}</td>
+                        <td class="td-num">${fmtNum(total.adhk)}</td>
+                        <td><span class="total-badge total-badge-pct">100%</span></td>
+                        <td>${totalBadge(total.qoq)}</td>
+                        <td>${totalBadge(total.yoy)}</td>
                     </tr>
                 </tfoot>
-            </table>`;
+            </table>
+            </div>`;
 
-            document.getElementById('modalBody').innerHTML = html;
+            body.innerHTML = html;
         })
         .catch(() => {
-            document.getElementById('modalBody').innerHTML =
-                '<div class="modal-loading" style="color:#991b1b;">Gagal memuat data. Silakan coba lagi.</div>';
+            body.innerHTML = '<div class="modal-loading" style="color:#991b1b;">Gagal memuat data. Silakan coba lagi.</div>';
         });
 }
 
@@ -803,8 +948,10 @@ function tutupModal() {
 }
 
 // Tutup modal jika klik backdrop
-document.getElementById('modalDetailVersi').addEventListener('click', function(e) {
-    if (e.target === this) tutupModal();
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('modalDetailVersi').addEventListener('click', function (e) {
+        if (e.target === this) tutupModal();
+    });
 });
 </script>
 @endsection

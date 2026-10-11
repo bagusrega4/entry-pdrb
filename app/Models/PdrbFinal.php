@@ -18,6 +18,7 @@ class PdrbFinal extends Model
         'pertumbuhan',
         'versi',
         'status',
+        'komentar',
         'finalized_by',
     ];
 
