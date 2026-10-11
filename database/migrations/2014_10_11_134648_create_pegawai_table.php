@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('pegawai', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 150);
-            $table->string('nip_lama', 50)->nullable();
-            $table->string('nip_baru', 50)->nullable();
+            $table->string('nip_lama', 50)->nullable()->unique();
+            $table->string('nip_baru', 50)->nullable()->unique();
             $table->string('jabatan', 255)->nullable();
             $table->string('golongan_akhir', 10)->nullable();
             $table->date('tamat_gol')->nullable();
