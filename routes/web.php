@@ -33,7 +33,7 @@ Route::get('/check-auth', function () {
 })->name('check-auth');
 
 Route::get('/notfound', function () {
-    return view('error.unauthorized');
+    return view('errors.403');
 })->name('error.unauthorized');
 
 Route::middleware(['auth', 'verified'])->group(function () {
